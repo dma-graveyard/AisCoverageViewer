@@ -51,9 +51,6 @@ import org.apache.log4j.xml.DOMConfigurator;
 import com.bbn.openmap.MapHandler;
 import com.bbn.openmap.PropertyConsumer;
 
-import dk.frv.ais.proprietary.GatehouseFactory;
-import dk.frv.ais.reader.RoundRobinAisTcpReader;
-import dk.frv.enav.acv.ais.AisHandler;
 import dk.frv.enav.acv.gui.MainFrame;
 import dk.frv.enav.acv.settings.Settings;
 import dk.frv.enav.acv.util.OneInstanceGuard;
@@ -75,7 +72,6 @@ public class ACV {
 	private static Settings settings;
 	private static Properties properties = new Properties();
 
-	private static AisHandler aisHandler;
 	private static ExceptionHandler exceptionHandler = new ExceptionHandler();
 	
 	public static void main(String[] args) {
@@ -116,23 +112,7 @@ public class ACV {
         	JOptionPane.showMessageDialog(null, "One application instance already running. Stop instance or restart computer.", "Error", JOptionPane.ERROR_MESSAGE);
         	System.exit(1);
         }
-        
-        // Start AIS target monitoring
-        aisHandler = new AisHandler();
-//        aisHandler.loadView();
-        mapHandler.add(aisHandler);
-        
-        RoundRobinAisTcpReader reader = new RoundRobinAisTcpReader();
-        reader.setCommaseparatedHostPort("10.3.246.100:4001");
-        
-//        reader.setTimeout(getInt("ais_source_timeout." + name, "10"));
-//        reader.setReconnectInterval(getInt("ais_source_reconnect_interval." + name, "5") * 1000);
 
-        // Register proprietary handlers
-        reader.addProprietaryFactory(new GatehouseFactory());
- 
-        reader.registerHandler(aisHandler);
-        
         // Create plugin components
         createPluginComponents();
         
@@ -317,10 +297,6 @@ public class ACV {
 	
 	public static MainFrame getMainFrame() {
 		return mainFrame;
-	}
-	
-	public static AisHandler getAisHandler() {
-		return aisHandler;
 	}
 	
 	public static MapHandler getMapHandler() {
