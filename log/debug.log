@@ -1,0 +1,48 @@
+2012-02-10 10:24:16,240 INFO  [dk.frv.enav.ins.EeINS] Starting ee-INS version null
+2012-02-10 10:24:16,241 INFO  [dk.frv.enav.ins.EeINS] Copyright (C) 2011 Danish Maritime Safety Administration
+2012-02-10 10:24:16,241 INFO  [dk.frv.enav.ins.EeINS] This program comes with ABSOLUTELY NO WARRANTY.
+2012-02-10 10:24:16,241 INFO  [dk.frv.enav.ins.EeINS] This is free software, and you are welcome to redistribute it under certain conditions.
+2012-02-10 10:24:16,241 INFO  [dk.frv.enav.ins.EeINS] For details see LICENSE file.
+2012-02-10 10:24:16,242 ERROR [dk.frv.enav.ins.ExceptionHandler] Uncaught exception from thread main
+2012-02-10 10:24:16,242 ERROR [dk.frv.enav.ins.ExceptionHandler] 
+2012-02-10 10:24:16,254 ERROR [dk.frv.enav.ins.ExceptionHandler] java.lang.NullPointerException
+	at dk.frv.enav.ins.EeINS.main(EeINS.java:120)
+
+2012-02-10 10:25:20,739 INFO  [dk.frv.enav.ins.EeINS] Starting ee-INS version null
+2012-02-10 10:25:20,742 INFO  [dk.frv.enav.ins.EeINS] Copyright (C) 2011 Danish Maritime Safety Administration
+2012-02-10 10:25:20,743 INFO  [dk.frv.enav.ins.EeINS] This program comes with ABSOLUTELY NO WARRANTY.
+2012-02-10 10:25:20,743 INFO  [dk.frv.enav.ins.EeINS] This is free software, and you are welcome to redistribute it under certain conditions.
+2012-02-10 10:25:20,743 INFO  [dk.frv.enav.ins.EeINS] For details see LICENSE file.
+2012-02-10 10:25:20,744 ERROR [dk.frv.enav.ins.EeINS] Failed to load resources: Properties file not found
+2012-02-10 10:25:20,832 INFO  [dk.frv.enav.ins.EeINS] Using settings file: settings.properties
+2012-02-10 10:25:20,842 INFO  [dk.frv.enav.ins.settings.Settings] No settings file found
+2012-02-10 10:25:20,919 INFO  [dk.frv.enav.ins.ais.AisHandler] Found AIS sensor
+2012-02-10 10:25:21,264 ERROR [dk.frv.enav.ins.gui.MainFrame] Could not find app icon
+2012-02-10 10:25:21,339 ERROR [dk.frv.enav.ins.ExceptionHandler] Uncaught exception from thread AWT-EventQueue-0
+2012-02-10 10:25:21,339 ERROR [dk.frv.enav.ins.ExceptionHandler] 
+2012-02-10 10:25:21,340 ERROR [dk.frv.enav.ins.ExceptionHandler] java.lang.NullPointerException
+	at javax.swing.ImageIcon.<init>(Unknown Source)
+	at dk.frv.enav.ins.gui.TopPanel.<init>(TopPanel.java:142)
+	at dk.frv.enav.ins.gui.MainFrame.initGUI(MainFrame.java:102)
+	at dk.frv.enav.ins.gui.MainFrame.<init>(MainFrame.java:80)
+	at dk.frv.enav.ins.EeINS.createAndShowGUI(EeINS.java:294)
+	at dk.frv.enav.ins.EeINS.access$0(EeINS.java:286)
+	at dk.frv.enav.ins.EeINS$1.run(EeINS.java:191)
+	at java.awt.event.InvocationEvent.dispatch(Unknown Source)
+	at java.awt.EventQueue.dispatchEventImpl(Unknown Source)
+	at java.awt.EventQueue.access$000(Unknown Source)
+	at java.awt.EventQueue$1.run(Unknown Source)
+	at java.awt.EventQueue$1.run(Unknown Source)
+	at java.security.AccessController.doPrivileged(Native Method)
+	at java.security.AccessControlContext$1.doIntersectionPrivilege(Unknown Source)
+	at java.awt.EventQueue.dispatchEvent(Unknown Source)
+	at java.awt.EventDispatchThread.pumpOneEventForFilters(Unknown Source)
+	at java.awt.EventDispatchThread.pumpEventsForFilter(Unknown Source)
+	at java.awt.EventDispatchThread.pumpEventsForHierarchy(Unknown Source)
+	at java.awt.EventDispatchThread.pumpEvents(Unknown Source)
+	at java.awt.EventDispatchThread.pumpEvents(Unknown Source)
+	at java.awt.EventDispatchThread.run(Unknown Source)
+
+2012-02-10 10:25:21,961 ERROR [dk.frv.enav.ins.nmea.NmeaTcpSensor] Could not connect to NMEA source: localhost: Connection refused: connect
+2012-02-10 10:25:21,961 ERROR [dk.frv.enav.ins.nmea.NmeaTcpSensor] TCP NMEA sensor failed: Connection refused: connect retry in 5 seconds
+2012-02-10 10:25:22,917 DEBUG [dk.frv.enav.ins.ais.AisHandler] Published all targets

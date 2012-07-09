@@ -1,0 +1,5 @@
+2012-02-10 Version 0.1 Alpha
+  
+	* Added the OpenMap map
+	* Added mouse listener so navigation is possible
+	* Created basis framework
