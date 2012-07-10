@@ -1,9 +1,9 @@
-# e-Navigation Shore Display ESD #
+# AIS Coverage Viewer #
 
 ## Introduction ##
    
-ESD (e-Navigation Shore Display) is an VST
-application for demonstrating possible e-Navigation services.
+The AIS Coverage Viewer is a stand-alone application used for analyizing
+AIS data and determining the strength of the signal in a given area   
    
 The application is in Java and uses OpenMap(tm) for presenting geospatial
 information, and as a JavaBeans(tm) component framework.
