@@ -56,6 +56,7 @@ import com.bbn.openmap.proj.coords.LatLonPoint;
 
 import dk.frv.ais.geo.GeoLocation;
 import dk.frv.enav.acv.ACV;
+import dk.frv.enav.acv.coverage.layers.CoverageLayer;
 import dk.frv.enav.acv.event.NavigationMouseMode;
 import dk.frv.enav.acv.settings.MapSettings;
 
@@ -72,6 +73,7 @@ public class ChartPanel extends OMComponentPanel implements MouseWheelListener {
 	private BufferedLayerMapBean map;
 	private Layer encLayer;
 	private Layer bgLayer;
+	private CoverageLayer coverageLayer;
 	private NavigationMouseMode mapNavMouseMode;
 	private MouseDelegator mouseDelegator;
 	public int maxScale = 5000;
@@ -139,6 +141,8 @@ public class ChartPanel extends OMComponentPanel implements MouseWheelListener {
 			mapHandler.add(encLayer);
 		}
 
+
+		
 		// Add map to map handler
 		mapHandler.add(map);
 
@@ -151,6 +155,13 @@ public class ChartPanel extends OMComponentPanel implements MouseWheelListener {
 		add(map);
 	
 		getMap().addMouseWheelListener(this);
+		
+		// Add coverage layer
+		coverageLayer = new CoverageLayer();
+		coverageLayer.setVisible(true);
+		mapHandler.add(coverageLayer);
+
+		
 	}
 
 	public void saveSettings() {
