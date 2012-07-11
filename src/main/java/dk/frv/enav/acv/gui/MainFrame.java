@@ -32,6 +32,7 @@ package dk.frv.enav.acv.gui;
 
 import java.awt.BorderLayout;
 import java.awt.Container;
+import java.awt.Dimension;
 import java.awt.Image;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
@@ -44,6 +45,7 @@ import org.apache.log4j.Logger;
 
 import com.bbn.openmap.MapHandler;
 
+import dk.dma.aiscoverage.GlobalSettings;
 import dk.frv.enav.acv.ACV;
 import dk.frv.enav.acv.settings.GuiSettings;
 
@@ -60,6 +62,7 @@ public class MainFrame extends JFrame implements WindowListener {
 	protected static final int SENSOR_PANEL_WIDTH = 190;
 	
 	private ChartPanel chartPanel;
+	private LeftPanel leftPanel;
 
 	private JPanel glassPanel;
 	
@@ -87,10 +90,14 @@ public class MainFrame extends JFrame implements WindowListener {
 		
 		// Create panels
 		Container pane = getContentPane();
-
 		chartPanel = new ChartPanel();
+		leftPanel = new LeftPanel();
 
-		pane.add(chartPanel, BorderLayout.CENTER);
+		// Add panels
+		pane.add(chartPanel);
+		
+		leftPanel.setPreferredSize(new Dimension(0, 30));
+		pane.add(leftPanel, BorderLayout.PAGE_START);
 
 		// Set up the chart panel with layers etc
 		chartPanel.initChart();
@@ -101,6 +108,7 @@ public class MainFrame extends JFrame implements WindowListener {
 		
 		// Add self to map map handler
 		mapHandler.add(this);
+		mapHandler.add(leftPanel);
 
 	}
 	
@@ -165,21 +173,5 @@ public class MainFrame extends JFrame implements WindowListener {
 	@Override
 	public void windowOpened(WindowEvent we) {
 	}
-
-//	public ChartPanel getChartPanel() {
-//		return chartPanel;
-//	}
-	
-//	public SensorPanel getSensorPanel() {
-//		return sensorPanel;
-//	}
-	
-	public JPanel getGlassPanel() {
-		return glassPanel;
-	}
-	
-//	public TopPanel getTopPanel() {
-//		return topPanel;
-//	}
 	
 }

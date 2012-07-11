@@ -26,7 +26,7 @@ public class GridPolygon extends OMGraphicList {
 		hatchFill = new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB);
 		Graphics2D big = hatchFill.createGraphics();
 		Composite originalComposite = big.getComposite();
-		big.setComposite(makeComposite(0.2f));
+		big.setComposite(makeComposite(0.5f));
 		big.setColor(color);
 		big.drawLine(0, 0, 10, 10);
 
