@@ -1,48 +1,87 @@
-package dk.dma.aiscoverage;
+package dk.dma.aiscoverage.project;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.PrintWriter;
+import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.xml.DOMConfigurator;
 
+import dk.dma.aiscoverage.GlobalSettings;
+import dk.dma.aiscoverage.MessageHandler;
 import dk.dma.aiscoverage.calculator.AbstractCoverageCalculator;
-import dk.dma.aiscoverage.calculator.CellChangedListener;
 import dk.dma.aiscoverage.calculator.CoverageCalculatorAdvanced3;
+import dk.dma.aiscoverage.data.BaseStationHandler;
+import dk.dma.aiscoverage.data.Cell;
 import dk.frv.ais.proprietary.DmaFactory;
 import dk.frv.ais.proprietary.GatehouseFactory;
 import dk.frv.ais.reader.AisReader;
 import dk.frv.ais.reader.AisStreamReader;
 import dk.frv.ais.reader.RoundRobinAisTcpReader;
 
-public class AisCoverageAnalyser {
-	
-	private static Logger LOG;
+public class AisCoverageProject implements Serializable {
+	transient private static Logger LOG;
 	private String filename;
 	private String hostPort;
 	private int timeout = -1;
-	private AbstractCoverageCalculator calc = new CoverageCalculatorAdvanced3(true);
-	private AisReader aisReader = null;
-	private List<AisCoverageListener> listeners = new ArrayList<AisCoverageListener>();
-	private MessageHandler messageHandler = null;
-	private boolean analysisStarted = false;
+	transient private AbstractCoverageCalculator calc = new CoverageCalculatorAdvanced3(true);
+	transient private AisReader aisReader = null;
+	transient private List<AisCoverageListener> listeners = new ArrayList<AisCoverageListener>();
+	transient private MessageHandler messageHandler = null;
+	private BaseStationHandler gridHandler = new BaseStationHandler();
+	private Date starttime;
+	private Date endtime;
+	private boolean isRunning = false;
+	private boolean isDone = false;
+	private long messageCount = 0;
+	private double latSize = -1;
+	private double longSize = -1;
+	private int cellSize = 2500;
 	
 	
-	public boolean isAnalysisStarted() {
-		return analysisStarted;
+	public double getLatSize() {
+		return latSize;
 	}
-	public void setAnalysisStarted(boolean analysisStarted) {
-		this.analysisStarted = analysisStarted;
+	public void setLatSize(double latSize) {
+		this.latSize = latSize;
+		gridHandler.setLatSize(latSize);
 	}
-	public AbstractCoverageCalculator getCalc() {
+	public double getLongSize() {
+		return longSize;
+	}
+	public void setLongSize(double longSize) {
+		this.longSize = longSize;
+		gridHandler.setLonSize(longSize);
+	}
+	public int getCellSize() {
+		return cellSize;
+	}
+	public void setCellSize(int cellSize) {
+		this.cellSize = cellSize;
+	}
+	public boolean isRunning() {
+		return isRunning;
+	}
+	public AbstractCoverageCalculator getCalculator() {
 		return calc;
 	}
-	public void setCalc(AbstractCoverageCalculator calc) {
+	public void setCalculator(AbstractCoverageCalculator calc) {
 		this.calc = calc;
 	}
-	public AisCoverageAnalyser(){
+	public AisCoverageProject(){
 		
 	}
 	public void setFile(String filepath){
@@ -53,7 +92,7 @@ public class AisCoverageAnalyser {
 	}
 	public void startAnalysis() throws FileNotFoundException, InterruptedException{
 		DOMConfigurator.configure("log4j.xml");
-		LOG = Logger.getLogger(AisCoverage.class);
+		LOG = Logger.getLogger(AisCoverageProject.class);
 		LOG.info("Starting AisCoverage");
 		
 		if (filename == null && hostPort == null) {
@@ -77,7 +116,7 @@ public class AisCoverageAnalyser {
 		aisReader.addProprietaryFactory(new GatehouseFactory());
 
 		// Make handler instance
-		messageHandler = new MessageHandler(timeout, aisReader, calc);
+		messageHandler = new MessageHandler(this);
 
 		// Register handler and start reader
 		aisReader.registerHandler(messageHandler);
@@ -102,22 +141,67 @@ public class AisCoverageAnalyser {
 		aisReader.stop();
 	}
 	private void started(){
-		this.analysisStarted = true;
+		starttime = new Date();
+		this.isRunning = true;
 		for (AisCoverageListener listener : listeners) {
 			listener.analysisStarted();
 		}
 	}
 	private void stopped(){
-		this.analysisStarted = false;
+		endtime = new Date();
+		this.isRunning = false;
+		this.isDone = true;
 		for (AisCoverageListener listener : listeners) {
 			listener.analysisStopped();
 		}
 	}
 	
+	public boolean isDone() {
+		return isDone;
+	}
+	
+	public int getTimeout() {
+		return timeout;
+	}
+	public void setTimeout(int timeout) {
+		this.timeout = timeout;
+	}
 	public void addListener(AisCoverageListener listener){
 		listeners.add(listener);
 	}
 	public Long getMessageCount(){
-		return messageHandler.getCount();
+		return messageCount;
 	}
+	public BaseStationHandler getBaseStationHandler(){
+		return gridHandler;
+	}
+	public Long[] getBaseStationNames(){
+		Set<Long> set = gridHandler.grids.keySet();
+		Long[] bssmsis = new Long[set.size()];
+		int i = 0;
+		for (Long long1 : set) {
+			bssmsis[i] = long1;
+			i++;
+		}
+		return bssmsis;
+	}
+	public Long getRunningTime(){
+		
+		if(starttime == null) return -1L;
+		if(isRunning) 
+			return (new Date().getTime() - starttime.getTime()) /1000;
+		else
+			return (endtime.getTime() - starttime.getTime()) /1000;
+	}
+	/*
+	 * Returns a combined coverage of cells from selected base stations.
+	 * If two base stations cover same area, the best coverage is chosen.
+	 */
+	public Collection<Cell> getCoverage(List<Long> baseStations){
+		return gridHandler.getCoverage(baseStations);
+	}
+	public void incrementMessageCount(){
+		this.messageCount++;
+	}
+
 }

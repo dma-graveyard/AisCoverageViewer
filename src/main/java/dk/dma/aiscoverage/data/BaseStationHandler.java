@@ -15,32 +15,76 @@
  */
 package dk.dma.aiscoverage.data;
 
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 
-public class GridHandler {
+public class BaseStationHandler implements Serializable {
 
-	public ConcurrentHashMap<Long, Grid> grids = new ConcurrentHashMap<Long, Grid>();
+	public ConcurrentHashMap<Long, BaseStation> grids = new ConcurrentHashMap<Long, BaseStation>();
+	private double latSize;
+	public double getLatSize() {
+		return latSize;
+	}
+
+	public void setLatSize(double latSize) {
+		this.latSize = latSize;
+	}
+
+	public double getLonSize() {
+		return lonSize;
+	}
+
+	public void setLonSize(double lonSize) {
+		this.lonSize = lonSize;
+	}
+
+	private double lonSize;
 	
-	public GridHandler(){
+	public BaseStationHandler() {
 	}
 	
 	/*
 	 * Create grid associated to a specific transponder
 	 */
 	public void createGrid(Long bsMmsi){
-		Grid grid = new Grid(bsMmsi);
+		BaseStation grid = new BaseStation(bsMmsi, latSize, lonSize);
 		grids.put(bsMmsi, grid);
 	}
 	
-	public Grid getGrid(Long bsMmsi){
+	public BaseStation getGrid(Long bsMmsi){
 		return grids.get(bsMmsi);
 	}
+
+	/*
+	 * Consider optimizing?
+	 *
+	 * Returns a combined coverage of cells from selected base stations.
+	 * If two base stations cover same area, the best coverage is chosen.
+	 */
+	public Collection<Cell> getCoverage(List<Long> baseStations) {
+		HashMap<String, Cell> cells = new HashMap<String, Cell>();
+		
+		//For each base station
+		for (Long bsmmsi : baseStations) {
+			BaseStation bs = grids.get(bsmmsi);
+			
+			//For each cell
+			Collection<Cell> bscells = bs.grid.values();
+			for (Cell cell : bscells) {
+				Cell existing = cells.get(cell.id);
+				if(existing == null)
+					cells.put(cell.id, cell);
+				else
+					if(cell.getCoverage() > existing.getCoverage())
+						cells.put(cell.id, cell);
+			}
+			
+		}
+		return cells.values();
+	}
 	
-//	public Collection<Grid> getCopy(){
-//		HashMap<Long, Grid> g = (HashMap<Long, Grid>) grids.clone();
-//		return g.values();
-//	}
 }

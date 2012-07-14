@@ -1,4 +1,4 @@
-package dk.dma.aiscoverage;
+package dk.dma.aiscoverage.project;
 
 import dk.dma.aiscoverage.data.Cell;
 

@@ -15,21 +15,26 @@
  */
 package dk.dma.aiscoverage.data;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
 
 import dk.dma.aiscoverage.GlobalSettings;
 
 
-public class Grid {
+public class BaseStation implements Serializable {
 	
 	public ConcurrentHashMap<String, Cell> grid = new ConcurrentHashMap<String, Cell>();
 	public ConcurrentHashMap<Long, Ship> ships = new ConcurrentHashMap<Long, Ship>();
 	public Long bsMmsi;
+	private double latSize;
+	private double lonSize;
 
 	
-	public Grid(Long bsMmsi) {
+	public BaseStation(long bsMmsi, double latSize, double lonSize) {
 		this.bsMmsi = bsMmsi;
+		this.latSize = latSize;
+		this.lonSize = lonSize;
 	}
 	
 
@@ -47,9 +52,7 @@ public class Grid {
 	 * The id is lat-lon-coords representing top-left point in cell
 	 */
 	public String getCellId(double latitude, double longitude){
-		double latSize = GlobalSettings.getInstance().getLatSize();
-		double lonSize = GlobalSettings.getInstance().getLonSize();
-		
+
 		double lat;
 		double lon;
 		if(latitude < 0){
@@ -73,9 +76,6 @@ public class Grid {
 	}
 	
 	public Cell createCell(double latitude, double longitude){
-		double latSize = GlobalSettings.getInstance().getLatSize();
-		double lonSize = GlobalSettings.getInstance().getLonSize();
-		
 		String id = getCellId(latitude, longitude);
 		double lat = (double)((int)(10000*(latitude - (latitude % latSize))))/10000;
 		double lon = (double)((int)(10000*(longitude - (longitude % lonSize))))/10000;

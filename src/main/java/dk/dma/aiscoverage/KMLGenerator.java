@@ -21,11 +21,11 @@ import java.io.IOException;
 import java.util.Collection;
 
 import dk.dma.aiscoverage.data.Cell;
-import dk.dma.aiscoverage.data.Grid;
+import dk.dma.aiscoverage.data.BaseStation;
 
 public class KMLGenerator {
 
-	public static void generateKML(Collection<Grid> grids, String path) {
+	public static void generateKML(Collection<BaseStation> grids, String path) {
 		FileWriter fstream = null;
 		BufferedWriter out = null;
 
@@ -86,7 +86,7 @@ public class KMLGenerator {
 			writeLine("</PolyStyle>", out);
 			writeLine("</Style>", out);
 
-			for (Grid grid : grids) {
+			for (BaseStation grid : grids) {
 				generateGrid(grid.bsMmsi, grid.grid.values(), out);
 			}
 
@@ -147,10 +147,10 @@ public class KMLGenerator {
 			writeLine("<LinearRing>", out);
 			writeLine("<coordinates>", out);
 
-			writeLine(		cell.longitude + "," + cell.latitude + "," + z+ " " + 
-							(cell.longitude + settings.getLonSize()) + "," + cell.latitude + ","  + z + " " + 
-							(cell.longitude + settings.getLonSize()) + "," + (cell.latitude + settings.getLatSize()) + "," + z + " " + 
-							cell.longitude + "," + (cell.latitude + settings.getLatSize()) + "," + z, out);
+//			writeLine(		cell.longitude + "," + cell.latitude + "," + z+ " " + 
+//							(cell.longitude + settings.getLonSize()) + "," + cell.latitude + ","  + z + " " + 
+//							(cell.longitude + settings.getLonSize()) + "," + (cell.latitude + settings.getLatSize()) + "," + z + " " + 
+//							cell.longitude + "," + (cell.latitude + settings.getLatSize()) + "," + z, out);
 
 
 			writeLine("</coordinates>", out);

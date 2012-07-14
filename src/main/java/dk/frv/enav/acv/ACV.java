@@ -51,6 +51,7 @@ import org.apache.log4j.xml.DOMConfigurator;
 import com.bbn.openmap.MapHandler;
 import com.bbn.openmap.PropertyConsumer;
 
+import dk.dma.aiscoverage.project.ProjectHandler;
 import dk.frv.enav.acv.gui.MainFrame;
 import dk.frv.enav.acv.settings.Settings;
 import dk.frv.enav.acv.util.OneInstanceGuard;
@@ -75,6 +76,7 @@ public class ACV {
 	private static ExceptionHandler exceptionHandler = new ExceptionHandler();
 	
 	public static void main(String[] args) {
+		
 		// Set up log4j logging
 		DOMConfigurator.configure("log4j.xml");
         LOG = Logger.getLogger(ACV.class);

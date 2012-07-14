@@ -110,7 +110,6 @@ public class ChartPanel extends OMComponentPanel implements MouseWheelListener {
 		 
 		 //Mouse mode
 		mapNavMouseMode = new NavigationMouseMode(this);
-		 
 
 		mouseDelegator.addMouseMode(mapNavMouseMode);
 		mouseDelegator.setActive(mapNavMouseMode);

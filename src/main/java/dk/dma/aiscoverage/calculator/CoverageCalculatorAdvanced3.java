@@ -2,8 +2,8 @@ package dk.dma.aiscoverage.calculator;
 
 import java.util.LinkedList;
 
-import dk.dma.aiscoverage.CustomMessage;
 import dk.dma.aiscoverage.data.Cell;
+import dk.dma.aiscoverage.data.CustomMessage;
 import dk.dma.aiscoverage.geotools.SphereProjection;
 
 public class CoverageCalculatorAdvanced3 extends AbstractCoverageCalculator {
@@ -28,41 +28,50 @@ public class CoverageCalculatorAdvanced3 extends AbstractCoverageCalculator {
 	 * 
 	 */
 	@Override
-	public void calculateCoverage(CustomMessage m2) {
+	public void calculateCoverage(CustomMessage message) {
 		
 		//put message in ships' buffer
-		m2.ship.messageTransmitted(m2);
+		message.ship.addToBuffer(message);
+		
+		
+		
+		// If this message is filtered, we empty the ships' buffer and returns
+		if( filterMessage(message) ){
+			message.ship.emptyBuffer();
+			return;
+		}
+		
+		
 		
 		//Time difference between first and last message in buffer
-		CustomMessage firstMessage = m2.ship.getMessages().peekFirst();
-		CustomMessage lastMessage = m2.ship.getMessages().peekLast();
+		CustomMessage firstMessage = message.ship.getMessages().peekFirst();
+		CustomMessage lastMessage = message.ship.getMessages().peekLast();
 		double timeDifference = this.getTimeDifference(firstMessage, lastMessage);
 		
 		//
 		if(timeDifference >= bufferInSeconds){
 			
 			if(timeDifference < 1800){
-				LinkedList<CustomMessage> buffer = m2.ship.getMessages();
-				double rotation = Math.abs( angleDiff((double)firstMessage.message.getCog()/10, (double)lastMessage.message.getCog()/10) );
+				LinkedList<CustomMessage> buffer = message.ship.getMessages();
+				double rotation = Math.abs( angleDiff((double)firstMessage.cog, (double)lastMessage.cog) );
 				
+				//Ship is rotating
 				if(rotation > ((double)degreesPerMinute/60)*timeDifference){
-					if(ignoreRotation == false){
-						//Maybe this shouln't be calculated
-						for (int i = 0; i < m2.ship.getMessages().size()-1; i++) {
+					if(!ignoreRotation){
+						for (int i = 0; i < message.ship.getMessages().size()-1; i++) {
 							calculateMissingPoints(buffer.get(i), buffer.get(i+1), true);
 						}
 					}
 				}
 				else{
-					for (int i = 0; i < m2.ship.getMessages().size()-1; i++) {
+					for (int i = 0; i < message.ship.getMessages().size()-1; i++) {
 						calculateMissingPoints(buffer.get(i), buffer.get(i+1), false);
 					}
 				}
 			}
 			
 			//empty buffer
-			m2.ship.getMessages().clear();
-			m2.ship.messageTransmitted(m2); //We still want the last message in buffer
+			message.ship.emptyBuffer();
 		}
 		
 	}
@@ -71,22 +80,24 @@ public class CoverageCalculatorAdvanced3 extends AbstractCoverageCalculator {
 	 * Calculates missing points between two messages and add them to corresponding cells
 	 */
 	private void calculateMissingPoints(CustomMessage m1, CustomMessage m2, boolean rotating){
+		
+		//WHERE TO PUT THIS??
 		m1.cell.NOofReceivedSignals++;
 		this.cellChanged(m1.cell);
 		
 		Long p1Time = m1.timestamp.getTime();
 		Long p2Time = m2.timestamp.getTime();
-		double p1Lat = m1.message.getPos().getGeoLocation().getLatitude();
-		double p1Lon = m1.message.getPos().getGeoLocation().getLongitude();
-		double p2Lat = m2.message.getPos().getGeoLocation().getLatitude();
-		double p2Lon = m2.message.getPos().getGeoLocation().getLongitude();
+		double p1Lat = m1.latitude;
+		double p1Lon = m1.longitude;
+		double p2Lat = m2.latitude;
+		double p2Lon = m2.longitude;
 		double p1X = projection.lon2x(p1Lon, p1Lat);
 		double p1Y = projection.lat2y(p1Lon, p1Lat);
 		double p2X = projection.lon2x(p2Lon, p2Lat);
 		double p2Y = projection.lat2y(p2Lon, p2Lat);
 		
 		double timeSinceLastMessage = getTimeDifference(p1Time, p2Time);
-		int sog = m2.message.getSog()/10;
+		int sog = (int) m2.sog;
 		double expectedTransmittingFrequency = getExpectedTransmittingFrequency(sog, rotating);
 		
 		// Calculate missing messages

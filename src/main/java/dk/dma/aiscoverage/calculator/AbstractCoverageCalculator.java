@@ -3,8 +3,8 @@ package dk.dma.aiscoverage.calculator;
 import java.util.ArrayList;
 import java.util.List;
 
-import dk.dma.aiscoverage.CustomMessage;
 import dk.dma.aiscoverage.data.Cell;
+import dk.dma.aiscoverage.data.CustomMessage;
 
 public abstract class AbstractCoverageCalculator {
 
@@ -45,9 +45,9 @@ public abstract class AbstractCoverageCalculator {
 	
 	public boolean filterMessage(CustomMessage customMessage){
 		boolean filterMessage = false;
-		if(customMessage.message.getSog()/10 < 3 || customMessage.message.getSog()/10 > 50)
+		if(customMessage.sog < 3 || customMessage.sog > 50)
 			filterMessage = true;
-		if(customMessage.message.getCog() == 360)
+		if(customMessage.cog == 360)
 			filterMessage = true;
 		
 		//if this is the first message for a ship, we don't calculate coverage

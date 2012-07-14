@@ -1,7 +1,7 @@
 package dk.dma.aiscoverage.calculator;
 
-import dk.dma.aiscoverage.CustomMessage;
 import dk.dma.aiscoverage.data.Cell;
+import dk.dma.aiscoverage.data.CustomMessage;
 
 public class CoverageCalculatorAdvanced1 extends AbstractCoverageCalculator {
 
@@ -15,14 +15,14 @@ public class CoverageCalculatorAdvanced1 extends AbstractCoverageCalculator {
 		CustomMessage m1 = m2.ship.getLastMessage();
 		Long p1Time = m1.timestamp.getTime();
 		Long p2Time = m2.timestamp.getTime();
-		double p1Lat = m1.message.getPos().getGeoLocation().getLatitude();
-		double p1Lon = m1.message.getPos().getGeoLocation().getLongitude();
-		double p2Lat = m2.message.getPos().getGeoLocation().getLatitude();
-		double p2Lon = m2.message.getPos().getGeoLocation().getLongitude();
+		double p1Lat = m1.latitude;
+		double p1Lon = m1.longitude;
+		double p2Lat = m2.latitude;
+		double p2Lon = m2.longitude;
 
 		double timeSinceLastMessage = getTimeDifference(p1Time, p2Time);
-		int sog = m2.message.getSog()/10;
-		double expectedTransmittingFrequency = getExpectedTransmittingFrequency(sog, false);
+		double sog = m2.sog;
+		double expectedTransmittingFrequency = getExpectedTransmittingFrequency((int) sog, false);
 
 		// Calculate missing messages
 		// A Parametric equation is used to find missing points' lat-lon coordinates between point1 and point2.

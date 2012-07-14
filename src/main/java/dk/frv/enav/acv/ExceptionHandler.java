@@ -51,14 +51,16 @@ public class ExceptionHandler implements UncaughtExceptionHandler {
 	
 	@Override
 	public void uncaughtException(Thread t, Throwable e) {
-//		LOG.error("Uncaught exception from thread " + t.getName());
-//		LOG.error(e.getMessage());
-//		Writer result = new StringWriter();
-//		PrintWriter printWriter = new PrintWriter(result);
-//		e.printStackTrace(printWriter);
-//		LOG.error(result.toString());
-//		e.printStackTrace();
-//		JOptionPane.showMessageDialog(null, "An error has occured! Please contact administrator.", "Application error", JOptionPane.ERROR_MESSAGE);
+		if(e.getClass() == java.lang.ThreadDeath.class) return;
+		
+		LOG.error("Uncaught exception from thread " + t.getName());
+		LOG.error(e.getMessage());
+		Writer result = new StringWriter();
+		PrintWriter printWriter = new PrintWriter(result);
+		e.printStackTrace(printWriter);
+		LOG.error(result.toString());
+		e.printStackTrace();
+		JOptionPane.showMessageDialog(null, "An error has occured! Please contact administrator.", "Application error", JOptionPane.ERROR_MESSAGE);
 //		System.exit(1);
 	}
 

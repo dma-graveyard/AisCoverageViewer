@@ -30,22 +30,30 @@
 package dk.frv.enav.acv.gui;
 
 
+import java.awt.AWTEvent;
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Image;
+import java.awt.Toolkit;
+import java.awt.event.AWTEventListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.awt.event.MouseMotionListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.border.EmptyBorder;
 
 import org.apache.log4j.Logger;
 
 import com.bbn.openmap.MapHandler;
 
 import dk.dma.aiscoverage.GlobalSettings;
+import dk.dma.aiscoverage.project.ProjectHandler;
 import dk.frv.enav.acv.ACV;
 import dk.frv.enav.acv.settings.GuiSettings;
 
@@ -53,6 +61,7 @@ import dk.frv.enav.acv.settings.GuiSettings;
  * The main frame containing map and panels 
  */
 public class MainFrame extends JFrame implements WindowListener {
+	
 	
 	private static final String TITLE = "AIS Coverage Viewer";
 	
@@ -62,7 +71,7 @@ public class MainFrame extends JFrame implements WindowListener {
 	protected static final int SENSOR_PANEL_WIDTH = 190;
 	
 	private ChartPanel chartPanel;
-	private LeftPanel leftPanel;
+	private AnalysisPanel leftPanel;
 
 	private JPanel glassPanel;
 	
@@ -91,17 +100,18 @@ public class MainFrame extends JFrame implements WindowListener {
 		// Create panels
 		Container pane = getContentPane();
 		chartPanel = new ChartPanel();
-		leftPanel = new LeftPanel();
+		leftPanel = new AnalysisPanel();
+		leftPanel.setBorder(new EmptyBorder(5,5,5,5));
 
 		// Add panels
 		pane.add(chartPanel);
 		
-		leftPanel.setPreferredSize(new Dimension(0, 30));
-		pane.add(leftPanel, BorderLayout.PAGE_START);
+		leftPanel.setPreferredSize(new Dimension(240, 0));
+		pane.add(leftPanel, BorderLayout.LINE_END);
 
 		// Set up the chart panel with layers etc
 		chartPanel.initChart();
-
+		
 		
 		// Init glass pane
 		initGlassPane();
@@ -109,6 +119,7 @@ public class MainFrame extends JFrame implements WindowListener {
 		// Add self to map map handler
 		mapHandler.add(this);
 		mapHandler.add(leftPanel);
+		mapHandler.add(ProjectHandler.getInstance());
 
 	}
 	

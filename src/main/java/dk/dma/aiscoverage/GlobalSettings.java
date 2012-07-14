@@ -18,17 +18,9 @@ package dk.dma.aiscoverage;
 public class GlobalSettings {
 	
 	//global settings
-	private double lonSize = -1;
-	private double latSize = -1;
-	private double cellInMeters = 2500;
-	
-	public double getCellInMeters() {
-		return cellInMeters;
-	}
 
-	public void setCellInMeters(double cellInMeters) {
-		this.cellInMeters = cellInMeters;
-	}
+
+
 
 	//Getters and setters
 	public int getMessagesPerShipThreshold() {
@@ -41,22 +33,6 @@ public class GlobalSettings {
 
 	private int messagesPerShipThreshold;
 
-	
-	public double getLonSize() {
-		return lonSize;
-	}
-
-	public void setLonSize(double lonSize) {
-		this.lonSize = lonSize;
-	}
-
-	public double getLatSize() {
-		return latSize;
-	}
-
-	public void setLatSize(double latSize) {
-		this.latSize = latSize;
-	}
 	
 	//Singleton stuff
 	private static GlobalSettings singletonObject;

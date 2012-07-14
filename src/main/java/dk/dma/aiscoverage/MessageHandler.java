@@ -20,10 +20,12 @@ import org.apache.log4j.Logger;
 
 import dk.dma.aiscoverage.calculator.AbstractCoverageCalculator;
 import dk.dma.aiscoverage.data.Cell;
-import dk.dma.aiscoverage.data.Grid;
-import dk.dma.aiscoverage.data.GridHandler;
+import dk.dma.aiscoverage.data.BaseStation;
+import dk.dma.aiscoverage.data.BaseStationHandler;
+import dk.dma.aiscoverage.data.CustomMessage;
 import dk.dma.aiscoverage.data.Ship;
 import dk.dma.aiscoverage.geotools.GeoConverter;
+import dk.dma.aiscoverage.project.AisCoverageProject;
 import dk.frv.ais.country.Country;
 import dk.frv.ais.geo.GeoLocation;
 import dk.frv.ais.handler.IAisHandler;
@@ -38,12 +40,7 @@ import dk.frv.ais.reader.AisReader;
 public class MessageHandler implements IAisHandler {
 	
 	private static Logger LOG = Logger.getLogger(MessageHandler.class);
-	private long count = 0;
-	private int timeout = -1;
-	public GridHandler gridHandler = new GridHandler();
-	private Date starttime = new Date();
-	private AisReader aisReader = null;
-	private AbstractCoverageCalculator calculator = null;
+	private AisCoverageProject project = null;
 	
 	/*
 	 * Timeout is in seconds. 
@@ -51,10 +48,8 @@ public class MessageHandler implements IAisHandler {
 	 * AisReader is only used to stop processing messages
 	 * 
 	 */
-	public MessageHandler(int timeout, AisReader aisReader, AbstractCoverageCalculator calculator){
-		this.timeout = timeout;
-		this.aisReader = aisReader;
-		this.calculator = calculator;
+	public MessageHandler(AisCoverageProject project){
+		this.project = project;
 	}
 
 
@@ -65,9 +60,9 @@ public class MessageHandler implements IAisHandler {
 	public void receive(AisMessage aisMessage) {
 		//Check timeout
 		Date now = new Date();
-		int timeSinceStart = (int) ((now.getTime() - starttime.getTime()) / 1000);
-		if(timeout != -1 && timeSinceStart > timeout)		
-			aisReader.stop();
+		long timeSinceStart = project.getRunningTime();
+		if(project.getTimeout() != -1 && timeSinceStart > project.getTimeout())		
+			project.stopAnalysis();
 
 		
 		
@@ -98,7 +93,7 @@ public class MessageHandler implements IAisHandler {
 		}
 		
 		// Increment count
-		count++;
+		project.incrementMessageCount();
 		
 		// Validate postion
 		if (!posMessage.isPositionValid()) {
@@ -109,10 +104,10 @@ public class MessageHandler implements IAisHandler {
 		pos = posMessage.getPos().getGeoLocation();
 		
 		//calculate lat lon size based on first message
-		if(GlobalSettings.getInstance().getLatSize() == -1){
-			double cellInMeters= GlobalSettings.getInstance().getCellInMeters();
-			GlobalSettings.getInstance().setLatSize(GeoConverter.metersToLatDegree(cellInMeters));
-			GlobalSettings.getInstance().setLonSize(GeoConverter.metersToLonDegree(pos.getLatitude(), cellInMeters));
+		if(project.getLatSize() == -1){
+			double cellInMeters= project.getCellSize(); //cell size in meters
+			project.setLatSize(GeoConverter.metersToLatDegree(cellInMeters));
+			project.setLongSize(GeoConverter.metersToLonDegree(pos.getLatitude(), cellInMeters));
 		}
 		
 		
@@ -126,7 +121,8 @@ public class MessageHandler implements IAisHandler {
 
 		// Check if grid exists (If a message with that bsmmsi has been received before)
 		// Otherwise create a grid for corresponding base station
-		Grid grid = gridHandler.getGrid(bsMmsi);
+		BaseStationHandler gridHandler = project.getBaseStationHandler();
+		BaseStation grid = gridHandler.getGrid(bsMmsi);
 		if(grid == null){
 			gridHandler.createGrid(bsMmsi);
 			grid = gridHandler.getGrid(bsMmsi);
@@ -147,33 +143,25 @@ public class MessageHandler implements IAisHandler {
 		}
 		
 		CustomMessage newMessage = new CustomMessage();
-		newMessage.message = posMessage;
+		newMessage.cog = (double)posMessage.getCog()/10;
+		newMessage.sog = (double)posMessage.getSog()/10;
+		newMessage.latitude = posMessage.getPos().getGeoLocation().getLatitude();
+		newMessage.longitude = posMessage.getPos().getGeoLocation().getLongitude();
 		newMessage.timestamp = timestamp;
 		newMessage.grid = grid;
 		newMessage.ship = ship;
 		newMessage.cell = cell;
+		newMessage.cell.ships.put(ship.mmsi, ship);
 		
 		if(newMessage.ship.getMessages().peekLast() != null)
 			newMessage.timeSinceLastMsg = (newMessage.timestamp.getTime() - newMessage.ship.getLastMessage().timestamp.getTime())/1000;
 		
-		//Filter messages, based on rules of thumb
-		boolean filterMessage = calculator.filterMessage(newMessage);
-		
-		//calculate stuff
-		if(filterMessage == false){
-			calculator.calculateCoverage(newMessage);
-		}
-		
-		//add ship to cell
-		newMessage.cell.ships.put(newMessage.ship.mmsi, newMessage.ship);
-				
+		//Calculator takes care of filtering of messages and calculation of coverage
+		project.getCalculator().calculateCoverage(newMessage);
+			
 		//Store received message as lastMessage in ship
 		ship.setLastMessage(newMessage);
 
-	}
-	
-	public long getCount() {
-		return count;
 	}
 
 }

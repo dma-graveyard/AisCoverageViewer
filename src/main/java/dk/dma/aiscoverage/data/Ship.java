@@ -15,11 +15,11 @@
  */
 package dk.dma.aiscoverage.data;
 
+import java.io.Serializable;
 import java.util.LinkedList;
 
-import dk.dma.aiscoverage.CustomMessage;
 
-public class Ship {
+public class Ship implements Serializable {
 	
 	public Long mmsi;
 	private CustomMessage lastMessage = null;
@@ -35,11 +35,16 @@ public class Ship {
 	public CustomMessage getLastMessage(){
 		return lastMessage;
 	}
-	public void messageTransmitted(CustomMessage m){
+	public void addToBuffer(CustomMessage m){
 		messageBuffer.add(m);
 	}
 	public LinkedList<CustomMessage> getMessages(){
 		return messageBuffer;
+	}
+	public void emptyBuffer(){
+		CustomMessage last = messageBuffer.getLast();
+		messageBuffer.clear();
+		messageBuffer.add(last); //We still want the last message in the buffer
 	}
 	
 

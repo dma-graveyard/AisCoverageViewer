@@ -15,11 +15,12 @@
  */
 package dk.dma.aiscoverage.data;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
 
 
-public class Cell {
+public class Cell implements Serializable {
 	
 	public ConcurrentHashMap<Long, Ship> ships = new ConcurrentHashMap<Long, Ship>();
 	public Long NOofReceivedSignals=0L; 
@@ -27,9 +28,9 @@ public class Cell {
 	public double latitude;
 	public double longitude;
 	public String id;
-	public Grid grid;
+	public BaseStation grid;
 	
-	public Cell(Grid grid, double lat, double lon, String id){
+	public Cell(BaseStation grid, double lat, double lon, String id){
 		this.latitude = lat;
 		this.longitude = lon;
 		this.grid = grid;

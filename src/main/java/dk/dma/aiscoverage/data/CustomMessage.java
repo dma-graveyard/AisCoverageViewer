@@ -1,17 +1,19 @@
-package dk.dma.aiscoverage;
+package dk.dma.aiscoverage.data;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.HashMap;
 
-import dk.dma.aiscoverage.data.Cell;
-import dk.dma.aiscoverage.data.Grid;
-import dk.dma.aiscoverage.data.Ship;
 import dk.frv.ais.message.AisPositionMessage;
 
-public class CustomMessage {
-	public AisPositionMessage message = null;
+public class CustomMessage implements Serializable {
+//	public AisPositionMessage message = null;
+	public double cog;
+	public double sog;
+	public double latitude;
+	public double longitude;
 	public Date timestamp = null;
-	public Grid grid;
+	public BaseStation grid;
 	public Ship ship;
 	public Cell cell;
 	public long timeSinceLastMsg;

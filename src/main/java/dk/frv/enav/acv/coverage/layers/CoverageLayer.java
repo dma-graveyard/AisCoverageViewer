@@ -15,31 +15,27 @@ import com.bbn.openmap.layer.OMGraphicHandlerLayer;
 import com.bbn.openmap.omGraphics.OMGraphicList;
 import com.bbn.openmap.proj.coords.LatLonPoint;
 
-import dk.dma.aiscoverage.AisCoverage;
 import dk.dma.aiscoverage.GlobalSettings;
 import dk.dma.aiscoverage.MessageHandler;
 import dk.dma.aiscoverage.calculator.AbstractCoverageCalculator;
 import dk.dma.aiscoverage.calculator.CellChangedListener;
 import dk.dma.aiscoverage.calculator.CoverageCalculatorAdvanced3;
 import dk.dma.aiscoverage.data.Cell;
-import dk.dma.aiscoverage.data.Grid;
-import dk.frv.ais.proprietary.DmaFactory;
-import dk.frv.ais.proprietary.GatehouseFactory;
-import dk.frv.ais.reader.AisReader;
-import dk.frv.ais.reader.AisStreamReader;
-import dk.frv.ais.reader.RoundRobinAisTcpReader;
-import dk.frv.enav.acv.ACV;
+import dk.dma.aiscoverage.data.BaseStation;
+import dk.dma.aiscoverage.project.AisCoverageProject;
+import dk.dma.aiscoverage.project.ProjectHandler;
 
-public class CoverageLayer extends OMGraphicHandlerLayer implements CellChangedListener {
+
+public class CoverageLayer extends OMGraphicHandlerLayer {
 
 	private static final long serialVersionUID = 1L;
 	private OMGraphicList graphics = new OMGraphicList();
 	public boolean isRunning = false;
-	private ConcurrentHashMap<String, Cell> cellsToBeDisplayed = new ConcurrentHashMap<String, Cell>();
+	private AisCoverageProject project;
 
 	private void updateCell(Cell cell){
-		double longSize = GlobalSettings.getInstance().getLonSize();
-		double latSize = GlobalSettings.getInstance().getLatSize();
+		double longSize = ProjectHandler.getInstance().getProject().getLongSize();
+		double latSize = ProjectHandler.getInstance().getProject().getLatSize();
 		List<LatLonPoint> polygon = new ArrayList<LatLonPoint>();
 		//LatLonPoint.Double parameters are swapped
 		polygon.add(new LatLonPoint.Double(cell.longitude, cell.latitude));
@@ -59,10 +55,9 @@ public class CoverageLayer extends OMGraphicHandlerLayer implements CellChangedL
 		graphics.add(g);
 	}
 
-	public void doUpdate() {
+	public void doUpdate(Collection<Cell> cells) {
 		graphics.clear();
 		System.out.println("update");
-		Collection<Cell> cells = cellsToBeDisplayed.values();
 		for (Cell cell : cells) {
 			updateCell(cell);
 		}
@@ -72,6 +67,9 @@ public class CoverageLayer extends OMGraphicHandlerLayer implements CellChangedL
 	@Override
 	public void findAndInit(Object obj) {
 		//This is used in case we need to communicate with other handler objects such as AIS 
+		if (obj instanceof AisCoverageProject) {
+			project = (AisCoverageProject) obj;
+		}
 	}
 
 	
@@ -81,19 +79,4 @@ public class CoverageLayer extends OMGraphicHandlerLayer implements CellChangedL
 		return graphics;
 	}
 
-	@Override
-	public void cellChanged(Cell cell) {
-		Cell existing = cellsToBeDisplayed.get(cell.id);
-		if(existing == null){
-			cellsToBeDisplayed.put(cell.id, cell);
-		}
-		else{
-			if(existing.getCoverage() < cell.getCoverage()){
-				cellsToBeDisplayed.put(cell.id, cell);
-			}
-		}
-			
-//		System.out.println("update cell");
-//		updateCell(cell);		
-	}
 }
