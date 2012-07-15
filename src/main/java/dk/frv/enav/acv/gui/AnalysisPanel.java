@@ -13,12 +13,14 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 
+import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.SwingUtilities;
+import javax.swing.Timer;
 import javax.swing.border.TitledBorder;
 import javax.swing.JScrollPane;
 import javax.swing.LayoutStyle.ComponentPlacement;
@@ -26,10 +28,8 @@ import javax.swing.LayoutStyle.ComponentPlacement;
 import com.bbn.openmap.MapHandler;
 import com.bbn.openmap.gui.OMComponentPanel;
 
-import dk.dma.aiscoverage.KMLGenerator;
 import dk.dma.aiscoverage.data.Cell;
 import dk.dma.aiscoverage.project.AisCoverageListener;
-import dk.dma.aiscoverage.project.AisCoverageProject;
 import dk.dma.aiscoverage.project.ProjectHandler;
 import dk.dma.aiscoverage.project.ProjectHandlerListener;
 import dk.frv.enav.acv.ACV;
@@ -62,7 +62,7 @@ public class AnalysisPanel extends OMComponentPanel implements ActionListener, A
 	private JLabel totalMessages;
 	private JLabel messagesPerSec;
 	private CoverageLayer coverageLayer;
-	private Thread refresherThread;
+	private Thread updateCoverageThread;
 	private HashMap<Long, JCheckBox> bsmmsis = new HashMap<Long, JCheckBox>();
 	private JPanel baseStationPanel;
 	private JScrollPane scrollPane;
@@ -70,7 +70,7 @@ public class AnalysisPanel extends OMComponentPanel implements ActionListener, A
 	private JCheckBox chckbxSelectAll;
 	private JPanel selectAllPanel;
 	private JSeparator separator;
-	private boolean forceUpdate = false;
+	private boolean updateCoverageLayer = false;
 	private int waitUpdate = 0;
 	private JPanel bottomPanel;
 	private JPanel projectPanel;
@@ -86,7 +86,8 @@ public class AnalysisPanel extends OMComponentPanel implements ActionListener, A
 	private boolean mouseDown = false;
 	private static Toolkit tk = Toolkit.getDefaultToolkit();
     private static long eventMask = AWTEvent.MOUSE_EVENT_MASK +AWTEvent.MOUSE_WHEEL_EVENT_MASK;
-    private ProjectHandler projectHandler;
+    private JLabel lblRunningTime;
+    private JLabel runningTime;
 
 	
 	/**
@@ -212,6 +213,10 @@ public class AnalysisPanel extends OMComponentPanel implements ActionListener, A
 		
 		messagesPerSec = new JLabel();
 		
+		lblRunningTime = new JLabel("Running time");
+		
+		runningTime = new JLabel("");
+		
 		GroupLayout gl_progressPanel = new GroupLayout(progressPanel);
 		gl_progressPanel.setHorizontalGroup(
 			gl_progressPanel.createParallelGroup(Alignment.LEADING)
@@ -225,9 +230,11 @@ public class AnalysisPanel extends OMComponentPanel implements ActionListener, A
 						.addGroup(gl_progressPanel.createSequentialGroup()
 							.addGroup(gl_progressPanel.createParallelGroup(Alignment.LEADING)
 								.addComponent(lblNewLabel)
-								.addComponent(lblNewLabel_1))
+								.addComponent(lblNewLabel_1)
+								.addComponent(lblRunningTime))
 							.addGap(18)
 							.addGroup(gl_progressPanel.createParallelGroup(Alignment.LEADING)
+								.addComponent(runningTime)
 								.addComponent(totalMessages)
 								.addComponent(messagesPerSec))))
 					.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
@@ -236,6 +243,10 @@ public class AnalysisPanel extends OMComponentPanel implements ActionListener, A
 			gl_progressPanel.createParallelGroup(Alignment.LEADING)
 				.addGroup(gl_progressPanel.createSequentialGroup()
 					.addContainerGap()
+					.addGroup(gl_progressPanel.createParallelGroup(Alignment.BASELINE)
+						.addComponent(lblRunningTime)
+						.addComponent(runningTime))
+					.addPreferredGap(ComponentPlacement.RELATED)
 					.addGroup(gl_progressPanel.createParallelGroup(Alignment.BASELINE)
 						.addComponent(lblNewLabel)
 						.addComponent(totalMessages))
@@ -247,7 +258,7 @@ public class AnalysisPanel extends OMComponentPanel implements ActionListener, A
 								.addComponent(messagesPerSec))
 							.addGap(29))
 						.addGroup(gl_progressPanel.createSequentialGroup()
-							.addPreferredGap(ComponentPlacement.RELATED, 26, Short.MAX_VALUE)
+							.addPreferredGap(ComponentPlacement.RELATED, 45, Short.MAX_VALUE)
 							.addGroup(gl_progressPanel.createParallelGroup(Alignment.BASELINE)
 								.addComponent(btnStopAnalysis)
 								.addComponent(btnStartAnalysis))
@@ -266,16 +277,88 @@ public class AnalysisPanel extends OMComponentPanel implements ActionListener, A
 //		ProjectHandler.getInstance().loadProject("C:\\Users\\Kasper\\Desktop\\save.ana");
 		
 		updateButtons();
-		startRefresherThread();
+		
+		//timers
+		startTimers();
+		
 
 	}
+	
+	/*
+	 * Starts timers for updating GUI and coverage layer
+	 */
+	private void startTimers() {
+		//This is only for updating GUI elements
+		//Don't perform lengthy work
+		new Timer(1000, new AbstractAction() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				updateProgress();
+			}
+		}).start();
+		
+		//This thread updates the coverage layer.
+		//We don't use a Swing timer, since this is a bit heavy
+		updateCoverageThread = new Thread(new Runnable(){
+			
+
+			@Override
+			public void run() {
+				while(true){
+					try {
+						
+						while(waitUpdate > 0){
+							Thread.sleep(1000);
+							waitUpdate--;
+						}
+						waitUpdate = 5; //set standard delay, until next update of coverage
+						
+						//If mouse is down, we wait a little bit
+						while(mouseDown){
+							Thread.sleep(500);
+						}
+						
+						//If project is running, or updateCoverageLayer was called, we update layer
+						if(updateCoverageLayer || ProjectHandler.getInstance().getProject().isRunning()){
+
+							// Update layer
+							List<Long> baseStations = new ArrayList<Long>();
+							Collection<JCheckBox> checkboxes = bsmmsis.values();
+							for (JCheckBox jCheckBox : checkboxes) {
+								if (jCheckBox.isSelected())
+									baseStations.add(Long.parseLong(jCheckBox.getText()));
+							}
+							Collection<Cell> cells = ProjectHandler.getInstance().getProject()
+									.getCoverage(baseStations);
+							if (coverageLayer != null && cells != null) {
+								coverageLayer.doUpdate(cells);
+							}
+							updateCoverageLayer = false;
+						}
+						
+					} catch (InterruptedException e) {}
+				}
+			}
+		});
+		updateCoverageThread.setPriority(1);
+		updateCoverageThread.start();
+
+	}
+	
+	/*
+	 * Selects or deselects all base station checkboxes
+	 */
 	private void selectAll(boolean bool){
 		Collection<JCheckBox> boxes = this.bsmmsis.values();
 		for (JCheckBox jCheckBox : boxes) {
 			jCheckBox.setSelected(bool);
 		}
 	}
-	public void updateBsmmsis(Long[] bsmmsis){
+	
+	/*
+	 * Updates the list of base station
+	 */
+	private void updateBaseStationList(Long[] bsmmsis){
 		Arrays.sort(bsmmsis);
 		
 		baseStationPanel.removeAll();
@@ -303,13 +386,16 @@ public class AnalysisPanel extends OMComponentPanel implements ActionListener, A
 		
 	}
 	
-	public void updateButtons(){
+	private void updateButtons(){
 		//Thread safety
 		Runnable doWorkRunnable = new Runnable() {
 		    public void run() {
 		    	if(ProjectHandler.getInstance().getProject().isRunning()){
 					btnStartAnalysis.setEnabled(false);
 					btnStopAnalysis.setEnabled(true);
+				}else if(ProjectHandler.getInstance().getProject().isDone()){
+					btnStartAnalysis.setEnabled(false);
+					btnStopAnalysis.setEnabled(false);
 				}else{
 					btnStartAnalysis.setEnabled(true);
 					btnStopAnalysis.setEnabled(false);
@@ -319,97 +405,66 @@ public class AnalysisPanel extends OMComponentPanel implements ActionListener, A
 		SwingUtilities.invokeLater(doWorkRunnable);
 	}
 	
+	/*
+	 * When this method is called, the coverage updater thread
+	 * will update the coverage layer.
+	 * If it is called multiple times before an update, the layer will
+	 * only be updated once.
+	 */
+	public void updateCoverage(int delay){
+		waitUpdate = delay;
+		updateCoverageLayer = true;
+	}
 	
-	public void updateProgress(){
+	private String runningTimeToString(Long secondsElapsed){
+		String hoursString= null, minutesString = null, secondsString = null;
+		int hours = (int) (secondsElapsed/3600);
+		int minutes = (int) ((secondsElapsed/60)-(hours*60));
+		int seconds = (int) (secondsElapsed-(minutes*60));
+		if(seconds < 10) secondsString = "0"+seconds;
+		else secondsString = ""+seconds;
+		if(minutes < 10) minutesString = "0"+minutes;
+		else minutesString = ""+minutes;
+		if(hours < 10) hoursString = "0"+hours;
+		else hoursString = ""+hours;
+		return hoursString + ":"+minutesString+":"+secondsString;
+	}
+	
+	private void updateProgress(){
 		if(ProjectHandler.getInstance().getProject() == null) return;
-		// For thread safety
-		Runnable doWorkRunnable = new Runnable() {
-		    public void run() {
-				Long secondsElapsed = ProjectHandler.getInstance().getProject().getRunningTime();
-				if(secondsElapsed > 0){
-					totalMessages.setText(""+ProjectHandler.getInstance().getProject().getMessageCount());
-					messagesPerSec.setText(""+ProjectHandler.getInstance().getProject().getMessageCount()/secondsElapsed);
-					updateBsmmsis(ProjectHandler.getInstance().getProject().getBaseStationNames());
-				}
-				
-		    }
-		};
-		SwingUtilities.invokeLater(doWorkRunnable);
-		
-		// Update layer
-		List<Long> baseStations = new ArrayList<Long>();
-		Collection<JCheckBox> checkboxes = bsmmsis.values();
-		for (JCheckBox jCheckBox : checkboxes) {
-			if(jCheckBox.isSelected())
-				baseStations.add(Long.parseLong(jCheckBox.getText()));
-		}
-		Collection<Cell> cells = ProjectHandler.getInstance().getProject().getCoverage(baseStations);
-		if(coverageLayer != null && cells != null){
-			coverageLayer.doUpdate(cells);
-			System.out.println(cells.size());
+		Long secondsElapsed = ProjectHandler.getInstance().getProject().getRunningTime();
+		if(secondsElapsed > 0){
+			totalMessages.setText(""+ProjectHandler.getInstance().getProject().getMessageCount());
+			messagesPerSec.setText(""+ProjectHandler.getInstance().getProject().getMessageCount()/secondsElapsed);
+			updateBaseStationList(ProjectHandler.getInstance().getProject().getBaseStationNames());
+			runningTime.setText(runningTimeToString(secondsElapsed));
 		}
 	}
-	
-	public void stopAnalysis(){
-		ProjectHandler.getInstance().getProject().stopAnalysis();
-	}
-	
-	public void startAnalysis(){
-		ProjectHandler.getInstance().getProject().setFile("C:\\Users\\Kasper\\Desktop\\aisdump.txt");
-		try {
-			ProjectHandler.getInstance().getProject().startAnalysis(); //start thread
-		} catch (FileNotFoundException e1) {
-			e1.printStackTrace();
-		} catch (InterruptedException e1) {
-			e1.printStackTrace();
-		}
-	}
-	public void startRefresherThread(){
-		refresherThread = new Thread(new Runnable(){
-			@Override
-			public void run() {
-				int secondsSinceLastUpdate = 0;
-				while(true){
-					try {
-						Thread.sleep(1000);
-						secondsSinceLastUpdate++;
-						if(!mouseDown){
-							while(waitUpdate > 0){
-								Thread.sleep(650);
-								waitUpdate--;
-							}
-							
-							if(ProjectHandler.getInstance().getProject().isRunning() && secondsSinceLastUpdate >= 5){
-								updateProgress();
-								secondsSinceLastUpdate = 0;
-							}
-							else if(forceUpdate){
-								
-								updateProgress();
-								secondsSinceLastUpdate = 0;
-								forceUpdate = false;
-							}
-						}
-						
-						
-					} catch (InterruptedException e) {}
-					
-				}
-			}
-		});
-		refresherThread.start();
-	}
+
 	
 	@Override
 	public void actionPerformed(ActionEvent e) {
+		
+		//start the analysis
 		if (e.getSource() == btnStartAnalysis) {
-			startAnalysis();
+			ProjectHandler.getInstance().getProject().setFile("C:\\Users\\Kasper\\Desktop\\aisdump.txt");
+			try {
+				ProjectHandler.getInstance().getProject().startAnalysis(); //start thread
+			} catch (FileNotFoundException e1) {
+				e1.printStackTrace();
+			} catch (InterruptedException e1) {
+				e1.printStackTrace();
+			}
 		} 
-		if(e.getSource() == btnStopAnalysis){
-			stopAnalysis();
+		
+		// Stop the analysis
+		else if(e.getSource() == btnStopAnalysis){
+			ProjectHandler.getInstance().getProject().stopAnalysis();
 		}
-		if(e.getSource().getClass() == JCheckBox.class){
-			forceUpdate = true; //Change in base stations, force update
+		
+		// Checkbox event, refresh coverageLayer
+		else if(e.getSource().getClass() == JCheckBox.class){
+			updateCoverage(1);
 			if(e.getSource() == chckbxSelectAll) 
 				selectAll(chckbxSelectAll.isSelected());
 			else
@@ -425,8 +480,6 @@ public class AnalysisPanel extends OMComponentPanel implements ActionListener, A
 			mainFrame = (MainFrame) obj;
 		}else if (obj instanceof CoverageLayer) {
 			coverageLayer = (CoverageLayer) obj;
-		}else if (obj instanceof ProjectHandler) {
-			projectHandler = (ProjectHandler) obj;
 		}
 	}
 
@@ -441,13 +494,7 @@ public class AnalysisPanel extends OMComponentPanel implements ActionListener, A
 	public void analysisStopped() {
 		System.out.println("analysis stopped");
 		updateButtons();
-		updateProgress();
-//		KMLGenerator.generateKML(analyser.getMessageHandler().gridHandler.grids.values(), "C:\\Users\\Kasper\\Desktop\\testing.kml");
-//		coverageLayer.doUpdate();
-		
-//		ProjectHandler.getInstance().saveProject(ProjectHandler.getInstance().getProject(), "C:\\Users\\Kasper\\Desktop\\save.ana");
-		System.out.println("saved");
-		
+		updateCoverage(0);		
 	}
 	
 	/*
@@ -467,7 +514,13 @@ public class AnalysisPanel extends OMComponentPanel implements ActionListener, A
 	}
 	@Override
 	public void projectLoaded() {
-		forceUpdate = true;
+		updateButtons();
+		updateCoverage(0);
 	}
 
+	@Override
+	public void projectCreated() {
+		updateButtons();
+		updateCoverage(0);
+	}
 }

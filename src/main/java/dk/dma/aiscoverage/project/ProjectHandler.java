@@ -16,6 +16,11 @@ public class ProjectHandler {
 	
 	public AisCoverageProject createProject(){
 		this.project = new AisCoverageProject();
+		
+		for (ProjectHandlerListener listener : listeners) {
+			listener.projectCreated();
+		}
+			
 		return project;
 	}
 
@@ -32,6 +37,7 @@ public class ProjectHandler {
 //			for (AisCoverageListener listener : listeners) {
 //				listener.projectSaved();
 //			}
+			System.out.println("Project saved");
 			
 		} catch (IOException e) {
 			e.printStackTrace();
