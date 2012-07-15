@@ -34,7 +34,7 @@ import dk.frv.ais.reader.RoundRobinAisTcpReader;
 
 public class AisCoverageProject implements Serializable {
 	transient private static Logger LOG;
-	private String filename;
+	private String filename = "C:\\Users\\silentk\\Desktop\\aisdump.txt";
 	private String hostPort;
 	private int timeout = -1;
 	transient private AbstractCoverageCalculator calc = new CoverageCalculatorAdvanced3(true);
@@ -85,7 +85,13 @@ public class AisCoverageProject implements Serializable {
 		
 	}
 	public void setFile(String filepath){
-		this.filename = filepath; 
+		this.filename = filepath;
+		//this.filename = "C:\\Users\\silentk\\Desktop\\aisdump.txt"; 
+	}
+	
+	public String getFile()
+	{
+		return filename;
 	}
 	public void setHostPort(int port){
 		this.hostPort = port+"";

@@ -19,6 +19,7 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Collection;
+import java.util.concurrent.ConcurrentHashMap;
 
 import dk.dma.aiscoverage.data.Cell;
 import dk.dma.aiscoverage.data.BaseStation;

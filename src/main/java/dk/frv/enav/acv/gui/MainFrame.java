@@ -37,6 +37,8 @@ import java.awt.Dimension;
 import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.event.AWTEventListener;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
@@ -45,6 +47,8 @@ import java.awt.event.WindowListener;
 
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
@@ -56,6 +60,7 @@ import dk.dma.aiscoverage.GlobalSettings;
 import dk.dma.aiscoverage.project.ProjectHandler;
 import dk.frv.enav.acv.ACV;
 import dk.frv.enav.acv.settings.GuiSettings;
+import javax.swing.JMenuItem;
 
 /**
  * The main frame containing map and panels 
@@ -70,13 +75,20 @@ public class MainFrame extends JFrame implements WindowListener {
 	
 	protected static final int SENSOR_PANEL_WIDTH = 190;
 	
+	private final GUIHelper guiHelper = new GUIHelper();
+	
 	private ChartPanel chartPanel;
 	private AnalysisPanel leftPanel;
+	//private AnalysisPanel rightPanel;
 
 	private JPanel glassPanel;
+	private JMenuBar menuBar;
 	
 	public MainFrame() {
         super();
+        
+        menuBar = new JMenuBar();
+        setJMenuBar(menuBar);
         initGUI();
     }
 	
@@ -102,12 +114,23 @@ public class MainFrame extends JFrame implements WindowListener {
 		chartPanel = new ChartPanel();
 		leftPanel = new AnalysisPanel();
 		leftPanel.setBorder(new EmptyBorder(5,5,5,5));
+		//rightPanel = new AnalysisPanel();
+		//rightPanel.setBorder(new EmptyBorder(5,5,5,5));
+		
 
 		// Add panels
 		pane.add(chartPanel);
 		
 		leftPanel.setPreferredSize(new Dimension(240, 0));
 		pane.add(leftPanel, BorderLayout.LINE_END);
+		
+		
+		//rightPanel.setPreferredSize(new Dimension(240, 0));
+		//pane.add(rightPanel, BorderLayout.NORTH);
+		
+		
+		
+		
 
 		// Set up the chart panel with layers etc
 		chartPanel.initChart();
@@ -121,6 +144,81 @@ public class MainFrame extends JFrame implements WindowListener {
 		mapHandler.add(leftPanel);
 		mapHandler.add(ProjectHandler.getInstance());
 
+		
+		//menubar items
+		
+		/*
+		 * file menu
+		 */
+		JMenu menu = new JMenu("File");
+		menuBar.add(menu);
+		
+		JMenuItem mntmNewAnalysis = new JMenuItem("New analysis");
+		menu.add(mntmNewAnalysis);
+		mntmNewAnalysis.addActionListener(new ActionListener()  {public void actionPerformed(ActionEvent e)	
+		{	NewAnalysis newAnalysisframe = new NewAnalysis();
+			newAnalysisframe.setVisible(true);	}	});
+		
+		JMenuItem mntmSave = new JMenuItem("Save");
+		menu.add(mntmSave);
+		mntmSave.addActionListener(new ActionListener()  {public void actionPerformed(ActionEvent e)	{	guiHelper.saveFileDialog();	}	});
+		
+		JMenuItem mntmLoad = new JMenuItem("Load");
+		menu.add(mntmLoad);
+		mntmLoad.addActionListener(new ActionListener()  {public void actionPerformed(ActionEvent e)	{	guiHelper.openFileDialog();	}	});
+		
+		JMenuItem mntmProperties = new JMenuItem("Settings");
+		menu.add(mntmProperties);
+		mntmProperties.addActionListener(new ActionListener()  {public void actionPerformed(ActionEvent e)	
+		{	
+			ChangeSettings changeSettingsframe = new ChangeSettings();
+			changeSettingsframe.setVisible(true);	}	});
+		
+		
+		/*
+		 * export menu
+		 */
+		JMenu mnExport = new JMenu("Export");
+		menuBar.add(mnExport);
+		
+		JMenuItem mntmExportToKml = new JMenuItem("Export to KML");
+		mnExport.add(mntmExportToKml);
+		mntmExportToKml.addActionListener(new ActionListener()  {public void actionPerformed(ActionEvent e)	{	guiHelper.saveKMLDialog();	}	});
+		
+		JMenuItem mntmExportToShape = new JMenuItem("Export to shape");
+		mnExport.add(mntmExportToShape);
+		mntmExportToShape.addActionListener(new ActionListener()  {public void actionPerformed(ActionEvent e)	{	guiHelper.saveShapeDialog();	}	});
+		
+		
+		/*
+		 * about menu
+		 */
+		JMenu mnAbout = new JMenu("About");
+		menuBar.add(mnAbout);
+		
+		JMenuItem mntmHelpzor = new JMenuItem("Helpzor");
+		mnAbout.add(mntmHelpzor);
+		mntmHelpzor.addActionListener(new ActionListener()  {public void actionPerformed(ActionEvent e) 
+		{	
+			Help helpframe = new Help();
+			helpframe.setVisible(true);	}	});
+		
+		JMenuItem mntmLicense = new JMenuItem("License");
+		mnAbout.add(mntmLicense);
+		mntmLicense.addActionListener(new ActionListener()  {public void actionPerformed(ActionEvent e) 
+		{	
+			License licenseframe = new License();
+			licenseframe.setVisible(true);	}	});
+		
+		JMenuItem mntmAbout = new JMenuItem("About");
+		mnAbout.add(mntmAbout);
+		mntmAbout.addActionListener(new ActionListener()  {public void actionPerformed(ActionEvent e) 
+		{	
+			About aboutframe = new About();
+			aboutframe.setVisible(true);	}	});
+		
+		
+		
 	}
 	
 	private void initGlassPane() {

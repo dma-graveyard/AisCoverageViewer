@@ -21,7 +21,7 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="lib" path="extlib/eeins.jar"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry exported="true" kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="extlib/enavshore-common.jar"/>
 	<classpathentry kind="lib" path="extlib/aislib-1.5.jar"/>
 	<classpathentry kind="output" path="build/classes"/>

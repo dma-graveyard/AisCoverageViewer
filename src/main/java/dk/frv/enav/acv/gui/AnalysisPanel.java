@@ -355,7 +355,7 @@ public class AnalysisPanel extends OMComponentPanel implements ActionListener, A
 	}
 	
 	public void startAnalysis(){
-		ProjectHandler.getInstance().getProject().setFile("C:\\Users\\Kasper\\Desktop\\aisdump.txt");
+		//ProjectHandler.getInstance().getProject().setFile("C:\\Users\\Kasper\\Desktop\\aisdump.txt");
 		try {
 			ProjectHandler.getInstance().getProject().startAnalysis(); //start thread
 		} catch (FileNotFoundException e1) {
