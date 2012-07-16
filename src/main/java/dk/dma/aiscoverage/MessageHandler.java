@@ -136,12 +136,12 @@ public class MessageHandler implements IAisHandler {
 			ship = grid.getShip(posMessage.getUserId());
 		}
 		
-		Cell cell = grid.getCell(pos.getLatitude(), pos.getLongitude());
-		if(cell == null){
-			grid.createCell(pos.getLatitude(), pos.getLongitude());
-			cell = grid.getCell(pos.getLatitude(), pos.getLongitude());
-		}
-		
+//		Cell cell = grid.getCell(pos.getLatitude(), pos.getLongitude());
+//		if(cell == null){
+//			grid.createCell(pos.getLatitude(), pos.getLongitude());
+//			cell = grid.getCell(pos.getLatitude(), pos.getLongitude());
+//		}
+//		
 		CustomMessage newMessage = new CustomMessage();
 		newMessage.cog = (double)posMessage.getCog()/10;
 		newMessage.sog = (double)posMessage.getSog()/10;
@@ -150,8 +150,8 @@ public class MessageHandler implements IAisHandler {
 		newMessage.timestamp = timestamp;
 		newMessage.grid = grid;
 		newMessage.ship = ship;
-		newMessage.cell = cell;
-		newMessage.cell.ships.put(ship.mmsi, ship);
+//		newMessage.cell = cell;
+//		newMessage.cell.ships.put(ship.mmsi, ship);
 		
 		if(newMessage.ship.getMessages().peekLast() != null)
 			newMessage.timeSinceLastMsg = (newMessage.timestamp.getTime() - newMessage.ship.getLastMessage().timestamp.getTime())/1000;

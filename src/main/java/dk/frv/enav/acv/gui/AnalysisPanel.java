@@ -29,7 +29,6 @@ import com.bbn.openmap.MapHandler;
 import com.bbn.openmap.gui.OMComponentPanel;
 
 import dk.dma.aiscoverage.data.Cell;
-import dk.dma.aiscoverage.project.AisCoverageListener;
 import dk.dma.aiscoverage.project.ProjectHandler;
 import dk.dma.aiscoverage.project.ProjectHandlerListener;
 import dk.frv.enav.acv.ACV;
@@ -50,7 +49,7 @@ import javax.swing.UIManager;
 import java.awt.GridLayout;
 
 
-public class AnalysisPanel extends OMComponentPanel implements ActionListener, AisCoverageListener, AWTEventListener, ProjectHandlerListener {
+public class AnalysisPanel extends OMComponentPanel implements ActionListener, AWTEventListener, ProjectHandlerListener {
 
 	/**
 	 * 
@@ -269,7 +268,6 @@ public class AnalysisPanel extends OMComponentPanel implements ActionListener, A
 		//add listeners
 		btnStartAnalysis.addActionListener(this);
 		btnStopAnalysis.addActionListener(this);
-		ProjectHandler.getInstance().getProject().addListener(this);
 		chckbxSelectAll.addActionListener(this);
 		tk.addAWTEventListener(this, eventMask);
 		
@@ -293,7 +291,9 @@ public class AnalysisPanel extends OMComponentPanel implements ActionListener, A
 		new Timer(1000, new AbstractAction() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				updateProgress();
+				if(!mouseDown){
+					updateProgress();
+				}
 			}
 		}).start();
 		
@@ -320,7 +320,7 @@ public class AnalysisPanel extends OMComponentPanel implements ActionListener, A
 						
 						//If project is running, or updateCoverageLayer was called, we update layer
 						if(updateCoverageLayer || ProjectHandler.getInstance().getProject().isRunning()){
-
+							System.out.println("ngee");
 							// Update layer
 							List<Long> baseStations = new ArrayList<Long>();
 							Collection<JCheckBox> checkboxes = bsmmsis.values();
@@ -430,14 +430,36 @@ public class AnalysisPanel extends OMComponentPanel implements ActionListener, A
 		return hoursString + ":"+minutesString+":"+secondsString;
 	}
 	
+//<<<<<<< HEAD
 	private void updateProgress(){
-		if(ProjectHandler.getInstance().getProject() == null) return;
+		if(ProjectHandler.getInstance().getProject() == null){
+			System.out.println("no project");
+			return;
+		}
 		Long secondsElapsed = ProjectHandler.getInstance().getProject().getRunningTime();
 		if(secondsElapsed > 0){
 			totalMessages.setText(""+ProjectHandler.getInstance().getProject().getMessageCount());
 			messagesPerSec.setText(""+ProjectHandler.getInstance().getProject().getMessageCount()/secondsElapsed);
 			updateBaseStationList(ProjectHandler.getInstance().getProject().getBaseStationNames());
 			runningTime.setText(runningTimeToString(secondsElapsed));
+		}
+		else{
+			totalMessages.setText("-");
+			messagesPerSec.setText("-");
+			updateBaseStationList(ProjectHandler.getInstance().getProject().getBaseStationNames());
+			runningTime.setText("-");
+		}
+	}
+//=======
+	public void startAnalysis(){
+		//ProjectHandler.getInstance().getProject().setFile("C:\\Users\\Kasper\\Desktop\\aisdump.txt");
+		try {
+			ProjectHandler.getInstance().getProject().startAnalysis(); //start thread
+		} catch (FileNotFoundException e1) {
+			e1.printStackTrace();
+		} catch (InterruptedException e1) {
+			e1.printStackTrace();
+//>>>>>>> 5a4a745eaa998180988aeed853c43d32dc1ad889
 		}
 	}
 
@@ -447,7 +469,9 @@ public class AnalysisPanel extends OMComponentPanel implements ActionListener, A
 		
 		//start the analysis
 		if (e.getSource() == btnStartAnalysis) {
-			ProjectHandler.getInstance().getProject().setFile("C:\\Users\\Kasper\\Desktop\\aisdump.txt");
+//			ProjectHandler.getInstance().getProject().setFile("C:\\Users\\Kasper\\Desktop\\aisdump.txt");
+			ProjectHandler.getInstance().getProject().setHostPort("ais163.sealan.dk:65262");
+
 			try {
 				ProjectHandler.getInstance().getProject().startAnalysis(); //start thread
 			} catch (FileNotFoundException e1) {
@@ -514,13 +538,16 @@ public class AnalysisPanel extends OMComponentPanel implements ActionListener, A
 	}
 	@Override
 	public void projectLoaded() {
+		System.out.println("loaded");
 		updateButtons();
 		updateCoverage(0);
+		
 	}
 
 	@Override
 	public void projectCreated() {
 		updateButtons();
 		updateCoverage(0);
+		System.out.println("created");
 	}
 }

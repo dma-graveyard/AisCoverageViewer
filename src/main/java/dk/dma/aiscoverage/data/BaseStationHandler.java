@@ -72,6 +72,8 @@ public class BaseStationHandler implements Serializable {
 		for (Long bsmmsi : baseStations) {
 			BaseStation bs = grids.get(bsmmsi);
 			
+			if(bs == null) break;
+			
 			//For each cell
 			Collection<Cell> bscells = bs.grid.values();
 			for (Cell cell : bscells) {

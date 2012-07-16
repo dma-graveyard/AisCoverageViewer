@@ -14,6 +14,18 @@ public class ProjectHandler {
 	private List<ProjectHandlerListener> listeners = new ArrayList<ProjectHandlerListener>();
 	private AisCoverageProject project = new AisCoverageProject();
 	
+	public void analysisStopped(){
+		for (ProjectHandlerListener listener : listeners) {
+			listener.analysisStopped();
+		}
+	}
+	
+	public void analysisStarted(){
+		for (ProjectHandlerListener listener : listeners) {
+			listener.analysisStarted();
+		}
+	}
+	
 	public AisCoverageProject createProject(){
 		this.project = new AisCoverageProject();
 		

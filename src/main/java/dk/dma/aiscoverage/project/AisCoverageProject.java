@@ -34,12 +34,11 @@ import dk.frv.ais.reader.RoundRobinAisTcpReader;
 
 public class AisCoverageProject implements Serializable {
 	transient private static Logger LOG;
-	private String filename;
+	private String filename = null;
 	private String hostPort;
 	private int timeout = -1;
 	transient private AbstractCoverageCalculator calc = new CoverageCalculatorAdvanced3(true);
 	transient private AisReader aisReader = null;
-	transient private List<AisCoverageListener> listeners = new ArrayList<AisCoverageListener>();
 	transient private MessageHandler messageHandler = null;
 	private BaseStationHandler gridHandler = new BaseStationHandler();
 	private Date starttime;
@@ -85,10 +84,16 @@ public class AisCoverageProject implements Serializable {
 		
 	}
 	public void setFile(String filepath){
-		this.filename = filepath; 
+		this.filename = filepath;
+		//this.filename = "C:\\Users\\silentk\\Desktop\\aisdump.txt"; 
 	}
-	public void setHostPort(int port){
-		this.hostPort = port+"";
+	
+	public String getFile()
+	{
+		return filename;
+	}
+	public void setHostPort(String port){
+		this.hostPort = port;
 	}
 	public void startAnalysis() throws FileNotFoundException, InterruptedException{
 		DOMConfigurator.configure("log4j.xml");
@@ -143,17 +148,13 @@ public class AisCoverageProject implements Serializable {
 	private void started(){
 		starttime = new Date();
 		this.isRunning = true;
-		for (AisCoverageListener listener : listeners) {
-			listener.analysisStarted();
-		}
+		ProjectHandler.getInstance().analysisStarted();
 	}
 	private void stopped(){
 		endtime = new Date();
 		this.isRunning = false;
 		this.isDone = true;
-		for (AisCoverageListener listener : listeners) {
-			listener.analysisStopped();
-		}
+		ProjectHandler.getInstance().analysisStopped();
 	}
 	
 	public boolean isDone() {
@@ -165,9 +166,6 @@ public class AisCoverageProject implements Serializable {
 	}
 	public void setTimeout(int timeout) {
 		this.timeout = timeout;
-	}
-	public void addListener(AisCoverageListener listener){
-		listeners.add(listener);
 	}
 	public Long getMessageCount(){
 		return messageCount;
