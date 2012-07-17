@@ -14,14 +14,14 @@ import com.bbn.openmap.omGraphics.OMGraphicList;
 import com.bbn.openmap.omGraphics.OMPoly;
 import com.bbn.openmap.proj.coords.LatLonPoint;
 
-public class GridPolygon extends OMGraphicList {
+public class BaseStationPolygon extends OMGraphicList {
 
 	private static final long serialVersionUID = 1L;
 	private List<LatLonPoint> polygon;
 	private Rectangle hatchFillRectangle;
 	private BufferedImage hatchFill;
 
-	public GridPolygon(List<LatLonPoint> polygon, Color color) {
+	public BaseStationPolygon(List<LatLonPoint> polygon, Color color) {
 
 		hatchFill = new BufferedImage(1, 1, BufferedImage.TYPE_INT_ARGB);
 		Graphics2D big = hatchFill.createGraphics();

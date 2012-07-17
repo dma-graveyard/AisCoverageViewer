@@ -31,17 +31,16 @@ public class CoverageLayer extends OMGraphicHandlerLayer {
 	private static final long serialVersionUID = 1L;
 	private OMGraphicList graphics = new OMGraphicList();
 	public boolean isRunning = false;
-	private AisCoverageProject project;
 
 	private void updateCell(Cell cell){
 		double longSize = ProjectHandler.getInstance().getProject().getLongSize();
 		double latSize = ProjectHandler.getInstance().getProject().getLatSize();
 		List<LatLonPoint> polygon = new ArrayList<LatLonPoint>();
-		//LatLonPoint.Double parameters are swapped
-		polygon.add(new LatLonPoint.Double(cell.longitude, cell.latitude));
-		polygon.add(new LatLonPoint.Double(cell.longitude + longSize, cell.latitude));
-		polygon.add(new LatLonPoint.Double(cell.longitude + longSize, cell.latitude + latSize));
-		polygon.add(new LatLonPoint.Double(cell.longitude, cell.latitude + latSize));
+
+		polygon.add(new LatLonPoint.Double(cell.latitude, cell.longitude));
+		polygon.add(new LatLonPoint.Double(cell.latitude, cell.longitude + longSize));
+		polygon.add(new LatLonPoint.Double(cell.latitude + latSize, cell.longitude + longSize));
+		polygon.add(new LatLonPoint.Double(cell.latitude + latSize, cell.longitude));
 
 		Color color;
 		if (cell.getCoverage() > 0.8) { // green
@@ -67,9 +66,6 @@ public class CoverageLayer extends OMGraphicHandlerLayer {
 	@Override
 	public void findAndInit(Object obj) {
 		//This is used in case we need to communicate with other handler objects such as AIS 
-		if (obj instanceof AisCoverageProject) {
-			project = (AisCoverageProject) obj;
-		}
 	}
 
 	

@@ -62,13 +62,13 @@ public class NewAnalysis extends JFrame {
 				System.out.println(textField.getText());
 				project.setFile(txtTypeInInput.getText());
 
-				if (comboBox.getSelectedItem() == "Calculator 1") {
-					System.out.println("calculator 1");
-					project.setCalculator(new dk.dma.aiscoverage.calculator.CoverageCalculatorAdvanced1());
-				} else if (comboBox.getSelectedItem() == "Calculator 2") {
+//				if (comboBox.getSelectedItem() == "Calculator 1") {
+//					System.out.println("calculator 1");
+//					project.setCalculator(new dk.dma.aiscoverage.calculator.CoverageCalculatorAdvanced1());
+//				} else if (comboBox.getSelectedItem() == "Calculator 2") {
 					System.out.println("calculator 2");
 					project.setCalculator(new dk.dma.aiscoverage.calculator.CoverageCalculatorAdvanced3());
-				}
+//				}
 
 				dispose();
 				System.out.println("set alle settings");

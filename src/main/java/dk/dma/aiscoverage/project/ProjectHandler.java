@@ -12,8 +12,16 @@ import java.util.List;
 public class ProjectHandler {
 
 	private List<ProjectHandlerListener> listeners = new ArrayList<ProjectHandlerListener>();
-	private AisCoverageProject project = new AisCoverageProject();
+	private AisCoverageProject project = null;
 	
+	private void terminateProject(){
+		if(project != null){
+			if(this.project.isRunning()){
+				this.project.stopAnalysis();
+			}
+		}
+		project = null;
+	}
 	public void analysisStopped(){
 		for (ProjectHandlerListener listener : listeners) {
 			listener.analysisStopped();
@@ -27,6 +35,7 @@ public class ProjectHandler {
 	}
 	
 	public AisCoverageProject createProject(){
+		terminateProject();
 		this.project = new AisCoverageProject();
 		
 		for (ProjectHandlerListener listener : listeners) {
@@ -58,6 +67,8 @@ public class ProjectHandler {
 	}
 	public AisCoverageProject loadProject(String filename){
 		try {
+			terminateProject();
+			
 			FileInputStream loadFile = new FileInputStream(filename);
 			ObjectInputStream in = new ObjectInputStream(loadFile);
 			AisCoverageProject project = (AisCoverageProject) in.readObject();

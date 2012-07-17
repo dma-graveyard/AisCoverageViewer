@@ -51,15 +51,15 @@ public abstract class AbstractCoverageCalculator {
 			filterMessage = true;
 		
 		//if this is the first message for a ship, we don't calculate coverage
-		if(customMessage.ship.getLastMessage() == null) {
-			filterMessage = true;
-		}else{
-
-			//If time since last message is > 30 minutes, we filter
-//			if(customMessage.timeSinceLastMsg > 1800)
-//				filterMessage = true;
-//				
-			}
+//		if(customMessage.ship.getLastMessage() == null) {
+//			filterMessage = true;
+//		}else{
+//
+//			//If time since last message is > 30 minutes, we filter
+////			if(customMessage.timeSinceLastMsg > 1800)
+////				filterMessage = true;
+////				
+//			}
 		
 		return filterMessage;
 	}

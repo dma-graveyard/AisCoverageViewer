@@ -23,6 +23,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import dk.dma.aiscoverage.data.Cell;
 import dk.dma.aiscoverage.data.BaseStation;
+import dk.dma.aiscoverage.project.ProjectHandler;
 
 public class KMLGenerator {
 
@@ -148,10 +149,10 @@ public class KMLGenerator {
 			writeLine("<LinearRing>", out);
 			writeLine("<coordinates>", out);
 
-//			writeLine(		cell.longitude + "," + cell.latitude + "," + z+ " " + 
-//							(cell.longitude + settings.getLonSize()) + "," + cell.latitude + ","  + z + " " + 
-//							(cell.longitude + settings.getLonSize()) + "," + (cell.latitude + settings.getLatSize()) + "," + z + " " + 
-//							cell.longitude + "," + (cell.latitude + settings.getLatSize()) + "," + z, out);
+			writeLine(		cell.longitude + "," + cell.latitude + "," + z+ " " + 
+							(cell.longitude + ProjectHandler.getInstance().getProject().getLongSize()) + "," + cell.latitude + ","  + z + " " + 
+							(cell.longitude +ProjectHandler.getInstance().getProject().getLongSize()) + "," + (cell.latitude + ProjectHandler.getInstance().getProject().getLatSize()) + "," + z + " " + 
+							cell.longitude + "," + (cell.latitude + ProjectHandler.getInstance().getProject().getLatSize()) + "," + z, out);
 
 
 			writeLine("</coordinates>", out);

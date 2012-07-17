@@ -82,12 +82,13 @@ public class CoverageCalculatorAdvanced3 extends AbstractCoverageCalculator {
 	private void calculateMissingPoints(CustomMessage m1, CustomMessage m2, boolean rotating){
 		
 		//WHERE TO PUT THIS??
-		if(m1.cell == null){
-			m1.cell = m1.grid.createCell(m1.latitude, m1.longitude);
-			m1.cell.ships.put(m1.ship.mmsi, m1.ship);
+		Cell cell = m1.grid.getCell(m1.latitude, m1.longitude);
+		if(cell == null){
+			cell = m1.grid.createCell(m1.latitude, m1.longitude);
+			cell.ships.put(m1.ship.mmsi, m1.ship);
 		}
-		m1.cell.NOofReceivedSignals++;
-		this.cellChanged(m1.cell);
+		cell.NOofReceivedSignals++;
+		this.cellChanged(cell);
 		
 		Long p1Time = m1.timestamp.getTime();
 		Long p2Time = m2.timestamp.getTime();

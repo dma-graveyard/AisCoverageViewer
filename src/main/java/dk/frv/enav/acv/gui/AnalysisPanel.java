@@ -28,10 +28,12 @@ import javax.swing.LayoutStyle.ComponentPlacement;
 import com.bbn.openmap.MapHandler;
 import com.bbn.openmap.gui.OMComponentPanel;
 
+import dk.dma.aiscoverage.data.BaseStation;
 import dk.dma.aiscoverage.data.Cell;
 import dk.dma.aiscoverage.project.ProjectHandler;
 import dk.dma.aiscoverage.project.ProjectHandlerListener;
 import dk.frv.enav.acv.ACV;
+import dk.frv.enav.acv.coverage.layers.BaseStationLayer;
 import dk.frv.enav.acv.coverage.layers.CoverageLayer;
 
 import java.awt.AWTEvent;
@@ -87,6 +89,7 @@ public class AnalysisPanel extends OMComponentPanel implements ActionListener, A
     private static long eventMask = AWTEvent.MOUSE_EVENT_MASK +AWTEvent.MOUSE_WHEEL_EVENT_MASK;
     private JLabel lblRunningTime;
     private JLabel runningTime;
+    private BaseStationLayer basestationLayer;
 
 	
 	/**
@@ -319,21 +322,28 @@ public class AnalysisPanel extends OMComponentPanel implements ActionListener, A
 						}
 						
 						//If project is running, or updateCoverageLayer was called, we update layer
-						if(updateCoverageLayer || ProjectHandler.getInstance().getProject().isRunning()){
-							System.out.println("ngee");
-							// Update layer
-							List<Long> baseStations = new ArrayList<Long>();
-							Collection<JCheckBox> checkboxes = bsmmsis.values();
-							for (JCheckBox jCheckBox : checkboxes) {
-								if (jCheckBox.isSelected())
-									baseStations.add(Long.parseLong(jCheckBox.getText()));
+						if(ProjectHandler.getInstance().getProject() != null){
+							if(updateCoverageLayer || ProjectHandler.getInstance().getProject().isRunning()){
+								
+								// Update coverage layer
+								List<Long> baseStations = new ArrayList<Long>();
+								Collection<JCheckBox> checkboxes = bsmmsis.values();
+								for (JCheckBox jCheckBox : checkboxes) {
+									if (jCheckBox.isSelected())
+										baseStations.add(Long.parseLong(jCheckBox.getText()));
+								}
+								Collection<Cell> cells = ProjectHandler.getInstance().getProject()
+										.getCoverage(baseStations);
+								System.out.println(cells.size());
+								if (coverageLayer != null && cells != null) {
+									coverageLayer.doUpdate(cells);
+								}
+								
+								//update base station layer
+								basestationLayer.doUpdate(ProjectHandler.getInstance().getProject().getBaseStationHandler().grids.values());
+								
+								updateCoverageLayer = false;
 							}
-							Collection<Cell> cells = ProjectHandler.getInstance().getProject()
-									.getCoverage(baseStations);
-							if (coverageLayer != null && cells != null) {
-								coverageLayer.doUpdate(cells);
-							}
-							updateCoverageLayer = false;
 						}
 						
 					} catch (InterruptedException e) {}
@@ -390,7 +400,11 @@ public class AnalysisPanel extends OMComponentPanel implements ActionListener, A
 		//Thread safety
 		Runnable doWorkRunnable = new Runnable() {
 		    public void run() {
-		    	if(ProjectHandler.getInstance().getProject().isRunning()){
+		    	if(ProjectHandler.getInstance().getProject() == null){
+		    		btnStartAnalysis.setEnabled(false);
+					btnStopAnalysis.setEnabled(false);
+		    	}
+		    	else if(ProjectHandler.getInstance().getProject().isRunning()){
 					btnStartAnalysis.setEnabled(false);
 					btnStopAnalysis.setEnabled(true);
 				}else if(ProjectHandler.getInstance().getProject().isDone()){
@@ -504,6 +518,8 @@ public class AnalysisPanel extends OMComponentPanel implements ActionListener, A
 			mainFrame = (MainFrame) obj;
 		}else if (obj instanceof CoverageLayer) {
 			coverageLayer = (CoverageLayer) obj;
+		}else if (obj instanceof BaseStationLayer) {
+			basestationLayer = (BaseStationLayer) obj;
 		}
 	}
 
@@ -539,15 +555,18 @@ public class AnalysisPanel extends OMComponentPanel implements ActionListener, A
 	@Override
 	public void projectLoaded() {
 		System.out.println("loaded");
+		resetGui();
+		
+	}
+	private void resetGui(){
+		this.bsmmsis.clear();
 		updateButtons();
 		updateCoverage(0);
-		
 	}
 
 	@Override
 	public void projectCreated() {
-		updateButtons();
-		updateCoverage(0);
+		resetGui();
 		System.out.println("created");
 	}
 }

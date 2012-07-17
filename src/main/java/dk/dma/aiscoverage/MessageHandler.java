@@ -30,6 +30,7 @@ import dk.frv.ais.country.Country;
 import dk.frv.ais.geo.GeoLocation;
 import dk.frv.ais.handler.IAisHandler;
 import dk.frv.ais.message.AisMessage;
+import dk.frv.ais.message.AisMessage4;
 import dk.frv.ais.message.AisPositionMessage;
 import dk.frv.ais.proprietary.IProprietarySourceTag;
 import dk.frv.ais.reader.AisReader;
@@ -57,7 +58,8 @@ public class MessageHandler implements IAisHandler {
 	 * Message for receiving AIS messages
 	 */
 	@Override
-	public void receive(AisMessage aisMessage) {
+	public void receive(AisMessage aisMessage) {	
+		
 		//Check timeout
 		Date now = new Date();
 		long timeSinceStart = project.getRunningTime();
@@ -85,12 +87,22 @@ public class MessageHandler implements IAisHandler {
 			return;
 		}
 			
+		if(aisMessage instanceof AisMessage4){
+			AisMessage4 m = (AisMessage4) aisMessage;
+			BaseStation b = project.getBaseStationHandler().grids.get(m.getUserId());
+			if(b != null){
+				b.latitude = m.getPos().getGeoLocation().getLatitude();
+				b.longitude = m.getPos().getGeoLocation().getLongitude();
+			}
+		}
+
 		// Handle position messages
 		if (aisMessage instanceof AisPositionMessage) {
-			posMessage = (AisPositionMessage)aisMessage;
+			posMessage = (AisPositionMessage)aisMessage;		
 		} else {
 			return;
 		}
+	
 		
 		// Increment count
 		project.incrementMessageCount();
@@ -102,6 +114,8 @@ public class MessageHandler implements IAisHandler {
 		
 		// Get location
 		pos = posMessage.getPos().getGeoLocation();
+		
+		
 		
 		//calculate lat lon size based on first message
 		if(project.getLatSize() == -1){
@@ -128,6 +142,8 @@ public class MessageHandler implements IAisHandler {
 			grid = gridHandler.getGrid(bsMmsi);
 		}
 		
+		
+		
 		// Check which ship sent the message.
 		// If it's the first message from that ship, create ship and put it in grid belonging to bsmmsi
 		Ship ship = grid.getShip(posMessage.getUserId());
@@ -135,13 +151,7 @@ public class MessageHandler implements IAisHandler {
 			grid.createShip(posMessage.getUserId());
 			ship = grid.getShip(posMessage.getUserId());
 		}
-		
-//		Cell cell = grid.getCell(pos.getLatitude(), pos.getLongitude());
-//		if(cell == null){
-//			grid.createCell(pos.getLatitude(), pos.getLongitude());
-//			cell = grid.getCell(pos.getLatitude(), pos.getLongitude());
-//		}
-//		
+	
 		CustomMessage newMessage = new CustomMessage();
 		newMessage.cog = (double)posMessage.getCog()/10;
 		newMessage.sog = (double)posMessage.getSog()/10;
@@ -150,11 +160,6 @@ public class MessageHandler implements IAisHandler {
 		newMessage.timestamp = timestamp;
 		newMessage.grid = grid;
 		newMessage.ship = ship;
-//		newMessage.cell = cell;
-//		newMessage.cell.ships.put(ship.mmsi, ship);
-		
-		if(newMessage.ship.getMessages().peekLast() != null)
-			newMessage.timeSinceLastMsg = (newMessage.timestamp.getTime() - newMessage.ship.getLastMessage().timestamp.getTime())/1000;
 		
 		//Calculator takes care of filtering of messages and calculation of coverage
 		project.getCalculator().calculateCoverage(newMessage);

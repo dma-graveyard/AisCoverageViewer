@@ -29,6 +29,8 @@ public class BaseStation implements Serializable {
 	public Long bsMmsi;
 	private double latSize;
 	private double lonSize;
+	public Double latitude;
+	public Double longitude;
 
 	
 	public BaseStation(long bsMmsi, double latSize, double lonSize) {
