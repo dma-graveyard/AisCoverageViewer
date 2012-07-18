@@ -282,6 +282,23 @@ public class AnalysisPanel extends OMComponentPanel implements ActionListener, A
 
 	}
 	
+	protected void setAnalysisData(String input, String calculator, String cellSize, String time)
+	{
+		lblAdvanced.setText(calculator);
+		
+		lblFile.setText(input);
+		
+		lblm.setText(cellSize);
+		
+		lblh.setText(time);
+		
+		projectPanel.repaint();
+		
+		
+		
+	}
+	
+	
 	/*
 	 * Starts timers for updating GUI and coverage layer
 	 */

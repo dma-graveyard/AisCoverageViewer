@@ -30,12 +30,22 @@ import javax.swing.border.LineBorder;
 import java.awt.Color;
 import javax.swing.border.EtchedBorder;
 
+import dk.dma.aiscoverage.calculator.AbstractCoverageCalculator;
+import dk.dma.aiscoverage.calculator.CoverageCalculatorAdvanced3;
 import dk.dma.aiscoverage.project.ProjectHandler;
 import javax.swing.JCheckBox;
+
+import com.bbn.openmap.gui.OMComponentPanel;
+
 import java.awt.FlowLayout;
 
 public class NewAnalysis extends JFrame {
 
+
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private GUIHelper guiHelper = new GUIHelper();
 	private JPanel contentPane;
 	private JTextField txtTypeInInput;
@@ -53,11 +63,18 @@ public class NewAnalysis extends JFrame {
 	private JTextField textField_1;
 	JFrame frame = this;
 	private JTextField textField_2;
+	private AnalysisPanel analysisPanel;
+	private String fileName;
+	private JTextField mapTextField;
+	private JTextField textField_3;
+	private JTextField textField_4;
 
 	/**
 	 * Create the frame.
 	 */
-	public NewAnalysis() {
+	public NewAnalysis(AnalysisPanel ap) {
+		analysisPanel = ap; 
+		
 		setResizable(false);
 		setTitle("New Analysis");
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -145,7 +162,7 @@ public class NewAnalysis extends JFrame {
 		});
 		
 		/*
-		 * grid panel
+		 * analysis panel
 		 */
 		final JPanel gridPanel = new JPanel();
 		gridPanel.setBorder(new TitledBorder(null, "Analysis settings", TitledBorder.LEADING, TitledBorder.TOP, null, null));
@@ -229,7 +246,7 @@ public class NewAnalysis extends JFrame {
 		textField_1 = new JTextField();
 		textField_1.setBounds(222, 50, 133, 20);
 		calculatorPanel.add(textField_1);
-		textField_1.setText("Ship rotation per min");
+		textField_1.setText("2");
 		
 		final JLabel lblShipRotationPer = new JLabel("Turning = ");
 		lblShipRotationPer.setBounds(168, 53, 156, 14);
@@ -269,6 +286,79 @@ public class NewAnalysis extends JFrame {
 			}
 		});
 		
+		
+		/*
+		 * map panel (advanced settings)
+		 */
+		final JPanel mapPanel = new JPanel();
+		mapPanel.setBorder(new TitledBorder(null, "Map", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		contentPane.add(mapPanel);
+		mapPanel.setVisible(false);
+		mapPanel.setPreferredSize(new Dimension(425, 80));
+		mapPanel.setLayout(null);
+		
+		mapTextField = new JTextField();
+		mapTextField.setEditable(false);
+		mapTextField.setBounds(10, 21, 306, 20);
+		mapPanel.add(mapTextField);
+		mapTextField.setColumns(10);
+		
+		JButton btnSelectFile_1 = new JButton("Select File");
+		btnSelectFile_1.setBounds(326, 20, 89, 23);
+		mapPanel.add(btnSelectFile_1);
+		btnSelectFile_1.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				mapTextField.setText(guiHelper.openShapeFileDialog());
+			}
+		});
+		
+		final JLabel lblLat = new JLabel("Lat");
+		lblLat.setBounds(165, 52, 30, 14);
+		mapPanel.add(lblLat);
+		lblLat.setVisible(false);
+		
+		textField_3 = new JTextField();
+		textField_3.setBounds(205, 49, 76, 20);
+		mapPanel.add(textField_3);
+		textField_3.setVisible(false);
+		
+		final JLabel lblLong = new JLabel("Long");
+		lblLong.setBounds(291, 52, 46, 14);
+		mapPanel.add(lblLong);
+		lblLong.setVisible(false);
+		
+		textField_4 = new JTextField();
+		textField_4.setBounds(336, 49, 79, 20);
+		mapPanel.add(textField_4);
+		textField_4.setVisible(false);
+		
+		JCheckBox chckbxSetMapCenterpoint = new JCheckBox("Set map centerpoint");
+		chckbxSetMapCenterpoint.setBounds(10, 48, 149, 23);
+		mapPanel.add(chckbxSetMapCenterpoint);
+		chckbxSetAnalysisTimer.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				System.out.print("har");
+				if(chckbxSetAnalysisTimer.isSelected() == false)
+				{
+					lblLat.setVisible(false);
+					lblLong.setVisible(false);
+					textField_3.setVisible(false);
+					textField_4.setVisible(false);
+					contentPane.repaint();
+				}
+				else if(chckbxSetAnalysisTimer.isSelected() == true)
+				{
+					lblLat.setVisible(true);
+					lblLong.setVisible(true);
+					textField_3.setVisible(true);
+					textField_4.setVisible(true);
+					contentPane.repaint();
+				}				
+			}
+		});
+		
+		
+		
 		/*
 		 * button panel
 		 */
@@ -295,7 +385,7 @@ public class NewAnalysis extends JFrame {
 				{
 
 					calculatorPanel.setVisible(true);
-					frame.setSize(new Dimension(460,350));
+					frame.setSize(new Dimension(460,420));
 					contentPane.repaint();
 					frame.repaint();
 				}				
@@ -308,7 +398,9 @@ public class NewAnalysis extends JFrame {
 			public void actionPerformed(ActionEvent arg0) {
 
 				dk.dma.aiscoverage.project.AisCoverageProject project = projectHandler.createProject();
-				project.setCellSize(Integer.parseInt(textField.getText()));
+				
+				
+				
 				
 				System.out.println(textField.getText());
 				if(rdbtnInputfile.isSelected())
@@ -320,7 +412,23 @@ public class NewAnalysis extends JFrame {
 					else
 					{
 						project.setFile(txtTypeInInput.getText());
-						project.setCalculator(new dk.dma.aiscoverage.calculator.CoverageCalculatorAdvanced3());
+						CoverageCalculatorAdvanced3 calc = new dk.dma.aiscoverage.calculator.CoverageCalculatorAdvanced3();
+						
+						if(chckbxIncludeTurningShips.isSelected() == false)
+						{
+							calc.setIgnoreRotation(true);
+							calc.setBufferInSeconds(Integer.parseInt(txtMessageBuffer.getText()));
+						}
+						else if (chckbxIncludeTurningShips.isSelected() == true)
+						{
+							calc.setIgnoreRotation(false);
+							calc.setBufferInSeconds(Integer.parseInt(txtMessageBuffer.getText()));
+							calc.setDegreesPerMinute(Integer.parseInt(textField_1.getText()));
+						}
+						
+						project.setCalculator(calc);
+						project.setCellSize(Integer.parseInt(textField.getText()));
+						analysisPanel.setAnalysisData(txtTypeInInput.getText(), "Advanced", textField.getText(), "999h");
 						
 						
 						
@@ -337,7 +445,33 @@ public class NewAnalysis extends JFrame {
 					{
 						//if(txtTypeInInput.getText().contains("port number")))
 						project.setHostPort(txtTypeInInput.getText());
-						project.setCalculator(new dk.dma.aiscoverage.calculator.CoverageCalculatorAdvanced3());
+						CoverageCalculatorAdvanced3 calc = new dk.dma.aiscoverage.calculator.CoverageCalculatorAdvanced3();
+						
+						if(chckbxIncludeTurningShips.isSelected() == false)
+						{
+							calc.setIgnoreRotation(true);
+							calc.setBufferInSeconds(Integer.parseInt(txtMessageBuffer.getText()));
+						}
+						else if (chckbxIncludeTurningShips.isSelected() == true)
+						{
+							calc.setIgnoreRotation(false);
+							calc.setBufferInSeconds(Integer.parseInt(txtMessageBuffer.getText()));
+							calc.setDegreesPerMinute(Integer.parseInt(textField_1.getText()));
+						}
+						
+						
+						project.setCalculator(calc);
+						project.setCellSize(Integer.parseInt(textField.getText()));
+						
+						if(chckbxSetAnalysisTimer.isSelected() == true)
+						{
+							int hour = Integer.parseInt(textField_2.getText().substring(0, 1));
+							int min = Integer.parseInt(textField_2.getText().substring(3, 4));
+							int sec = (((hour * 60) + min) * 60);
+							project.setTimeout(sec);
+						}
+						
+						analysisPanel.setAnalysisData(txtTypeInInput.getText(), "Advanced", textField.getText(), "999h");
 						dispose();
 					}
 				}
