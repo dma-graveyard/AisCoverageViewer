@@ -167,13 +167,6 @@ public class MainFrame extends JFrame implements WindowListener {
 		menu.add(mntmLoad);
 		mntmLoad.addActionListener(new ActionListener()  {public void actionPerformed(ActionEvent e)	{	guiHelper.openFileDialog();	}	});
 		
-		JMenuItem mntmProperties = new JMenuItem("Settings");
-		menu.add(mntmProperties);
-		mntmProperties.addActionListener(new ActionListener()  {public void actionPerformed(ActionEvent e)	
-		{	
-			ChangeSettings changeSettingsframe = new ChangeSettings();
-			changeSettingsframe.setVisible(true);	}	});
-		
 		
 		/*
 		 * export menu
