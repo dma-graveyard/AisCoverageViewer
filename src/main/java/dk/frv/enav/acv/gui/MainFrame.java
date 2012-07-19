@@ -140,6 +140,7 @@ public class MainFrame extends JFrame implements WindowListener {
 		initGlassPane();
 		
 		// Add self to map map handler
+		mapHandler.add(chartPanel);
 		mapHandler.add(this);
 		mapHandler.add(leftPanel);
 		mapHandler.add(ProjectHandler.getInstance());
@@ -189,6 +190,9 @@ public class MainFrame extends JFrame implements WindowListener {
 		mnExport.add(mntmExportToShape);
 		mntmExportToShape.addActionListener(new ActionListener()  {public void actionPerformed(ActionEvent e)	{	guiHelper.saveShapeDialog();	}	});
 		
+		JMenuItem mntmExportToPNG = new JMenuItem("Export to PNG");
+		mnExport.add(mntmExportToPNG);
+		mntmExportToPNG.addActionListener(new ActionListener()  {public void actionPerformed(ActionEvent e)	{	guiHelper.savePNGDialog(chartPanel);	}	});
 		
 		/*
 		 * about menu

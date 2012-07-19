@@ -31,13 +31,16 @@
 
 package dk.frv.enav.acv.coverage.layers;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.swing.ImageIcon;
 
 import com.bbn.openmap.omGraphics.OMGraphicList;
 
+import dk.dma.aiscoverage.data.BaseStation;
 import dk.frv.ais.geo.GeoLocation;
 import dk.frv.enav.ins.EeINS;
-import dk.frv.enav.ins.common.graphics.CenterRaster;
 
 public class AisTargetGraphic extends OMGraphicList {
 	private static final long serialVersionUID = 1L;
@@ -45,30 +48,51 @@ public class AisTargetGraphic extends OMGraphicList {
 	ImageIcon targetImage;
 	int imageWidth;
 	int imageHeight;
+	private BaseStation basestation;
 
-	public AisTargetGraphic(double latitude, double longitude) {
+	public BaseStation getBasestation() {
+		return basestation;
+	}
+	
+
+	public CenterRaster getCenterRaster(){
+		return selectionGraphics;
+	}
+	public void setBasestation(BaseStation basestation) {
+		this.basestation = basestation;
+		Map<Object, Object> attributes = new HashMap<Object, Object>();
+		attributes.put("basestation", basestation);
+		selectionGraphics.setAttributes(attributes);
+	}
+
+	public AisTargetGraphic(double latitude, double longitude, BaseStation bs) {
 		super();
+		this.basestation = bs;
 		createGraphics();
 		selectionGraphics = new CenterRaster(latitude,
-				longitude, imageWidth, imageHeight, targetImage);
+				longitude, imageWidth, imageHeight, targetImage, this);
 		add(selectionGraphics);
 	}
 
 	private void createGraphics() {
 
-		targetImage = new ImageIcon(
-				EeINS.class.getResource("/images/aton.png"));
+		if(basestation.isVisible()){
+			targetImage = new ImageIcon(EeINS.class.getResource("/images/atonActive.png"));
+		}else{
+			targetImage = new ImageIcon(EeINS.class.getResource("/images/aton.png"));
+		}
+		
 		imageWidth = targetImage.getIconWidth();
 		imageHeight = targetImage.getIconHeight();
 
 		selectionGraphics = new CenterRaster(0, 0, imageWidth, imageHeight,
-				targetImage);
+				targetImage, this);
 	}
 
 	public void moveSymbol(GeoLocation pos) {
 		remove(selectionGraphics);
 		selectionGraphics = new CenterRaster(pos.getLatitude(),
-				pos.getLongitude(), imageWidth, imageHeight, targetImage);
+				pos.getLongitude(), imageWidth, imageHeight, targetImage, this);
 		add(selectionGraphics);
 	}
 

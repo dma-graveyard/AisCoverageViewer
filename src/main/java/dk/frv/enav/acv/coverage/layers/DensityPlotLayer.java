@@ -26,15 +26,15 @@ import dk.dma.aiscoverage.project.AisCoverageProject;
 import dk.dma.aiscoverage.project.ProjectHandler;
 
 
-public class CoverageLayer extends OMGraphicHandlerLayer {
+public class DensityPlotLayer extends OMGraphicHandlerLayer {
 
 	private static final long serialVersionUID = 1L;
 	private OMGraphicList graphics = new OMGraphicList();
 	public boolean isRunning = false;
 	HashMap<String, GridPolygon> cellMap = new HashMap<String, GridPolygon>(); 
 
-	public CoverageLayer(){
-		setRenderPolicy(new com.bbn.openmap.layer.policy.BufferedImageRenderPolicy());
+	public DensityPlotLayer(){
+//		setRenderPolicy(new com.bbn.openmap.layer.policy.BufferedImageRenderPolicy());
 	}
 	private void updateCell(Cell cell){
 		double longSize = ProjectHandler.getInstance().getProject().getLongSize();
@@ -46,28 +46,18 @@ public class CoverageLayer extends OMGraphicHandlerLayer {
 		polygon.add(new LatLonPoint.Double(cell.latitude + latSize, cell.longitude + longSize));
 		polygon.add(new LatLonPoint.Double(cell.latitude + latSize, cell.longitude));
 
-		Color color;
-		if (cell.getCoverage() > 0.8) { // green
-			color = Color.GREEN;
-		} else if (cell.getCoverage() > 0.5) { // orange
-			color = Color.ORANGE;
-		} else { // red
-			color = Color.RED;
-		}
-		GridPolygon g = new GridPolygon(polygon, color);
+		GridPolygon g = new GridPolygon(polygon, Color.BLACK);
 		graphics.add(g);
 	}
 
 	public void doUpdate(Collection<Cell> cells) {
-		
+		System.out.println("density update");
 		graphics.clear();
 		
 		for (Cell cell : cells) {
 			updateCell(cell);
 		}
-		System.out.println("start update");
 		doPrepare();
-		System.out.println("update ended");
 	}
 	
 	@Override

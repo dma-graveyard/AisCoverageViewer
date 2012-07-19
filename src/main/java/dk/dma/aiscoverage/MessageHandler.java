@@ -16,6 +16,8 @@
 package dk.dma.aiscoverage;
 
 import java.util.Date;
+import java.util.List;
+
 import org.apache.log4j.Logger;
 
 import dk.dma.aiscoverage.calculator.AbstractCoverageCalculator;
@@ -33,6 +35,7 @@ import dk.frv.ais.message.AisMessage;
 import dk.frv.ais.message.AisMessage4;
 import dk.frv.ais.message.AisPositionMessage;
 import dk.frv.ais.proprietary.IProprietarySourceTag;
+import dk.frv.ais.proprietary.IProprietaryTag;
 import dk.frv.ais.reader.AisReader;
 
 /**
@@ -42,6 +45,7 @@ public class MessageHandler implements IAisHandler {
 	
 	private static Logger LOG = Logger.getLogger(MessageHandler.class);
 	private AisCoverageProject project = null;
+	private long defaultID;
 	
 	/*
 	 * Timeout is in seconds. 
@@ -49,8 +53,9 @@ public class MessageHandler implements IAisHandler {
 	 * AisReader is only used to stop processing messages
 	 * 
 	 */
-	public MessageHandler(AisCoverageProject project){
+	public MessageHandler(AisCoverageProject project, long defaultID){
 		this.project = project;
+		this.defaultID = defaultID;
 	}
 
 
@@ -59,6 +64,10 @@ public class MessageHandler implements IAisHandler {
 	 */
 	@Override
 	public void receive(AisMessage aisMessage) {	
+		List<IProprietaryTag> l = aisMessage.getTags();
+		for (IProprietaryTag iProprietaryTag : l) {
+			System.out.println(iProprietaryTag);
+		}
 		
 		//Check timeout
 		Date now = new Date();
@@ -84,9 +93,12 @@ public class MessageHandler implements IAisHandler {
 				
 		// What to do if no bsMmsi or timestamp?
 		if (bsMmsi == null || timestamp == null) {
-			return;
+			bsMmsi = defaultID; //determine id
+			timestamp = new Date();
+			System.out.println("message received: " + aisMessage.getMsgId());
 		}
-			
+
+		//It's a base station
 		if(aisMessage instanceof AisMessage4){
 			AisMessage4 m = (AisMessage4) aisMessage;
 			BaseStation b = project.getBaseStationHandler().grids.get(m.getUserId());
@@ -94,6 +106,7 @@ public class MessageHandler implements IAisHandler {
 				b.latitude = m.getPos().getGeoLocation().getLatitude();
 				b.longitude = m.getPos().getGeoLocation().getLongitude();
 			}
+			return;
 		}
 
 		// Handle position messages
@@ -125,13 +138,15 @@ public class MessageHandler implements IAisHandler {
 		}
 		
 		
-		if(pos.getLatitude() < 37){
+//		if(pos.getLatitude() < 37){
 			System.out.println("bsmsi: " + bsMmsi);
 			System.out.println("mmsi: " + posMessage.getUserId());
 			System.out.println("lat: "+ pos.getLatitude());
 			System.out.println("lon: " + pos.getLongitude());
+			System.out.println("cog: " + posMessage.getCog());
+			System.out.println("sog: " + posMessage.getSog());
 			System.out.println();
-		}
+//		}
 
 		// Check if grid exists (If a message with that bsmmsi has been received before)
 		// Otherwise create a grid for corresponding base station
@@ -141,7 +156,7 @@ public class MessageHandler implements IAisHandler {
 			gridHandler.createGrid(bsMmsi);
 			grid = gridHandler.getGrid(bsMmsi);
 		}
-		
+		System.out.println("Grid size "+grid.grid.size());
 		
 		
 		// Check which ship sent the message.

@@ -6,12 +6,14 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import javax.swing.JFileChooser;
+import javax.swing.JPanel;
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-import dk.dma.aiscoverage.KMLGenerator;
 import dk.dma.aiscoverage.data.BaseStation;
 import dk.dma.aiscoverage.data.BaseStationHandler;
+import dk.dma.aiscoverage.export.ImageGenerator;
+import dk.dma.aiscoverage.export.KMLGenerator;
 import dk.dma.aiscoverage.project.ProjectHandler;
 
 
@@ -21,6 +23,7 @@ public class GUIHelper {
 	FileFilter internalFilter = null;
 	FileFilter kmlFilter = null;
 	FileFilter shapeFilter = null;
+	FileFilter pngFilter = null;
 	ProjectHandler projectHandler = ProjectHandler.getInstance();
 	
 	
@@ -28,7 +31,8 @@ public class GUIHelper {
 	{
 		internalFilter = new FileNameExtensionFilter("aiscoverage", "aiscoverage"); 
 		kmlFilter = new FileNameExtensionFilter("kml", "kml"); 
-		shapeFilter = new FileNameExtensionFilter("shape", "shape"); 	
+		shapeFilter = new FileNameExtensionFilter("shape", "shape"); 
+		pngFilter = new FileNameExtensionFilter("png", "png"); 
 	}
 	
 	
@@ -114,6 +118,22 @@ public class GUIHelper {
 			KMLGenerator.generateKML(list , fileUrl+".kml");
 			
 			System.out.println(fileUrl + " printet");
+		}
+	}
+	public void savePNGDialog(JPanel panel){
+		fileChooser = new JFileChooser();
+		fileChooser.setBounds(0, 0, 600, 400);
+		fileChooser.setAcceptAllFileFilterUsed(false);
+		fileChooser.setFileFilter(pngFilter);
+
+		if (fileChooser.showSaveDialog(null) == JFileChooser.APPROVE_OPTION)
+		{
+			String fileUrl = fileChooser.getSelectedFile().getPath();
+			System.out.println(""+fileUrl);
+			
+			ImageGenerator.generatePNG(panel , fileUrl+".png");
+			
+			System.out.println(fileUrl + " saved");
 		}
 	}
 	

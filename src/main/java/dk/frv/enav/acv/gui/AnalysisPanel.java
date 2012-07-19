@@ -15,6 +15,7 @@ import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
+import javax.swing.ButtonGroup;
 import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.JCheckBox;
@@ -30,11 +31,13 @@ import com.bbn.openmap.gui.OMComponentPanel;
 
 import dk.dma.aiscoverage.data.BaseStation;
 import dk.dma.aiscoverage.data.Cell;
+import dk.dma.aiscoverage.export.ImageGenerator;
 import dk.dma.aiscoverage.project.ProjectHandler;
 import dk.dma.aiscoverage.project.ProjectHandlerListener;
 import dk.frv.enav.acv.ACV;
 import dk.frv.enav.acv.coverage.layers.BaseStationLayer;
 import dk.frv.enav.acv.coverage.layers.CoverageLayer;
+import dk.frv.enav.acv.coverage.layers.DensityPlotLayer;
 
 import java.awt.AWTEvent;
 import java.awt.GridBagLayout;
@@ -49,6 +52,7 @@ import javax.swing.border.MatteBorder;
 import java.awt.Color;
 import javax.swing.UIManager;
 import java.awt.GridLayout;
+import javax.swing.JRadioButton;
 
 
 public class AnalysisPanel extends OMComponentPanel implements ActionListener, AWTEventListener, ProjectHandlerListener {
@@ -86,10 +90,16 @@ public class AnalysisPanel extends OMComponentPanel implements ActionListener, A
 	private MainFrame mainFrame;
 	private boolean mouseDown = false;
 	private static Toolkit tk = Toolkit.getDefaultToolkit();
-    private static long eventMask = AWTEvent.MOUSE_EVENT_MASK +AWTEvent.MOUSE_WHEEL_EVENT_MASK;
+    private static long eventMask = AWTEvent.MOUSE_EVENT_MASK +AWTEvent.MOUSE_WHEEL_EVENT_MASK+AWTEvent.MOUSE_MOTION_EVENT_MASK;
     private JLabel lblRunningTime;
     private JLabel runningTime;
     private BaseStationLayer basestationLayer;
+    private ChartPanel chartPanel;
+    private boolean forceUpdateBaseStations = false;
+    private JPanel panel;
+    private JRadioButton coverageRadio;
+    private JRadioButton densityPlotRadio;
+    private DensityPlotLayer densityPlotLayer;
 
 	
 	/**
@@ -99,6 +109,34 @@ public class AnalysisPanel extends OMComponentPanel implements ActionListener, A
 		mapHandler = ACV.getMapHandler();
 		setBorder(null);
 		setLayout(new BorderLayout(0, 0));
+		
+		panel = new JPanel();
+		panel.setBorder(new TitledBorder(null, "View", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		add(panel, BorderLayout.NORTH);
+		
+		coverageRadio = new JRadioButton("Coverage");
+		coverageRadio.setSelected(true);
+		
+		densityPlotRadio = new JRadioButton("Density plot");
+		GroupLayout gl_panel = new GroupLayout(panel);
+		gl_panel.setHorizontalGroup(
+			gl_panel.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_panel.createSequentialGroup()
+					.addContainerGap()
+					.addComponent(coverageRadio)
+					.addGap(18)
+					.addComponent(densityPlotRadio)
+					.addContainerGap(12, Short.MAX_VALUE))
+		);
+		gl_panel.setVerticalGroup(
+			gl_panel.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_panel.createSequentialGroup()
+					.addGroup(gl_panel.createParallelGroup(Alignment.BASELINE)
+						.addComponent(coverageRadio)
+						.addComponent(densityPlotRadio))
+					.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+		);
+		panel.setLayout(gl_panel);
 		
 		baseStationWrapperPanel = new JPanel();
 		baseStationWrapperPanel.setBorder(new TitledBorder(null, "Base Stations", TitledBorder.LEADING, TitledBorder.TOP, null, null));
@@ -273,6 +311,12 @@ public class AnalysisPanel extends OMComponentPanel implements ActionListener, A
 		btnStopAnalysis.addActionListener(this);
 		chckbxSelectAll.addActionListener(this);
 		tk.addAWTEventListener(this, eventMask);
+		densityPlotRadio.addActionListener(this);
+		coverageRadio.addActionListener(this);
+		
+		ButtonGroup viewGroup = new ButtonGroup();
+		viewGroup.add(coverageRadio);
+		viewGroup.add(densityPlotRadio);
 		
 		ProjectHandler.getInstance().addProjectHandlerListener(this);
 //		ProjectHandler.getInstance().loadProject("C:\\Users\\Kasper\\Desktop\\save.ana");
@@ -303,7 +347,6 @@ public class AnalysisPanel extends OMComponentPanel implements ActionListener, A
 		//This thread updates the coverage layer.
 		//We don't use a Swing timer, since this is a bit heavy
 		updateCoverageThread = new Thread(new Runnable(){
-			
 
 			@Override
 			public void run() {
@@ -325,23 +368,27 @@ public class AnalysisPanel extends OMComponentPanel implements ActionListener, A
 						if(ProjectHandler.getInstance().getProject() != null){
 							if(updateCoverageLayer || ProjectHandler.getInstance().getProject().isRunning()){
 								
-								// Update coverage layer
-								List<Long> baseStations = new ArrayList<Long>();
-								Collection<JCheckBox> checkboxes = bsmmsis.values();
-								for (JCheckBox jCheckBox : checkboxes) {
-									if (jCheckBox.isSelected())
-										baseStations.add(Long.parseLong(jCheckBox.getText()));
+								if(coverageRadio.isSelected()){
+									// Update coverage layer
+									Collection<Cell> cells = ProjectHandler.getInstance().getProject()
+											.getCoverage();
+									if (coverageLayer != null && cells != null) {
+										coverageLayer.doUpdate(cells);
+									}
 								}
-								Collection<Cell> cells = ProjectHandler.getInstance().getProject()
-										.getCoverage(baseStations);
-								System.out.println(cells.size());
-								if (coverageLayer != null && cells != null) {
-									coverageLayer.doUpdate(cells);
+								
+								if(densityPlotRadio.isSelected()){
+									Collection<Cell> cells = ProjectHandler.getInstance().getProject()
+											.getCoverage();
+									if (densityPlotLayer != null && cells != null) {
+										densityPlotLayer.doUpdate(cells);
+									}
 								}
 								
 								//update base station layer
-								basestationLayer.doUpdate(ProjectHandler.getInstance().getProject().getBaseStationHandler().grids.values());
+								basestationLayer.doUpdate(ProjectHandler.getInstance().getProject().getBaseStationHandler().grids.values(), forceUpdateBaseStations);
 								
+								forceUpdateBaseStations = false;
 								updateCoverageLayer = false;
 							}
 						}
@@ -376,14 +423,6 @@ public class AnalysisPanel extends OMComponentPanel implements ActionListener, A
 		int i = 0;
 		for(Long bsmmsi : bsmmsis){
 			JCheckBox checkbox = this.bsmmsis.get(bsmmsi);
-			if(checkbox == null){
-				checkbox = new JCheckBox(bsmmsi+"");
-				checkbox.setHorizontalAlignment(SwingConstants.LEFT);
-				this.bsmmsis.put(bsmmsi, checkbox);
-				if(chckbxSelectAll.isSelected()) checkbox.setSelected(true);
-				checkbox.addActionListener(this);
-			}
-			
 			GridBagConstraints constraints = new GridBagConstraints();
 			constraints.insets = new Insets(5, 25, 0, 0);
 			constraints.anchor = GridBagConstraints.WEST;
@@ -425,9 +464,10 @@ public class AnalysisPanel extends OMComponentPanel implements ActionListener, A
 	 * If it is called multiple times before an update, the layer will
 	 * only be updated once.
 	 */
-	public void updateCoverage(int delay){
+	public void updateCoverage(int delay, boolean forceUpdate){
 		waitUpdate = delay;
 		updateCoverageLayer = true;
+		forceUpdateBaseStations = forceUpdate;
 	}
 	
 	private String runningTimeToString(Long secondsElapsed){
@@ -444,7 +484,6 @@ public class AnalysisPanel extends OMComponentPanel implements ActionListener, A
 		return hoursString + ":"+minutesString+":"+secondsString;
 	}
 	
-//<<<<<<< HEAD
 	private void updateProgress(){
 		if(ProjectHandler.getInstance().getProject() == null){
 			System.out.println("no project");
@@ -464,7 +503,6 @@ public class AnalysisPanel extends OMComponentPanel implements ActionListener, A
 			runningTime.setText("-");
 		}
 	}
-//=======
 	public void startAnalysis(){
 		//ProjectHandler.getInstance().getProject().setFile("C:\\Users\\Kasper\\Desktop\\aisdump.txt");
 		try {
@@ -473,7 +511,6 @@ public class AnalysisPanel extends OMComponentPanel implements ActionListener, A
 			e1.printStackTrace();
 		} catch (InterruptedException e1) {
 			e1.printStackTrace();
-//>>>>>>> 5a4a745eaa998180988aeed853c43d32dc1ad889
 		}
 	}
 
@@ -483,9 +520,6 @@ public class AnalysisPanel extends OMComponentPanel implements ActionListener, A
 		
 		//start the analysis
 		if (e.getSource() == btnStartAnalysis) {
-//			ProjectHandler.getInstance().getProject().setFile("C:\\Users\\Kasper\\Desktop\\aisdump.txt");
-			ProjectHandler.getInstance().getProject().setHostPort("ais163.sealan.dk:65262");
-
 			try {
 				ProjectHandler.getInstance().getProject().startAnalysis(); //start thread
 			} catch (FileNotFoundException e1) {
@@ -502,13 +536,29 @@ public class AnalysisPanel extends OMComponentPanel implements ActionListener, A
 		
 		// Checkbox event, refresh coverageLayer
 		else if(e.getSource().getClass() == JCheckBox.class){
-			updateCoverage(1);
-			if(e.getSource() == chckbxSelectAll) 
+			if(e.getSource() == chckbxSelectAll) {
 				selectAll(chckbxSelectAll.isSelected());
-			else
+				ProjectHandler.getInstance().getProject().getBaseStationHandler().setAllVisible(chckbxSelectAll.isSelected());
+			}
+			else{
+				JCheckBox checkBox = (JCheckBox) e.getSource();
 				chckbxSelectAll.setSelected(false);
-			
+				ProjectHandler.getInstance().getProject().getBaseStationHandler().setVisible(Long.parseLong(checkBox.getText()), checkBox.isSelected());
+			}
 		}
+		
+		// View is changed
+		else if(e.getSource() == coverageRadio) {
+			System.out.println("coverage");
+			coverageLayer.setVisible(true);
+			densityPlotLayer.setVisible(false);
+		}
+		else if(e.getSource() == densityPlotRadio) {
+			System.out.println("density");
+			coverageLayer.setVisible(false);
+			densityPlotLayer.setVisible(true);
+		}
+
 		
 	}
 	
@@ -520,6 +570,10 @@ public class AnalysisPanel extends OMComponentPanel implements ActionListener, A
 			coverageLayer = (CoverageLayer) obj;
 		}else if (obj instanceof BaseStationLayer) {
 			basestationLayer = (BaseStationLayer) obj;
+		}else if (obj instanceof ChartPanel) {
+			chartPanel = (ChartPanel) obj;
+		}else if (obj instanceof DensityPlotLayer) {
+			densityPlotLayer = (DensityPlotLayer) obj;
 		}
 	}
 
@@ -534,7 +588,9 @@ public class AnalysisPanel extends OMComponentPanel implements ActionListener, A
 	public void analysisStopped() {
 		System.out.println("analysis stopped");
 		updateButtons();
-		updateCoverage(0);		
+		updateCoverage(0, true);
+		System.out.println("yeah");
+		
 	}
 	
 	/*
@@ -561,12 +617,36 @@ public class AnalysisPanel extends OMComponentPanel implements ActionListener, A
 	private void resetGui(){
 		this.bsmmsis.clear();
 		updateButtons();
-		updateCoverage(0);
+		updateCoverage(0, true);
 	}
 
 	@Override
 	public void projectCreated() {
 		resetGui();
 		System.out.println("created");
+	}
+
+	@Override
+	public void visibilityChanged(long mmsi) {
+		BaseStation basestation = ProjectHandler.getInstance().getProject().getBaseStationHandler().getGrid(mmsi);
+		JCheckBox checkbox = this.bsmmsis.get(mmsi);
+		checkbox.setSelected(basestation.isVisible());
+		updateCoverage(1, true);
+	}
+
+	@Override
+	public void basestationAdded(long mmsi) {
+		BaseStation basestation = ProjectHandler.getInstance().getProject().getBaseStationHandler().getGrid(mmsi);
+		JCheckBox checkbox = new JCheckBox(mmsi+"");
+		checkbox.setHorizontalAlignment(SwingConstants.LEFT);		
+		this.bsmmsis.put(mmsi, checkbox);	
+		checkbox.addActionListener(this);
+		if(chckbxSelectAll.isSelected()){
+			basestation.setVisible(true);
+			
+		}else{
+			basestation.setVisible(false);
+		}
+		
 	}
 }

@@ -60,8 +60,11 @@ public class NewAnalysis extends JFrame {
 				dk.dma.aiscoverage.project.AisCoverageProject project = projectHandler.createProject();
 				project.setCellSize(Integer.parseInt(textField.getText()));
 				System.out.println(textField.getText());
-				project.setFile(txtTypeInInput.getText());
-
+//				project.setFile(txtTypeInInput.getText());
+//				project.addHostPort("172.28.25.66:9240");
+//				project.addHostPort("172.28.37.66:9240");
+				project.addHostPort("10.3.246.210:9240");
+	
 //				if (comboBox.getSelectedItem() == "Calculator 1") {
 //					System.out.println("calculator 1");
 //					project.setCalculator(new dk.dma.aiscoverage.calculator.CoverageCalculatorAdvanced1());

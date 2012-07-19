@@ -61,6 +61,7 @@ import dk.frv.ais.geo.GeoLocation;
 import dk.frv.enav.acv.ACV;
 import dk.frv.enav.acv.coverage.layers.BaseStationLayer;
 import dk.frv.enav.acv.coverage.layers.CoverageLayer;
+import dk.frv.enav.acv.coverage.layers.DensityPlotLayer;
 import dk.frv.enav.acv.event.NavigationMouseMode;
 import dk.frv.enav.acv.settings.MapSettings;
 
@@ -82,6 +83,7 @@ public class ChartPanel extends OMComponentPanel implements MouseWheelListener {
 	private NavigationMouseMode mapNavMouseMode;
 	private MouseDelegator mouseDelegator;
 	public int maxScale = 5000;
+	private DensityPlotLayer densityPlotLayer;
 
 
 	public ChartPanel() {
@@ -113,7 +115,7 @@ public class ChartPanel extends OMComponentPanel implements MouseWheelListener {
 		// Adding NavMouseMode first makes it active.
 		 mapHandler.add(new NavMouseMode());
 		 
-		 //Mouse mode
+		 //Mouse mode	
 		mapNavMouseMode = new NavigationMouseMode(this);
 		mouseDelegator.addMouseMode(mapNavMouseMode);
 		mouseDelegator.setActive(mapNavMouseMode);
@@ -167,6 +169,11 @@ public class ChartPanel extends OMComponentPanel implements MouseWheelListener {
 		basestationLayer = new BaseStationLayer();
 		basestationLayer.setVisible(true);
 		mapHandler.add(basestationLayer);
+		
+		//add density plot layer
+		densityPlotLayer = new DensityPlotLayer();
+		densityPlotLayer.setVisible(true);
+		mapHandler.add(densityPlotLayer);
 		
 	}
 

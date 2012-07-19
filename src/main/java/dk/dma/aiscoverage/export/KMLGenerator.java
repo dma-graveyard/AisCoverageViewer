@@ -13,7 +13,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this library.  If not, see <http://www.gnu.org/licenses/>.
  */
-package dk.dma.aiscoverage;
+package dk.dma.aiscoverage.export;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.concurrent.ConcurrentHashMap;
 
+import dk.dma.aiscoverage.GlobalSettings;
 import dk.dma.aiscoverage.data.Cell;
 import dk.dma.aiscoverage.data.BaseStation;
 import dk.dma.aiscoverage.project.ProjectHandler;

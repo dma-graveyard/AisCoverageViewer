@@ -22,6 +22,16 @@ public class ProjectHandler {
 		}
 		project = null;
 	}
+	public void basestationAdded(long mmsi){
+		for (ProjectHandlerListener listener : listeners) {
+			listener.basestationAdded(mmsi);
+		}
+	}
+	public void visibilityChanged(long mmsi){
+		for (ProjectHandlerListener listener : listeners) {
+			listener.visibilityChanged(mmsi);
+		}
+	}
 	public void analysisStopped(){
 		for (ProjectHandlerListener listener : listeners) {
 			listener.analysisStopped();

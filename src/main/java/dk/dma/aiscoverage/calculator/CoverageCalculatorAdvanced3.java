@@ -85,8 +85,9 @@ public class CoverageCalculatorAdvanced3 extends AbstractCoverageCalculator {
 		Cell cell = m1.grid.getCell(m1.latitude, m1.longitude);
 		if(cell == null){
 			cell = m1.grid.createCell(m1.latitude, m1.longitude);
-			cell.ships.put(m1.ship.mmsi, m1.ship);
 		}
+		cell.ships.put(m1.ship.mmsi, m1.ship);
+		m1.grid.messageCount++;
 		cell.NOofReceivedSignals++;
 		this.cellChanged(cell);
 		
@@ -125,7 +126,7 @@ public class CoverageCalculatorAdvanced3 extends AbstractCoverageCalculator {
 				if(c == null){
 					c = m2.grid.createCell(projection.y2Lat(xMissing, yMissing), projection.x2Lon(xMissing, yMissing));
 				}
-
+				c.ships.put(m1.ship.mmsi, m1.ship);
 				c.NOofMissingSignals++;
 				this.cellChanged(c);
 			}
