@@ -14,8 +14,11 @@ import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import javax.swing.JTabbedPane;
 import javax.swing.JLabel;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.JRadioButton;
+import javax.swing.ScrollPaneConstants;
+
 import java.awt.Panel;
 import java.awt.Button;
 import javax.swing.JComboBox;
@@ -23,6 +26,7 @@ import javax.swing.AbstractAction;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.io.FileFilter;
+import java.util.ArrayList;
 
 import javax.swing.Action;
 import java.awt.event.ActionListener;
@@ -38,6 +42,7 @@ import javax.swing.JCheckBox;
 import com.bbn.openmap.gui.OMComponentPanel;
 
 import java.awt.FlowLayout;
+import javax.swing.JScrollPane;
 
 public class NewAnalysis extends JFrame {
 
@@ -55,6 +60,7 @@ public class NewAnalysis extends JFrame {
 	ProjectHandler projectHandler = ProjectHandler.getInstance();
 	JRadioButton rdbtnInputfile = new JRadioButton("Input-File");
 	JRadioButton rdbtnInputstream = new JRadioButton("Input-Stream");
+	JRadioButton rdbtnInputfromip = new JRadioButton("Input-From-IP");
 	JCheckBox chckbxIncludeTurningShips = new JCheckBox("Include turning ships");
 	JCheckBox chckbxAdvancedSettings = new JCheckBox("Advanced settings");
 	JButton btnDone = new JButton("New");
@@ -68,6 +74,7 @@ public class NewAnalysis extends JFrame {
 	private JTextField mapTextField;
 	private JTextField textField_3;
 	private JTextField textField_4;
+	JTextArea ta = new JTextArea("this is a");
 
 	/**
 	 * Create the frame.
@@ -86,8 +93,13 @@ public class NewAnalysis extends JFrame {
 		//frame.setMaximumSize(new Dimension(460, 370));
 		//frame.setMinimumSize(new Dimension(460, 370));
 		frame.setSize(new Dimension(460,250));
+		ta.setBounds(10, 35, 404, 70);
+		//ta.setRows(3);
+		//ta.setVisible(false);
 		//frame.pack();
 
+		//frame.pack();
+		//contentPane.
 		//frame.pack();
 		
 	
@@ -109,6 +121,21 @@ public class NewAnalysis extends JFrame {
 		txtTypeInInput.setEditable(false);
 		txtTypeInInput.setText("Select file");
 		
+		
+		final JScrollPane scrollPane = new JScrollPane();
+		//scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+		//scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+		scrollPane.setBounds(10, 35, 405, 70);
+		inputPanel.add(scrollPane);
+		scrollPane.setVisible(false);
+		
+		ta.setText("indtast ip");
+		scrollPane.setViewportView(ta);
+		
+		
+		
+		//inputPanel.add(ta);
+		
 
 		final JButton btnSelectFile = new JButton("Select File");
 		btnSelectFile.setBounds(318, 36, 96, 23);
@@ -124,18 +151,31 @@ public class NewAnalysis extends JFrame {
 		 * radiobutton1
 		 */
 		//JRadioButton rdbtnInputfile = new JRadioButton("Input-File");
-		rdbtnInputfile.setBounds(199, 7, 109, 23);
+		rdbtnInputfile.setBounds(116, 7, 86, 23);
 		inputPanel.add(rdbtnInputfile);
 		bg.add(rdbtnInputfile);
 		rdbtnInputfile.setSelected(true);
 		rdbtnInputfile.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				txtTypeInInput.setVisible(true);
 				txtTypeInInput.setEditable(false);
 				txtTypeInInput.setText("Select File");
 				txtTypeInInput.setSize(300, 20);
 				btnSelectFile.setVisible(true);
 				//inputPanel.revalidate();
+				scrollPane.setVisible(false);
+				inputPanel.setPreferredSize(new Dimension(425, 80));
 				contentPane.repaint();
+				if (chckbxAdvancedSettings.isSelected() == false)
+				{
+				frame.setSize(new Dimension(460,250));
+				frame.repaint();
+				}
+				else if (chckbxAdvancedSettings.isSelected() == true)
+				{
+				frame.setSize(new Dimension(460,420));
+				frame.repaint();
+				}
 				
 				
 			}
@@ -145,64 +185,125 @@ public class NewAnalysis extends JFrame {
 		 * radiobutton2
 		 */
 		//JRadioButton rdbtnInputstream = new JRadioButton("Input-Stream");
-		rdbtnInputstream.setBounds(310, 7, 109, 23);
+		rdbtnInputstream.setBounds(204, 7, 96, 23);
 		inputPanel.add(rdbtnInputstream);
 		bg.add(rdbtnInputstream);
 		rdbtnInputstream.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				System.out.print("ha");
+				txtTypeInInput.setVisible(true);
 				txtTypeInInput.setEditable(true);
 				txtTypeInInput.setText("Type in input stream url or select file");
 				txtTypeInInput.setSize(400, 20);
 				btnSelectFile.setVisible(false);
 				//inputPanel.revalidate();
+				scrollPane.setVisible(false);
+				inputPanel.setPreferredSize(new Dimension(425, 80));
 				contentPane.repaint();
+				if (chckbxAdvancedSettings.isSelected() == false)
+				{
+				frame.setSize(new Dimension(460,250));
+				frame.repaint();
+				}
+				else if (chckbxAdvancedSettings.isSelected() == true)
+				{
+				frame.setSize(new Dimension(460,420));
+				frame.repaint();
+				}
 				
 			}
 		});
+		
+		
+		/*
+		 * radiobutton 3
+		 */
+		//JRadioButton rdbtnInputfromip = new JRadioButton("Input-From-IP");
+		rdbtnInputfromip.setBounds(305, 7, 109, 23);
+		inputPanel.add(rdbtnInputfromip);
+		bg.add(rdbtnInputfromip);
+		rdbtnInputfromip.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				System.out.print("ha");
+				//txtTypeInInput.setEditable(true);
+				//txtTypeInInput.setText("Type in input stream url or select file");
+				//txtTypeInInput.setSize(400, 20);
+				
+				//JTextArea ta = new JTextArea("this is a");
+				//ta.setBounds(0, 0, 444, 272);
+				//ta.setEditable(true);
+				//inputPanel.add(ta);
+				scrollPane.setVisible(true);
+				ta.setWrapStyleWord(true);
+				
+				txtTypeInInput.setVisible(false);
+				btnSelectFile.setVisible(false);
+				//inputPanel.revalidate();
+				inputPanel.setPreferredSize(new Dimension(425, 120));
+				contentPane.repaint();
+				
+				
+				if (chckbxAdvancedSettings.isSelected() == false)
+				{
+				frame.setSize(new Dimension(460,290));
+				frame.repaint();
+				}
+				else if (chckbxAdvancedSettings.isSelected() == true)
+				{
+				frame.setSize(new Dimension(460,460));
+				frame.repaint();
+				}
+				
+			}
+		});
+		
+		
+		
+		
+		
 		
 		/*
 		 * analysis panel
 		 */
 		final JPanel gridPanel = new JPanel();
 		gridPanel.setBorder(new TitledBorder(null, "Analysis settings", TitledBorder.LEADING, TitledBorder.TOP, null, null));
-		gridPanel.setPreferredSize(new Dimension(425, 80));
+		gridPanel.setPreferredSize(new Dimension(425, 85));
 		contentPane.add(gridPanel);
 		gridPanel.setLayout(null);
 
 
 		
 		final JLabel lblCellSize = new JLabel("CellSize: ");
-		lblCellSize.setBounds(6, 16, 43, 20);
+		lblCellSize.setBounds(10, 21, 43, 20);
 		gridPanel.add(lblCellSize);
 		
 		textField = new JTextField();
-		textField.setLocation(49, 16);
+		textField.setLocation(52, 21);
 		gridPanel.add(textField);
 		textField.setText("2500");
-		textField.setSize(339, 20);
+		textField.setSize(335, 20);
 		textField.setHorizontalAlignment(textField.RIGHT);
 
 		final JLabel lblMeter = new JLabel(" Meter");
-		lblMeter.setBounds(388, 16, 31, 20);
+		lblMeter.setBounds(388, 21, 31, 20);
 		gridPanel.add(lblMeter);
 		
 		
 		
 		final JLabel lblRunAnalysis = new JLabel("Run analysis for");
-		lblRunAnalysis.setBounds(212, 47, 80, 14);
+		lblRunAnalysis.setBounds(246, 52, 80, 14);
 		lblRunAnalysis.setVisible(false);
 		gridPanel.add(lblRunAnalysis);
 		
 		textField_2 = new JTextField();
 		textField_2.setText("00:01");
-		textField_2.setBounds(302, 44, 86, 20);
+		textField_2.setBounds(336, 52, 52, 20);
 		textField_2.setVisible(false);
 		gridPanel.add(textField_2);
 		textField_2.setColumns(10);
 		
 		final JCheckBox chckbxSetAnalysisTimer = new JCheckBox("Set analysis timer");
-		chckbxSetAnalysisTimer.setBounds(6, 43, 174, 23);
+		chckbxSetAnalysisTimer.setBounds(6, 52, 174, 23);
 		gridPanel.add(chckbxSetAnalysisTimer);
 		chckbxSetAnalysisTimer.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -246,7 +347,7 @@ public class NewAnalysis extends JFrame {
 		textField_1 = new JTextField();
 		textField_1.setBounds(222, 50, 133, 20);
 		calculatorPanel.add(textField_1);
-		textField_1.setText("2");
+		textField_1.setText("20");
 		
 		final JLabel lblShipRotationPer = new JLabel("Turning = ");
 		lblShipRotationPer.setBounds(168, 53, 156, 14);
@@ -332,26 +433,28 @@ public class NewAnalysis extends JFrame {
 		mapPanel.add(textField_4);
 		textField_4.setVisible(false);
 		
-		JCheckBox chckbxSetMapCenterpoint = new JCheckBox("Set map centerpoint");
+		final JCheckBox chckbxSetMapCenterpoint = new JCheckBox("Set map centerpoint");
 		chckbxSetMapCenterpoint.setBounds(10, 48, 149, 23);
 		mapPanel.add(chckbxSetMapCenterpoint);
-		chckbxSetAnalysisTimer.addActionListener(new ActionListener() {
+		chckbxSetMapCenterpoint.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				System.out.print("har");
-				if(chckbxSetAnalysisTimer.isSelected() == false)
+				if(chckbxSetMapCenterpoint.isSelected() == false)
 				{
 					lblLat.setVisible(false);
 					lblLong.setVisible(false);
 					textField_3.setVisible(false);
 					textField_4.setVisible(false);
+					mapPanel.repaint();
 					contentPane.repaint();
 				}
-				else if(chckbxSetAnalysisTimer.isSelected() == true)
+				else if(chckbxSetMapCenterpoint.isSelected() == true)
 				{
 					lblLat.setVisible(true);
 					lblLong.setVisible(true);
 					textField_3.setVisible(true);
 					textField_4.setVisible(true);
+					mapPanel.repaint();
 					contentPane.repaint();
 				}				
 			}
@@ -377,22 +480,49 @@ public class NewAnalysis extends JFrame {
 				if(chckbxAdvancedSettings.isSelected() == false)
 				{
 					calculatorPanel.setVisible(false);
-					frame.setSize(new Dimension(460,250));
-					contentPane.repaint();
-					frame.repaint();
+					mapPanel.setVisible(false);
+					
+					if (rdbtnInputfromip.isSelected() == false)
+					{
+						frame.setSize(new Dimension(460,250));
+						contentPane.repaint();
+						frame.repaint();
+					}
+					else if (rdbtnInputfromip.isSelected() == true)
+					{
+						frame.setSize(new Dimension(460,290));
+						contentPane.repaint();
+						frame.repaint();
+					}
+					
 				}
 				else if(chckbxAdvancedSettings.isSelected() == true)
 				{
 
 					calculatorPanel.setVisible(true);
-					frame.setSize(new Dimension(460,420));
-					contentPane.repaint();
-					frame.repaint();
+					mapPanel.setVisible(true);
+					
+					if (rdbtnInputfromip.isSelected() == false)
+					{
+						frame.setSize(new Dimension(460,420));
+						contentPane.repaint();
+						frame.repaint();
+					}
+					else if (rdbtnInputfromip.isSelected() == true)
+					{
+						frame.setSize(new Dimension(460,460));
+						contentPane.repaint();
+						frame.repaint();
+					}
+					
 				}				
 			}
 		});
 		btnDone.setBounds(287, 5, 53, 23);
 		
+		/*
+		 * new button
+		 */
 		//JButton btnDone = new JButton("New");
 		btnDone.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -451,12 +581,28 @@ public class NewAnalysis extends JFrame {
 						{
 							calc.setIgnoreRotation(true);
 							calc.setBufferInSeconds(Integer.parseInt(txtMessageBuffer.getText()));
+							if(chckbxSetAnalysisTimer.isSelected() == true)
+							{
+							analysisPanel.setAnalysisData(txtTypeInInput.getText(), "Advanced", textField.getText(), textField_2.getText());
+							}
+							else
+							{
+								analysisPanel.setAnalysisData(txtTypeInInput.getText(), "Advanced", textField.getText(), "-");
+							}
 						}
 						else if (chckbxIncludeTurningShips.isSelected() == true)
 						{
 							calc.setIgnoreRotation(false);
 							calc.setBufferInSeconds(Integer.parseInt(txtMessageBuffer.getText()));
 							calc.setDegreesPerMinute(Integer.parseInt(textField_1.getText()));
+							if(chckbxSetAnalysisTimer.isSelected() == true)
+							{
+							analysisPanel.setAnalysisData(txtTypeInInput.getText(), "Advanced", textField.getText(), textField_2.getText());
+							}
+							else
+							{
+								analysisPanel.setAnalysisData(txtTypeInInput.getText(), "Advanced", textField.getText(), "-");
+							}
 						}
 						
 						
@@ -471,10 +617,88 @@ public class NewAnalysis extends JFrame {
 							project.setTimeout(sec);
 						}
 						
-						analysisPanel.setAnalysisData(txtTypeInInput.getText(), "Advanced", textField.getText(), "999h");
+						//analysisPanel.setAnalysisData(txtTypeInInput.getText(), "Advanced", textField.getText(), textField_2.getText());
 						dispose();
 					}
 				}
+				else if (rdbtnInputfromip.isSelected())
+				{
+					if(ta.getText().contains("indtast ip"))
+					{
+						//give error message
+					}
+					else
+					{
+						//if(txtTypeInInput.getText().contains("port number")))
+						
+						//ArrayList<String> ip = new ArrayList<String>();
+						
+						String ips = ta.getText();
+						System.out.println(ips);
+						//System.out.println(ips.split("\n"));
+						//ip = ips.split("\n");
+						System.out.println(ips.split("\n").length);
+						String[] ip;
+						ip = ips.split("\n");
+						
+						for (String ib : ip)
+						{
+							//System.out.println(ib);
+							//assign ip's to the program
+						}
+						
+						
+						
+						
+						project.setHostPort(ta.getText());
+						CoverageCalculatorAdvanced3 calc = new dk.dma.aiscoverage.calculator.CoverageCalculatorAdvanced3();
+						
+						if(chckbxIncludeTurningShips.isSelected() == false)
+						{
+							calc.setIgnoreRotation(true);
+							calc.setBufferInSeconds(Integer.parseInt(txtMessageBuffer.getText()));
+							if(chckbxSetAnalysisTimer.isSelected() == true)
+							{
+							analysisPanel.setAnalysisData(txtTypeInInput.getText(), "Advanced", textField.getText(), textField_2.getText());
+							}
+							else
+							{
+								analysisPanel.setAnalysisData(txtTypeInInput.getText(), "Advanced", textField.getText(), "-");
+							}
+						}
+						else if (chckbxIncludeTurningShips.isSelected() == true)
+						{
+							calc.setIgnoreRotation(false);
+							calc.setBufferInSeconds(Integer.parseInt(txtMessageBuffer.getText()));
+							calc.setDegreesPerMinute(Integer.parseInt(textField_1.getText()));
+							if(chckbxSetAnalysisTimer.isSelected() == true)
+							{
+							analysisPanel.setAnalysisData(txtTypeInInput.getText(), "Advanced", textField.getText(), textField_2.getText());
+							}
+							else
+							{
+								analysisPanel.setAnalysisData(txtTypeInInput.getText(), "Advanced", textField.getText(), "-");
+							}
+						}
+						
+						
+						project.setCalculator(calc);
+						project.setCellSize(Integer.parseInt(textField.getText()));
+						
+						if(chckbxSetAnalysisTimer.isSelected() == true)
+						{
+							int hour = Integer.parseInt(textField_2.getText().substring(0, 1));
+							int min = Integer.parseInt(textField_2.getText().substring(3, 4));
+							int sec = (((hour * 60) + min) * 60);
+							project.setTimeout(sec);
+						}
+						
+						//analysisPanel.setAnalysisData(txtTypeInInput.getText(), "Advanced", textField.getText(), textField_2.getText());
+						dispose();
+					}
+				}
+				
+				
 
 				System.out.println("set alle settings");
 				

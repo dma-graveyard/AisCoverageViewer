@@ -11,6 +11,11 @@ import javax.swing.JButton;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.FlowLayout;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.DropMode;
+import javax.swing.JScrollBar;
+import javax.swing.ScrollPaneConstants;
 
 public class Test extends JFrame {
 
@@ -41,30 +46,19 @@ public class Test extends JFrame {
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
-		contentPane.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
+		contentPane.setLayout(null);
 		
-		JButton btnNewButton = new JButton("New button");
-		contentPane.add(btnNewButton);
+		JScrollPane scrollPane = new JScrollPane();
+		scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+		scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+		scrollPane.setBounds(10, 11, 414, 57);
+		contentPane.add(scrollPane);
 		
-		JButton btnNewButton_1 = new JButton("New button");
-		contentPane.add(btnNewButton_1);
+		JTextArea txtrGurli = new JTextArea();
+		txtrGurli.setText("indtast ip");
+		scrollPane.setViewportView(txtrGurli);
 		
-		JButton btnNewButton_2 = new JButton("New button");
-		contentPane.add(btnNewButton_2);
 		
-		JButton btnNewButton_3 = new JButton("New button");
-		contentPane.add(btnNewButton_3);
-		
-		JButton btnNewButton_4 = new JButton("New button");
-		contentPane.add(btnNewButton_4);
-		
-		JButton btnNewButton_5 = new JButton("New button");
-		contentPane.add(btnNewButton_5);
-		
-		JPanel panel = new JPanel();
-		contentPane.add(panel);
-		JPanel panel1 = new JPanel();
 		
 	}
-
 }
