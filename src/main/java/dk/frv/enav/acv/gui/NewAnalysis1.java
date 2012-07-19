@@ -4,6 +4,7 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.Frame;
+import java.awt.GridLayout;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
@@ -44,7 +45,7 @@ import com.bbn.openmap.gui.OMComponentPanel;
 import java.awt.FlowLayout;
 import javax.swing.JScrollPane;
 
-public class NewAnalysis extends JFrame {
+public class NewAnalysis1 extends JFrame {
 
 
 	/**
@@ -74,12 +75,13 @@ public class NewAnalysis extends JFrame {
 	private JTextField mapTextField;
 	private JTextField textField_3;
 	private JTextField textField_4;
+	
 	JTextArea ta = new JTextArea("this is a");
 
 	/**
 	 * Create the frame.
 	 */
-	public NewAnalysis(AnalysisPanel ap) {
+	public NewAnalysis1(AnalysisPanel ap) {
 		analysisPanel = ap; 
 		
 		setResizable(false);
@@ -92,7 +94,10 @@ public class NewAnalysis extends JFrame {
 		contentPane.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
 		//frame.setMaximumSize(new Dimension(460, 370));
 		//frame.setMinimumSize(new Dimension(460, 370));
-		frame.setSize(new Dimension(460,255));
+		//frame.setSize(new Dimension(460,255));
+		//frame.pack();
+		frame.setLayout(new GridLayout(0,1));
+		frame.setMaximumSize(new Dimension(460, 500));
 		ta.setBounds(10, 35, 404, 70);
 		//ta.setRows(3);
 		//ta.setVisible(false);
@@ -111,8 +116,9 @@ public class NewAnalysis extends JFrame {
 		 */
 		final JPanel inputPanel = new JPanel();
 		inputPanel.setBorder(new TitledBorder(null, "Input", TitledBorder.LEADING, TitledBorder.TOP, null, null));
-		contentPane.add(inputPanel);
+		
 		inputPanel.setPreferredSize(new Dimension(425, 80));
+		frame.add(inputPanel);
 		inputPanel.setLayout(null);
 
 		txtTypeInInput = new JTextField();
@@ -267,8 +273,9 @@ public class NewAnalysis extends JFrame {
 		 */
 		final JPanel gridPanel = new JPanel();
 		gridPanel.setBorder(new TitledBorder(null, "Analysis settings", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		
+		frame.add(gridPanel);
 		gridPanel.setPreferredSize(new Dimension(425, 85));
-		contentPane.add(gridPanel);
 		gridPanel.setLayout(null);
 
 
@@ -329,9 +336,10 @@ public class NewAnalysis extends JFrame {
 		 */
 		final JPanel calculatorPanel = new JPanel();
 		calculatorPanel.setBorder(new TitledBorder(null, "Calculator", TitledBorder.LEADING, TitledBorder.TOP, null, null));
-		contentPane.add(calculatorPanel);
-		calculatorPanel.setVisible(false);
-		calculatorPanel.setPreferredSize(new Dimension(425, 80));
+		frame.add(calculatorPanel);
+		//calculatorPanel.setVisible(false);
+		//calculatorPanel.setPreferredSize(new Dimension(425, 80));
+		calculatorPanel.setPreferredSize(new Dimension(425, 0));
 		calculatorPanel.setLayout(null);
 		
 		txtMessageBuffer = new JTextField();
@@ -393,9 +401,10 @@ public class NewAnalysis extends JFrame {
 		 */
 		final JPanel mapPanel = new JPanel();
 		mapPanel.setBorder(new TitledBorder(null, "Map", TitledBorder.LEADING, TitledBorder.TOP, null, null));
-		contentPane.add(mapPanel);
-		mapPanel.setVisible(false);
-		mapPanel.setPreferredSize(new Dimension(425, 80));
+		frame.add(mapPanel);
+		//mapPanel.setVisible(false);
+		//mapPanel.setPreferredSize(new Dimension(425, 80));
+		mapPanel.setPreferredSize(new Dimension(425, 0));
 		mapPanel.setLayout(null);
 		
 		mapTextField = new JTextField();
@@ -466,7 +475,7 @@ public class NewAnalysis extends JFrame {
 		 * button panel
 		 */
 		final JPanel buttonPanel = new JPanel();
-		contentPane.add(buttonPanel);
+		frame.add(buttonPanel);
 		buttonPanel.setPreferredSize(new Dimension(425, 40));
 		buttonPanel.setLayout(null);
 		chckbxAdvancedSettings.setBounds(0, 5, 115, 23);
@@ -479,18 +488,23 @@ public class NewAnalysis extends JFrame {
 				System.out.print("har");
 				if(chckbxAdvancedSettings.isSelected() == false)
 				{
-					calculatorPanel.setVisible(false);
-					mapPanel.setVisible(false);
+					calculatorPanel.setPreferredSize(new Dimension(425, 0));
+					mapPanel.setPreferredSize(new Dimension(425, 0));
+					//frame.remove(mapPanel);
+					frame.pack();
+					frame.repaint();
+					//calculatorPanel.setVisible(false);
+					//mapPanel.setVisible(false);
 					
 					if (rdbtnInputfromip.isSelected() == false)
 					{
-						frame.setSize(new Dimension(460,255));
+						//frame.setSize(new Dimension(460,255));
 						contentPane.repaint();
 						frame.repaint();
 					}
 					else if (rdbtnInputfromip.isSelected() == true)
 					{
-						frame.setSize(new Dimension(460,295));
+						//frame.setSize(new Dimension(460,295));
 						contentPane.repaint();
 						frame.repaint();
 					}
@@ -499,18 +513,24 @@ public class NewAnalysis extends JFrame {
 				else if(chckbxAdvancedSettings.isSelected() == true)
 				{
 
-					calculatorPanel.setVisible(true);
-					mapPanel.setVisible(true);
+					calculatorPanel.setPreferredSize(new Dimension(425, 80));
+					mapPanel.setPreferredSize(new Dimension(425, 80));
+					//frame.add(calculatorPanel);
+					//frame.add(mapPanel);
+					frame.pack();
+					frame.repaint();
+					//calculatorPanel.setVisible(true);
+					//mapPanel.setVisible(true);
 					
 					if (rdbtnInputfromip.isSelected() == false)
 					{
-						frame.setSize(new Dimension(460,425));
+						//frame.setSize(new Dimension(460,425));
 						contentPane.repaint();
 						frame.repaint();
 					}
 					else if (rdbtnInputfromip.isSelected() == true)
 					{
-						frame.setSize(new Dimension(460,465));
+						//frame.setSize(new Dimension(460,465));
 						contentPane.repaint();
 						frame.repaint();
 					}
@@ -723,5 +743,7 @@ public class NewAnalysis extends JFrame {
 		buttonPanel.add(btnCancel);
 		
 
+		frame.setMaximumSize(new Dimension(460,460));
+		frame.pack();
 	}
 }

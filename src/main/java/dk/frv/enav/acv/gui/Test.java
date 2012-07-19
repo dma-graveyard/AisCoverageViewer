@@ -19,8 +19,6 @@ import javax.swing.ScrollPaneConstants;
 
 public class Test extends JFrame {
 
-	private JPanel contentPane;
-
 	/**
 	 * Launch the application.
 	 */
@@ -43,20 +41,6 @@ public class Test extends JFrame {
 	public Test() {
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 450, 117);
-		contentPane = new JPanel();
-		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
-		setContentPane(contentPane);
-		contentPane.setLayout(null);
-		
-		JScrollPane scrollPane = new JScrollPane();
-		scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
-		scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-		scrollPane.setBounds(10, 11, 414, 57);
-		contentPane.add(scrollPane);
-		
-		JTextArea txtrGurli = new JTextArea();
-		txtrGurli.setText("indtast ip");
-		scrollPane.setViewportView(txtrGurli);
 		
 		
 		
