@@ -2,13 +2,27 @@ package dk.dma.aiscoverage.calculator;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
+import dk.dma.aiscoverage.data.BaseStationHandler;
 import dk.dma.aiscoverage.data.Cell;
 import dk.dma.aiscoverage.data.CustomMessage;
+import dk.dma.aiscoverage.project.AisCoverageProject;
+import dk.frv.ais.message.AisMessage;
 
 public abstract class AbstractCoverageCalculator {
 
 	private List<CellChangedListener> listeners = new ArrayList<CellChangedListener>();
+	protected BaseStationHandler gridHandler = new BaseStationHandler();
+	private double latSize = -1;
+	private double longSize = -1;
+	private int cellSize = 2500;
+	protected AisCoverageProject project;
+	
+	public AbstractCoverageCalculator(AisCoverageProject project){
+		this.project = project;
+	}
+	abstract public void processMessage(AisMessage message, long defaultID);
 	abstract public void calculateCoverage(CustomMessage message);
 	
 	/*
@@ -70,5 +84,39 @@ public abstract class AbstractCoverageCalculator {
 	}
 	public void addCellChangedListener(CellChangedListener listener){
 		listeners.add(listener);
+	}
+	
+	public double getLatSize() {
+		return latSize;
+	}
+	public void setLatSize(double latSize) {
+		this.latSize = latSize;
+		gridHandler.setLatSize(latSize);
+	}
+	public double getLongSize() {
+		return longSize;
+	}
+	public void setLongSize(double longSize) {
+		this.longSize = longSize;
+		gridHandler.setLonSize(longSize);
+	}
+	public BaseStationHandler getBaseStationHandler(){
+		return gridHandler;
+	}
+	public Long[] getBaseStationNames(){
+		Set<Long> set = gridHandler.grids.keySet();
+		Long[] bssmsis = new Long[set.size()];
+		int i = 0;
+		for (Long long1 : set) {
+			bssmsis[i] = long1;
+			i++;
+		}
+		return bssmsis;
+	}
+	public int getCellSize() {
+		return cellSize;
+	}
+	public void setCellSize(int cellSize) {
+		this.cellSize = cellSize;
 	}
 }

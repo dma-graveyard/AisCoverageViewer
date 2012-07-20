@@ -22,13 +22,15 @@ import java.util.Collection;
 import java.util.concurrent.ConcurrentHashMap;
 
 import dk.dma.aiscoverage.GlobalSettings;
+import dk.dma.aiscoverage.calculator.CoverageCalculator;
 import dk.dma.aiscoverage.data.Cell;
 import dk.dma.aiscoverage.data.BaseStation;
 import dk.dma.aiscoverage.project.ProjectHandler;
 
 public class KMLGenerator {
 
-	public static void generateKML(Collection<BaseStation> grids, String path) {
+	public static void generateKML(CoverageCalculator calc, String path) {
+		Collection<BaseStation> grids = calc.getBaseStationHandler().grids.values();
 		FileWriter fstream = null;
 		BufferedWriter out = null;
 
@@ -90,7 +92,7 @@ public class KMLGenerator {
 			writeLine("</Style>", out);
 
 			for (BaseStation grid : grids) {
-				generateGrid(grid.bsMmsi, grid.grid.values(), out);
+				generateGrid(grid.bsMmsi, grid.grid.values(), out, calc);
 			}
 
 			writeLine("</Document>", out);
@@ -108,7 +110,7 @@ public class KMLGenerator {
 		}
 	}
 	private static void generateGrid(Long bsMmsi, Collection<Cell> cells,
-			BufferedWriter out) {
+			BufferedWriter out, CoverageCalculator calc) {
 
 			writeLine("<Folder>", out);
 			writeLine("<name>" + bsMmsi + "</name>", out);
@@ -121,11 +123,11 @@ public class KMLGenerator {
 //				if (cell.NOofReceivedSignals / cell.ships.size() > 10) {
 					
 					if (cell.getCoverage() > 0.8) { // green
-						generatePlacemark("#greenStyle", cell, 300, out);
+						generatePlacemark("#greenStyle", cell, 300, out, calc);
 					} else if (cell.getCoverage() > 0.5) { // orange
-						generatePlacemark("#orangeStyle", cell, 200, out);
+						generatePlacemark("#orangeStyle", cell, 200, out, calc);
 					} else { // red
-						generatePlacemark("#redStyle", cell, 100, out);
+						generatePlacemark("#redStyle", cell, 100, out, calc);
 					}
 					
 //				}
@@ -137,7 +139,7 @@ public class KMLGenerator {
 	}
 
 	private static void generatePlacemark(String style, Cell cell, int z,
-			BufferedWriter out) {
+			BufferedWriter out, CoverageCalculator calc) {
 			GlobalSettings settings = GlobalSettings.getInstance();
 			
 			writeLine("<Placemark>", out);
@@ -151,9 +153,9 @@ public class KMLGenerator {
 			writeLine("<coordinates>", out);
 
 			writeLine(		cell.longitude + "," + cell.latitude + "," + z+ " " + 
-							(cell.longitude + ProjectHandler.getInstance().getProject().getLongSize()) + "," + cell.latitude + ","  + z + " " + 
-							(cell.longitude +ProjectHandler.getInstance().getProject().getLongSize()) + "," + (cell.latitude + ProjectHandler.getInstance().getProject().getLatSize()) + "," + z + " " + 
-							cell.longitude + "," + (cell.latitude + ProjectHandler.getInstance().getProject().getLatSize()) + "," + z, out);
+							(cell.longitude + calc.getLongSize()) + "," + cell.latitude + ","  + z + " " + 
+							(cell.longitude +calc.getLongSize()) + "," + (cell.latitude + calc.getLatSize()) + "," + z + " " + 
+							cell.longitude + "," + (cell.latitude + calc.getLatSize()) + "," + z, out);
 
 
 			writeLine("</coordinates>", out);

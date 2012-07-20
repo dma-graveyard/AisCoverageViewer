@@ -105,7 +105,7 @@ public class BaseStationInfo extends OverlayBox implements ActionListener {
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if(e.getSource() == checkBox) {
-			ProjectHandler.getInstance().getProject().getBaseStationHandler().setVisible(basestation.bsMmsi, checkBox.isSelected());
+			ProjectHandler.getInstance().getProject().getCoverageCalculator().getBaseStationHandler().setVisible(basestation.bsMmsi, checkBox.isSelected());
 		}
 		
 	}

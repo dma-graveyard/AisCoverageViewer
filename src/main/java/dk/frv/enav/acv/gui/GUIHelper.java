@@ -114,8 +114,7 @@ public class GUIHelper {
 			String fileUrl = fileChooser.getSelectedFile().getPath();
 			System.out.println(""+fileUrl);
 			
-			ArrayList<BaseStation> list = new ArrayList<BaseStation>(projectHandler.getProject().getBaseStationHandler().grids.values());
-			KMLGenerator.generateKML(list , fileUrl+".kml");
+			KMLGenerator.generateKML(ProjectHandler.getInstance().getProject().getCoverageCalculator() , fileUrl+".kml");
 			
 			System.out.println(fileUrl + " printet");
 		}

@@ -29,6 +29,9 @@ import javax.swing.LayoutStyle.ComponentPlacement;
 import com.bbn.openmap.MapHandler;
 import com.bbn.openmap.gui.OMComponentPanel;
 
+import dk.dma.aiscoverage.calculator.AbstractCoverageCalculator;
+import dk.dma.aiscoverage.calculator.CoverageCalculator;
+import dk.dma.aiscoverage.calculator.DensityPlotCalculator;
 import dk.dma.aiscoverage.data.BaseStation;
 import dk.dma.aiscoverage.data.Cell;
 import dk.dma.aiscoverage.export.ImageGenerator;
@@ -330,6 +333,7 @@ public class AnalysisPanel extends OMComponentPanel implements ActionListener, A
 
 	}
 	
+	
 	/*
 	 * Starts timers for updating GUI and coverage layer
 	 */
@@ -369,24 +373,25 @@ public class AnalysisPanel extends OMComponentPanel implements ActionListener, A
 						if(ProjectHandler.getInstance().getProject() != null){
 							if(updateCoverageLayer || ProjectHandler.getInstance().getProject().isRunning()){
 								
+								CoverageCalculator coverageCalc = ProjectHandler.getInstance().getProject().getCoverageCalculator();
+								DensityPlotCalculator densityPlotCalc = ProjectHandler.getInstance().getProject().getDensityPlotCalculator();
+
+								
 								if(coverageRadio.isSelected()){
 									// Update coverage layer
-									Collection<Cell> cells = ProjectHandler.getInstance().getProject()
-											.getCoverage();
-									if (coverageLayer != null && cells != null) {
-										coverageLayer.doUpdate(cells);
+									if (coverageLayer != null) {
+										coverageLayer.doUpdate(coverageCalc);
 									}
 								}
 								
 								if(densityPlotRadio.isSelected()){
-									Collection<Cell> cells = ProjectHandler.getInstance().getProject().getBaseStationHandler().getDensityPlotCoverage();
-									if (densityPlotLayer != null && cells != null) {
-										densityPlotLayer.doUpdate(cells);
+									if (densityPlotLayer != null) {
+										densityPlotLayer.doUpdate(densityPlotCalc);
 									}
 								}
 								
 								//update base station layer
-								basestationLayer.doUpdate(ProjectHandler.getInstance().getProject().getBaseStationHandler().grids.values(), forceUpdateBaseStations);
+								basestationLayer.doUpdate(coverageCalc.getBaseStationHandler().grids.values(), forceUpdateBaseStations);
 								
 								forceUpdateBaseStations = false;
 								updateCoverageLayer = false;
@@ -493,13 +498,13 @@ public class AnalysisPanel extends OMComponentPanel implements ActionListener, A
 		if(secondsElapsed > 0){
 			totalMessages.setText(""+ProjectHandler.getInstance().getProject().getMessageCount());
 			messagesPerSec.setText(""+ProjectHandler.getInstance().getProject().getMessageCount()/secondsElapsed);
-			updateBaseStationList(ProjectHandler.getInstance().getProject().getBaseStationNames());
+			updateBaseStationList(ProjectHandler.getInstance().getProject().getCoverageCalculator().getBaseStationNames());
 			runningTime.setText(runningTimeToString(secondsElapsed));
 		}
 		else{
 			totalMessages.setText("-");
 			messagesPerSec.setText("-");
-			updateBaseStationList(ProjectHandler.getInstance().getProject().getBaseStationNames());
+			updateBaseStationList(ProjectHandler.getInstance().getProject().getCoverageCalculator().getBaseStationNames());
 			runningTime.setText("-");
 		}
 	}
@@ -538,12 +543,12 @@ public class AnalysisPanel extends OMComponentPanel implements ActionListener, A
 		else if(e.getSource().getClass() == JCheckBox.class){
 			if(e.getSource() == chckbxSelectAll) {
 				selectAll(chckbxSelectAll.isSelected());
-				ProjectHandler.getInstance().getProject().getBaseStationHandler().setAllVisible(chckbxSelectAll.isSelected());
+				ProjectHandler.getInstance().getProject().getCoverageCalculator().getBaseStationHandler().setAllVisible(chckbxSelectAll.isSelected());
 			}
 			else{
 				JCheckBox checkBox = (JCheckBox) e.getSource();
 				chckbxSelectAll.setSelected(false);
-				ProjectHandler.getInstance().getProject().getBaseStationHandler().setVisible(Long.parseLong(checkBox.getText()), checkBox.isSelected());
+				ProjectHandler.getInstance().getProject().getCoverageCalculator().getBaseStationHandler().setVisible(Long.parseLong(checkBox.getText()), checkBox.isSelected());
 			}
 		}
 		
@@ -638,7 +643,7 @@ public class AnalysisPanel extends OMComponentPanel implements ActionListener, A
 
 	@Override
 	public void visibilityChanged(long mmsi) {
-		BaseStation basestation = ProjectHandler.getInstance().getProject().getBaseStationHandler().getGrid(mmsi);
+		BaseStation basestation = ProjectHandler.getInstance().getProject().getCoverageCalculator().getBaseStationHandler().getGrid(mmsi);
 		JCheckBox checkbox = this.bsmmsis.get(mmsi);
 		checkbox.setSelected(basestation.isVisible());
 		updateCoverage(1, true);
@@ -646,7 +651,8 @@ public class AnalysisPanel extends OMComponentPanel implements ActionListener, A
 
 	@Override
 	public void basestationAdded(long mmsi) {
-		BaseStation basestation = ProjectHandler.getInstance().getProject().getBaseStationHandler().getGrid(mmsi);
+		BaseStation basestation = ProjectHandler.getInstance().getProject().getCoverageCalculator().getBaseStationHandler().getGrid(mmsi);
+		if(basestation == null) return;
 		JCheckBox checkbox = new JCheckBox(mmsi+"");
 		checkbox.setHorizontalAlignment(SwingConstants.LEFT);		
 		this.bsmmsis.put(mmsi, checkbox);	

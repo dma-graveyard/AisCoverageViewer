@@ -19,7 +19,8 @@ import dk.dma.aiscoverage.GlobalSettings;
 import dk.dma.aiscoverage.MessageHandler;
 import dk.dma.aiscoverage.calculator.AbstractCoverageCalculator;
 import dk.dma.aiscoverage.calculator.CellChangedListener;
-import dk.dma.aiscoverage.calculator.CoverageCalculatorAdvanced3;
+import dk.dma.aiscoverage.calculator.CoverageCalculator;
+import dk.dma.aiscoverage.calculator.DensityPlotCalculator;
 import dk.dma.aiscoverage.data.Cell;
 import dk.dma.aiscoverage.data.BaseStation;
 import dk.dma.aiscoverage.project.AisCoverageProject;
@@ -28,6 +29,7 @@ import dk.dma.aiscoverage.project.ProjectHandler;
 
 public class DensityPlotLayer extends OMGraphicHandlerLayer {
 
+	private DensityPlotCalculator calc;
 	private static final long serialVersionUID = 1L;
 	private OMGraphicList graphics = new OMGraphicList();
 	public boolean isRunning = false;
@@ -37,8 +39,8 @@ public class DensityPlotLayer extends OMGraphicHandlerLayer {
 //		setRenderPolicy(new com.bbn.openmap.layer.policy.BufferedImageRenderPolicy());
 	}
 	private void updateCell(Cell cell){
-		double longSize = ProjectHandler.getInstance().getProject().getLongSize();
-		double latSize = ProjectHandler.getInstance().getProject().getLatSize();
+		double longSize = calc.getLongSize();
+		double latSize = calc.getLatSize();
 		List<LatLonPoint> polygon = new ArrayList<LatLonPoint>();
 
 		polygon.add(new LatLonPoint.Double(cell.latitude, cell.longitude));
@@ -50,8 +52,11 @@ public class DensityPlotLayer extends OMGraphicHandlerLayer {
 		graphics.add(g);
 	}
 
-	public void doUpdate(Collection<Cell> cells) {
+	public void doUpdate(DensityPlotCalculator calc) {
+		this.calc = calc;
+		Collection<Cell> cells = calc.getDensityPlotCoverage();
 		System.out.println("density update");
+		System.out.println(cells.size());
 		graphics.clear();
 		
 		for (Cell cell : cells) {

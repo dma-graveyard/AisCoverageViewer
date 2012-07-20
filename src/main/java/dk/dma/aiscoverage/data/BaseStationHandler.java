@@ -30,6 +30,8 @@ public class BaseStationHandler implements Serializable {
 
 	public ConcurrentHashMap<Long, BaseStation> grids = new ConcurrentHashMap<Long, BaseStation>();
 	private double latSize;
+	private double lonSize;
+	
 	public double getLatSize() {
 		return latSize;
 	}
@@ -46,15 +48,16 @@ public class BaseStationHandler implements Serializable {
 		this.lonSize = lonSize;
 	}
 
-	private double lonSize;
+	
 	
 	/*
 	 * Create grid associated to a specific transponder
 	 */
-	public void createGrid(Long bsMmsi){
+	public BaseStation createGrid(Long bsMmsi){
 		BaseStation grid = new BaseStation(bsMmsi, latSize, lonSize);
 		grids.put(bsMmsi, grid);
 		ProjectHandler.getInstance().basestationAdded(bsMmsi);
+		return grid;
 	}
 	
 	public BaseStation getGrid(Long bsMmsi){
@@ -74,92 +77,8 @@ public class BaseStationHandler implements Serializable {
 	}
 
 	
-	/*
-	 * Consider optimizing?
-	 *
-	 * Returns a combined coverage of cells from selected base stations.
-	 * If two base stations cover same area, the best coverage is chosen.
-	 */
-	public Collection<Cell> getCoverage() {
-		HashMap<String, Cell> cells = new HashMap<String, Cell>();
-		
-		//For each base station
-		Collection<BaseStation> basestations = grids.values();
-		for (BaseStation basestation : basestations) {
-
-			if(basestation.isVisible()){
-				//For each cell
-				Collection<Cell> bscells = basestation.grid.values();
-				for (Cell cell : bscells) {
-					Cell existing = cells.get(cell.id);
-					if(existing == null)
-						cells.put(cell.id, cell);
-					else
-						if(cell.getCoverage() > existing.getCoverage())
-							cells.put(cell.id, cell);
-				}
-			}
-			
-		}
-		return cells.values();
-	}
 	
-	/*
-	 * Consider optimizing?
-	 *
-	 * Returns a combined coverage of cells from ALL base stations.
-	 * If two base stations cover same cell area, the cell with most ships is chosen.
-	 * Number of ship in each cell can be used to draw density plot
-	 */
-	public Collection<Cell> getDensityPlotCoverage() {
-		HashMap<String, Cell> cells = new HashMap<String, Cell>();
-
-		// For each base station
-		Collection<BaseStation> basestations = grids.values();
-		for (BaseStation basestation : basestations) {
-
-			// For each cell
-			Collection<Cell> bscells = basestation.grid.values();
-			for (Cell cell : bscells) {
-				Cell existing = cells.get(cell.id);
-				if (existing == null)
-					cells.put(cell.id, cell);
-				else if (cell.ships.size() > existing.ships.size())
-					cells.put(cell.id, cell);
-			}
-
-		}
-		return cells.values();
-	}
 	
-	/*
-	 * Consider optimizing?
-	 *
-	 * Returns a combined coverage of cells from selected base stations.
-	 * If two base stations cover same area, the best coverage is chosen.
-	 */
-//	public Collection<Cell> getCoverage(List<Long> baseStations) {
-//		HashMap<String, Cell> cells = new HashMap<String, Cell>();
-//		
-//		//For each base station
-//		for (Long bsmmsi : baseStations) {
-//			BaseStation bs = grids.get(bsmmsi);
-//			
-//			if(bs == null) break;
-//			
-//			//For each cell
-//			Collection<Cell> bscells = bs.grid.values();
-//			for (Cell cell : bscells) {
-//				Cell existing = cells.get(cell.id);
-//				if(existing == null)
-//					cells.put(cell.id, cell);
-//				else
-//					if(cell.getCoverage() > existing.getCoverage())
-//						cells.put(cell.id, cell);
-//			}
-//			
-//		}
-//		return cells.values();
-//	}
+	
 	
 }

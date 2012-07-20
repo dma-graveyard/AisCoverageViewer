@@ -28,8 +28,8 @@ public class BaseStation implements Serializable {
 	public ConcurrentHashMap<String, Cell> grid = new ConcurrentHashMap<String, Cell>();
 	public ConcurrentHashMap<Long, Ship> ships = new ConcurrentHashMap<Long, Ship>();
 	public Long bsMmsi;
-	private double latSize;
-	private double lonSize;
+	public double latSize;
+	public double lonSize;
 	public Double latitude;
 	public Double longitude;
 	public long messageCount = 0;

@@ -23,7 +23,8 @@ import org.apache.log4j.xml.DOMConfigurator;
 import dk.dma.aiscoverage.GlobalSettings;
 import dk.dma.aiscoverage.MessageHandler;
 import dk.dma.aiscoverage.calculator.AbstractCoverageCalculator;
-import dk.dma.aiscoverage.calculator.CoverageCalculatorAdvanced3;
+import dk.dma.aiscoverage.calculator.CoverageCalculator;
+import dk.dma.aiscoverage.calculator.DensityPlotCalculator;
 import dk.dma.aiscoverage.data.BaseStationHandler;
 import dk.dma.aiscoverage.data.Cell;
 import dk.frv.ais.proprietary.DmaFactory;
@@ -37,48 +38,24 @@ public class AisCoverageProject implements Serializable {
 	private String filename = null;
 	private String hostPort;
 	private int timeout = -1;
-	transient private AbstractCoverageCalculator calc = new CoverageCalculatorAdvanced3(true);
+	transient private List<AbstractCoverageCalculator> calculators = new ArrayList<AbstractCoverageCalculator>();
 	transient private List<AisReader> readers = new ArrayList<AisReader>();
 	transient private List<MessageHandler> messageHandlers = new ArrayList<MessageHandler>();
-	private BaseStationHandler gridHandler = new BaseStationHandler();
+//	private BaseStationHandler gridHandler = new BaseStationHandler();
 	private Date starttime;
 	private Date endtime;
 	private boolean isRunning = false;
 	private boolean isDone = false;
 	private long messageCount = 0;
-	private double latSize = -1;
-	private double longSize = -1;
-	private int cellSize = 2500;
-	
-	
-	public double getLatSize() {
-		return latSize;
-	}
-	public void setLatSize(double latSize) {
-		this.latSize = latSize;
-		gridHandler.setLatSize(latSize);
-	}
-	public double getLongSize() {
-		return longSize;
-	}
-	public void setLongSize(double longSize) {
-		this.longSize = longSize;
-		gridHandler.setLonSize(longSize);
-	}
-	public int getCellSize() {
-		return cellSize;
-	}
-	public void setCellSize(int cellSize) {
-		this.cellSize = cellSize;
-	}
+
 	public boolean isRunning() {
 		return isRunning;
 	}
-	public AbstractCoverageCalculator getCalculator() {
-		return calc;
+	public List<AbstractCoverageCalculator> getCalculators() {
+		return calculators;
 	}
-	public void setCalculator(AbstractCoverageCalculator calc) {
-		this.calc = calc;
+	public void addCalculator(AbstractCoverageCalculator calc){
+		calculators.add(calc);
 	}
 	public AisCoverageProject(){
 		
@@ -194,19 +171,7 @@ public class AisCoverageProject implements Serializable {
 	public Long getMessageCount(){
 		return messageCount;
 	}
-	public BaseStationHandler getBaseStationHandler(){
-		return gridHandler;
-	}
-	public Long[] getBaseStationNames(){
-		Set<Long> set = gridHandler.grids.keySet();
-		Long[] bssmsis = new Long[set.size()];
-		int i = 0;
-		for (Long long1 : set) {
-			bssmsis[i] = long1;
-			i++;
-		}
-		return bssmsis;
-	}
+	
 	public Long getRunningTime(){
 		
 		if(starttime == null) return -1L;
@@ -222,12 +187,24 @@ public class AisCoverageProject implements Serializable {
 //	public Collection<Cell> getCoverage(List<Long> baseStations){
 //		return gridHandler.getCoverage(baseStations);
 //	}
-	public Collection<Cell> getCoverage(){
-		return gridHandler.getCoverage();
-	}
+	
 	
 	public void incrementMessageCount(){
 		this.messageCount++;
+	}
+	public CoverageCalculator getCoverageCalculator(){
+		for (AbstractCoverageCalculator abstractCalc : getCalculators()) {
+			if(abstractCalc instanceof CoverageCalculator)
+				return (CoverageCalculator) abstractCalc;
+		}
+		return null;
+	}
+	public DensityPlotCalculator getDensityPlotCalculator(){
+		for (AbstractCoverageCalculator abstractCalc : getCalculators()) {
+			if(abstractCalc instanceof DensityPlotCalculator)
+				return (DensityPlotCalculator) abstractCalc;
+		}
+		return null;
 	}
 
 }
