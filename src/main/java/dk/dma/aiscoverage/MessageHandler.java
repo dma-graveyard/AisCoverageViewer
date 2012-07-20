@@ -64,10 +64,6 @@ public class MessageHandler implements IAisHandler {
 	 */
 	@Override
 	public void receive(AisMessage aisMessage) {	
-		List<IProprietaryTag> l = aisMessage.getTags();
-		for (IProprietaryTag iProprietaryTag : l) {
-			System.out.println(iProprietaryTag);
-		}
 		
 		//Check timeout
 		Date now = new Date();
@@ -95,7 +91,6 @@ public class MessageHandler implements IAisHandler {
 		if (bsMmsi == null || timestamp == null) {
 			bsMmsi = defaultID; //determine id
 			timestamp = new Date();
-			System.out.println("message received: " + aisMessage.getMsgId());
 		}
 
 		//It's a base station
@@ -139,13 +134,13 @@ public class MessageHandler implements IAisHandler {
 		
 		
 //		if(pos.getLatitude() < 37){
-			System.out.println("bsmsi: " + bsMmsi);
-			System.out.println("mmsi: " + posMessage.getUserId());
-			System.out.println("lat: "+ pos.getLatitude());
-			System.out.println("lon: " + pos.getLongitude());
-			System.out.println("cog: " + posMessage.getCog());
-			System.out.println("sog: " + posMessage.getSog());
-			System.out.println();
+//			System.out.println("bsmsi: " + bsMmsi);
+//			System.out.println("mmsi: " + posMessage.getUserId());
+//			System.out.println("lat: "+ pos.getLatitude());
+//			System.out.println("lon: " + pos.getLongitude());
+//			System.out.println("cog: " + posMessage.getCog());
+//			System.out.println("sog: " + posMessage.getSog());
+//			System.out.println();
 //		}
 
 		// Check if grid exists (If a message with that bsmmsi has been received before)
@@ -156,7 +151,6 @@ public class MessageHandler implements IAisHandler {
 			gridHandler.createGrid(bsMmsi);
 			grid = gridHandler.getGrid(bsMmsi);
 		}
-		System.out.println("Grid size "+grid.grid.size());
 		
 		
 		// Check which ship sent the message.

@@ -40,6 +40,7 @@ import dk.frv.enav.acv.coverage.layers.CoverageLayer;
 import dk.frv.enav.acv.coverage.layers.DensityPlotLayer;
 
 import java.awt.AWTEvent;
+import java.awt.Component;
 import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
@@ -378,8 +379,7 @@ public class AnalysisPanel extends OMComponentPanel implements ActionListener, A
 								}
 								
 								if(densityPlotRadio.isSelected()){
-									Collection<Cell> cells = ProjectHandler.getInstance().getProject()
-											.getCoverage();
+									Collection<Cell> cells = ProjectHandler.getInstance().getProject().getBaseStationHandler().getDensityPlotCoverage();
 									if (densityPlotLayer != null && cells != null) {
 										densityPlotLayer.doUpdate(cells);
 									}
@@ -552,14 +552,24 @@ public class AnalysisPanel extends OMComponentPanel implements ActionListener, A
 			System.out.println("coverage");
 			coverageLayer.setVisible(true);
 			densityPlotLayer.setVisible(false);
+			enableBaseStationPanel(true);
 		}
 		else if(e.getSource() == densityPlotRadio) {
 			System.out.println("density");
 			coverageLayer.setVisible(false);
 			densityPlotLayer.setVisible(true);
+			enableBaseStationPanel(false);
 		}
 
 		
+	}
+	private void enableBaseStationPanel(boolean b){
+		Component[] com = this.baseStationPanel.getComponents();  
+		for (int i = 0; i < com.length; i++) {  
+		     com[i].setEnabled(b);
+		}  
+		chckbxSelectAll.setEnabled(b);
+		this.baseStationWrapperPanel.setEnabled(b);
 	}
 	
 	@Override

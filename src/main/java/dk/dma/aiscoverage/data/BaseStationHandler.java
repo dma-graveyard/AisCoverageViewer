@@ -81,7 +81,6 @@ public class BaseStationHandler implements Serializable {
 	 * If two base stations cover same area, the best coverage is chosen.
 	 */
 	public Collection<Cell> getCoverage() {
-		System.out.println("getcoverage begin");
 		HashMap<String, Cell> cells = new HashMap<String, Cell>();
 		
 		//For each base station
@@ -102,7 +101,34 @@ public class BaseStationHandler implements Serializable {
 			}
 			
 		}
-		System.out.println("getcoverage end");
+		return cells.values();
+	}
+	
+	/*
+	 * Consider optimizing?
+	 *
+	 * Returns a combined coverage of cells from ALL base stations.
+	 * If two base stations cover same cell area, the cell with most ships is chosen.
+	 * Number of ship in each cell can be used to draw density plot
+	 */
+	public Collection<Cell> getDensityPlotCoverage() {
+		HashMap<String, Cell> cells = new HashMap<String, Cell>();
+
+		// For each base station
+		Collection<BaseStation> basestations = grids.values();
+		for (BaseStation basestation : basestations) {
+
+			// For each cell
+			Collection<Cell> bscells = basestation.grid.values();
+			for (Cell cell : bscells) {
+				Cell existing = cells.get(cell.id);
+				if (existing == null)
+					cells.put(cell.id, cell);
+				else if (cell.ships.size() > existing.ships.size())
+					cells.put(cell.id, cell);
+			}
+
+		}
 		return cells.values();
 	}
 	

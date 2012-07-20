@@ -110,7 +110,7 @@ public class AisCoverageProject implements Serializable {
 	{
 		return filename;
 	}
-	public void addHostPort(String port){
+	public void addHostPort(String port, long defaultID){
 		RoundRobinAisTcpReader reader = new RoundRobinAisTcpReader();
 		reader.setCommaseparatedHostPort(port);
 		
@@ -123,7 +123,7 @@ public class AisCoverageProject implements Serializable {
 		// Make handler instance
 		// We create multiple message handlers because we need a default id
 		// if bsmmsi isn't set
-		MessageHandler messageHandler = new MessageHandler(this, 123l);
+		MessageHandler messageHandler = new MessageHandler(this, defaultID);
 		messageHandlers.add(messageHandler);
 		// register message handler
 		reader.registerHandler(messageHandler);
