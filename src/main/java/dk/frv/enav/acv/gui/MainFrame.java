@@ -157,7 +157,7 @@ public class MainFrame extends JFrame implements WindowListener {
 		JMenuItem mntmNewAnalysis = new JMenuItem("New analysis");
 		menu.add(mntmNewAnalysis);
 		mntmNewAnalysis.addActionListener(new ActionListener()  {public void actionPerformed(ActionEvent e)	
-		{	NewAnalysis newAnalysisframe = new NewAnalysis();
+		{	NewAnalysis newAnalysisframe = new NewAnalysis(leftPanel);
 			newAnalysisframe.setVisible(true);	}	});
 		
 		JMenuItem mntmSave = new JMenuItem("Save");
@@ -167,13 +167,6 @@ public class MainFrame extends JFrame implements WindowListener {
 		JMenuItem mntmLoad = new JMenuItem("Load");
 		menu.add(mntmLoad);
 		mntmLoad.addActionListener(new ActionListener()  {public void actionPerformed(ActionEvent e)	{	guiHelper.openFileDialog();	}	});
-		
-		JMenuItem mntmProperties = new JMenuItem("Settings");
-		menu.add(mntmProperties);
-		mntmProperties.addActionListener(new ActionListener()  {public void actionPerformed(ActionEvent e)	
-		{	
-			ChangeSettings changeSettingsframe = new ChangeSettings();
-			changeSettingsframe.setVisible(true);	}	});
 		
 		
 		/*
