@@ -427,14 +427,16 @@ public class AnalysisPanel extends OMComponentPanel implements ActionListener, A
 		
 		int i = 0;
 		for(Long bsmmsi : bsmmsis){
-			JCheckBox checkbox = this.bsmmsis.get(bsmmsi);
-			GridBagConstraints constraints = new GridBagConstraints();
-			constraints.insets = new Insets(5, 25, 0, 0);
-			constraints.anchor = GridBagConstraints.WEST;
-			constraints.gridx = 0;
-			constraints.gridy = i;
-			baseStationPanel.add(checkbox, constraints);
-			i++;
+			if(this.bsmmsis.containsKey(bsmmsi)){
+				JCheckBox checkbox = this.bsmmsis.get(bsmmsi);
+				GridBagConstraints constraints = new GridBagConstraints();
+				constraints.insets = new Insets(5, 25, 0, 0);
+				constraints.anchor = GridBagConstraints.WEST;
+				constraints.gridx = 0;
+				constraints.gridy = i;
+				baseStationPanel.add(checkbox, constraints);
+				i++;
+			}
 		}
 		
 		

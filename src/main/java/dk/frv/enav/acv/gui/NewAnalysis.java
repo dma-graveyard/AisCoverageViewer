@@ -71,16 +71,16 @@ public class NewAnalysis extends JFrame {
 				densityCalc.setCellSize(200);
 				project.addCalculator(densityCalc);
 
-				project.setFile(txtTypeInInput.getText());
+//				project.setFile(txtTypeInInput.getText());
 //				project.addHostPort("172.28.25.66:9240");
 //				project.addHostPort("172.28.37.66:9240");
 //				project.addHostPort("10.3.246.210:9240", 666);
 //				project.addHostPort("10.10.11.30:8030", 777);
 				
-//				project.addHostPort("10.10.32.2:9240", 1);
-//				project.addHostPort("88.85.35.18:9240", 2);
-//				project.addHostPort("93.160.251.222:9240", 3);
-//				project.addHostPort("95.209.148.160:9240", 4);
+				project.addHostPort("10.10.32.2:9240", 1);
+				project.addHostPort("88.85.35.18:9240", 2);
+				project.addHostPort("93.160.251.222:9240", 3);
+				project.addHostPort("95.209.148.160:9240", 4);
 				
 	
 

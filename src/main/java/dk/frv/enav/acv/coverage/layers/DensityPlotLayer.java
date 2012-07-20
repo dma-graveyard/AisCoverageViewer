@@ -31,14 +31,14 @@ public class DensityPlotLayer extends OMGraphicHandlerLayer {
 
 	private DensityPlotCalculator calc;
 	private static final long serialVersionUID = 1L;
-	private OMGraphicList graphics = new OMGraphicList();
 	public boolean isRunning = false;
-	HashMap<String, GridPolygon> cellMap = new HashMap<String, GridPolygon>(); 
+	HashMap<String, GridPolygon> added = new HashMap<String, GridPolygon>(); 
+	private OMGraphicList graphicslist = new OMGraphicList();
 
 	public DensityPlotLayer(){
-//		setRenderPolicy(new com.bbn.openmap.layer.policy.BufferedImageRenderPolicy());
+		setRenderPolicy(new com.bbn.openmap.layer.policy.BufferedImageRenderPolicy());
 	}
-	private void updateCell(Cell cell){
+	private void updateCell(OMGraphicList graphics, Cell cell){
 		double longSize = calc.getLongSize();
 		double latSize = calc.getLatSize();
 		List<LatLonPoint> polygon = new ArrayList<LatLonPoint>();
@@ -50,18 +50,20 @@ public class DensityPlotLayer extends OMGraphicHandlerLayer {
 
 		GridPolygon g = new GridPolygon(polygon, Color.BLACK);
 		graphics.add(g);
+		added.put(cell.id, g);
 	}
 
 	public void doUpdate(DensityPlotCalculator calc) {
+		OMGraphicList graphics = new OMGraphicList();
 		this.calc = calc;
 		Collection<Cell> cells = calc.getDensityPlotCoverage();
 		System.out.println("density update");
-		System.out.println(cells.size());
-		graphics.clear();
-		
 		for (Cell cell : cells) {
-			updateCell(cell);
+			if(!added.containsKey(cell.id)){
+				updateCell(graphics, cell);
+			}
 		}
+		this.paste(graphics);
 		doPrepare();
 	}
 	
@@ -73,8 +75,8 @@ public class DensityPlotLayer extends OMGraphicHandlerLayer {
 	
 	@Override
 	public synchronized OMGraphicList prepare() {
-		graphics.project(getProjection());
-		return graphics;
+		graphicslist.project(getProjection());
+		return graphicslist;
 	}
 
 }
