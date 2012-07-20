@@ -179,9 +179,9 @@ public class MainFrame extends JFrame implements WindowListener {
 		mnExport.add(mntmExportToKml);
 		mntmExportToKml.addActionListener(new ActionListener()  {public void actionPerformed(ActionEvent e)	{	guiHelper.saveKMLDialog();	}	});
 		
-		JMenuItem mntmExportToShape = new JMenuItem("Export to shape");
-		mnExport.add(mntmExportToShape);
-		mntmExportToShape.addActionListener(new ActionListener()  {public void actionPerformed(ActionEvent e)	{	guiHelper.saveShapeDialog();	}	});
+		//JMenuItem mntmExportToShape = new JMenuItem("Export to shape");
+		//mnExport.add(mntmExportToShape);
+		//mntmExportToShape.addActionListener(new ActionListener()  {public void actionPerformed(ActionEvent e)	{	guiHelper.saveShapeDialog();	}	});
 		
 		JMenuItem mntmExportToPNG = new JMenuItem("Export to PNG");
 		mnExport.add(mntmExportToPNG);

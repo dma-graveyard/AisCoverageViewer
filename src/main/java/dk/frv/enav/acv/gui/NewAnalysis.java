@@ -488,6 +488,20 @@ public class NewAnalysis extends JFrame {
 						coverageCalc.setCellSize(Integer.parseInt(textField.getText()));
 						analysisPanel.setAnalysisData(txtTypeInInput.getText(), "Advanced", textField.getText(), "999h");
 						
+						if(chckbxSetAnalysisTimer.isSelected() == true)
+						{
+							int hour = Integer.parseInt(textField_2.getText().substring(0, 2));
+							int min = Integer.parseInt(textField_2.getText().substring(3, 5));
+							int sec = (((hour * 60) + min) * 60);
+							System.out.println(hour);
+							System.out.println(min);
+							project.setTimeout(sec);
+							
+							//System.out.println("0,2 "+textField_2.getText().substring(0,2));
+							//System.out.println("2,2 "+textField_2.getText().substring(2,2));
+							//System.out.println("2 " +textField_2.getText().substring(2));
+							//System.out.println("3 " + textField_2.getText().substring(3));
+						}
 						
 						
 						dispose();
@@ -528,11 +542,11 @@ public class NewAnalysis extends JFrame {
 							coverageCalc.setBufferInSeconds(Integer.parseInt(txtMessageBuffer.getText()));
 							if(chckbxSetAnalysisTimer.isSelected() == true)
 							{
-							analysisPanel.setAnalysisData(txtTypeInInput.getText(), "Advanced", textField.getText(), textField_2.getText());
+							analysisPanel.setAnalysisData("Streams", "Advanced", textField.getText(), textField_2.getText());
 							}
 							else
 							{
-								analysisPanel.setAnalysisData(txtTypeInInput.getText(), "Advanced", textField.getText(), "-");
+								analysisPanel.setAnalysisData("Streams", "Advanced", textField.getText(), "-");
 							}
 						}
 						else if (chckbxIncludeTurningShips.isSelected() == true)
@@ -542,11 +556,11 @@ public class NewAnalysis extends JFrame {
 							coverageCalc.setDegreesPerMinute(Integer.parseInt(textField_1.getText()));
 							if(chckbxSetAnalysisTimer.isSelected() == true)
 							{
-							analysisPanel.setAnalysisData(txtTypeInInput.getText(), "Advanced", textField.getText(), textField_2.getText());
+							analysisPanel.setAnalysisData("Streams", "Advanced", textField.getText(), textField_2.getText());
 							}
 							else
 							{
-								analysisPanel.setAnalysisData(txtTypeInInput.getText(), "Advanced", textField.getText(), "-");
+								analysisPanel.setAnalysisData("Streams", "Advanced", textField.getText(), "-");
 							}
 						}
 						
@@ -555,13 +569,15 @@ public class NewAnalysis extends JFrame {
 						
 						if(chckbxSetAnalysisTimer.isSelected() == true)
 						{
-							int hour = Integer.parseInt(textField_2.getText().substring(0, 1));
-							int min = Integer.parseInt(textField_2.getText().substring(3, 4));
+							int hour = Integer.parseInt(textField_2.getText().substring(0, 2));
+							int min = Integer.parseInt(textField_2.getText().substring(3, 5));
 							int sec = (((hour * 60) + min) * 60);
-							//project.setTimeout(sec);
+							System.out.println(hour);
+							System.out.println(min);
+							project.setTimeout(sec);
 						}
 						
-						analysisPanel.setAnalysisData(txtTypeInInput.getText(), "Advanced", textField.getText(), textField_2.getText());
+						analysisPanel.setAnalysisData("Streams", "Advanced", textField.getText(), textField_2.getText());
 						dispose();
 					}
 				}					
