@@ -53,7 +53,7 @@ public class NewAnalysis1 extends JFrame {
 	 */
 	private static final long serialVersionUID = 1L;
 	private GUIHelper guiHelper = new GUIHelper();
-	private JPanel contentPane;
+	//private JPanel contentPane;
 	private JTextField txtTypeInInput;
 	private JTextField textField;
 	JComboBox comboBox = null;
@@ -75,6 +75,9 @@ public class NewAnalysis1 extends JFrame {
 	private JTextField mapTextField;
 	private JTextField textField_3;
 	private JTextField textField_4;
+	private Dimension onetwenty;
+	private Dimension eighty;
+	private Dimension forty;
 	
 	JTextArea ta = new JTextArea("this is a");
 
@@ -83,21 +86,25 @@ public class NewAnalysis1 extends JFrame {
 	 */
 	public NewAnalysis1(AnalysisPanel ap) {
 		analysisPanel = ap; 
+		onetwenty = new Dimension(425, 120);
+		eighty = new Dimension(425, 80);
+		forty = new Dimension(425, 40);
 		
 		setResizable(false);
 		setTitle("New Analysis");
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		//setBounds(100, 100, 460, 381);
-		contentPane = new JPanel();
-		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
-		setContentPane(contentPane);
-		contentPane.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
+		//contentPane = new JPanel();
+		//contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
+		//setContentPane(contentPane);
+		//contentPane.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
 		//frame.setMaximumSize(new Dimension(460, 370));
 		//frame.setMinimumSize(new Dimension(460, 370));
 		//frame.setSize(new Dimension(460,255));
 		//frame.pack();
-		frame.setLayout(new GridLayout(0,1));
-		frame.setMaximumSize(new Dimension(460, 500));
+		frame.getContentPane().setLayout(new GridLayout(0,1));
+		
+		//frame.setMaximumSize(new Dimension(460, 500));
 		ta.setBounds(10, 35, 404, 70);
 		//ta.setRows(3);
 		//ta.setVisible(false);
@@ -117,8 +124,11 @@ public class NewAnalysis1 extends JFrame {
 		final JPanel inputPanel = new JPanel();
 		inputPanel.setBorder(new TitledBorder(null, "Input", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		
-		inputPanel.setPreferredSize(new Dimension(425, 80));
-		frame.add(inputPanel);
+		inputPanel.setPreferredSize(eighty);
+		//inputPanel.setPreferredSize(null);
+		//inputPanel.setSize(eighty);
+		//inputPanel.set
+		frame.getContentPane().add(inputPanel);
 		inputPanel.setLayout(null);
 
 		txtTypeInInput = new JTextField();
@@ -170,16 +180,20 @@ public class NewAnalysis1 extends JFrame {
 				btnSelectFile.setVisible(true);
 				//inputPanel.revalidate();
 				scrollPane.setVisible(false);
-				inputPanel.setPreferredSize(new Dimension(425, 80));
-				contentPane.repaint();
+				inputPanel.setPreferredSize(eighty);
+				//inputPanel.setSize(eighty);
+				//contentPane.repaint();
+				
 				if (chckbxAdvancedSettings.isSelected() == false)
 				{
-				frame.setSize(new Dimension(460,255));
+				//frame.setSize(new Dimension(460,255));
+					frame.pack();
 				frame.repaint();
 				}
 				else if (chckbxAdvancedSettings.isSelected() == true)
 				{
-				frame.setSize(new Dimension(460,425));
+				//frame.setSize(new Dimension(460,425));
+					frame.pack();
 				frame.repaint();
 				}
 				
@@ -197,24 +211,38 @@ public class NewAnalysis1 extends JFrame {
 		rdbtnInputstream.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				System.out.print("ha");
-				txtTypeInInput.setVisible(true);
-				txtTypeInInput.setEditable(true);
-				txtTypeInInput.setText("Type in input stream url or select file");
-				txtTypeInInput.setSize(400, 20);
+				//txtTypeInInput.setVisible(true);
+				//txtTypeInInput.setEditable(true);
+				ta.setText("Type in input stream url");
+				//ta.setVisible(true);
+				//txtTypeInInput.setSize(400, 20);
+				
+				scrollPane.setVisible(true);
+				ta.setWrapStyleWord(true);
+				
+				txtTypeInInput.setVisible(false);
 				btnSelectFile.setVisible(false);
+				
 				//inputPanel.revalidate();
-				scrollPane.setVisible(false);
-				inputPanel.setPreferredSize(new Dimension(425, 80));
-				contentPane.repaint();
+				//scrollPane.setVisible(false);
+				inputPanel.setPreferredSize(onetwenty);
+				//inputPanel.setSize(onetwenty);
+				frame.pack();
+				//contentPane.repaint();
 				if (chckbxAdvancedSettings.isSelected() == false)
 				{
-				frame.setSize(new Dimension(460,255));
+				//frame.setSize(new Dimension(460,255));
+				//inputPanel.setPreferredSize(new Dimension(425, 80));
 				frame.repaint();
+				frame.pack();
+				
 				}
 				else if (chckbxAdvancedSettings.isSelected() == true)
 				{
-				frame.setSize(new Dimension(460,425));
+				//frame.setSize(new Dimension(460,425));
+				//inputPanel.setPreferredSize(new Dimension(425, 120));
 				frame.repaint();
+				frame.pack();
 				}
 				
 			}
@@ -245,20 +273,20 @@ public class NewAnalysis1 extends JFrame {
 				txtTypeInInput.setVisible(false);
 				btnSelectFile.setVisible(false);
 				//inputPanel.revalidate();
-				inputPanel.setPreferredSize(new Dimension(425, 120));
-				contentPane.repaint();
+				inputPanel.setPreferredSize(onetwenty);
+				//contentPane.repaint();
 				
 				
-				if (chckbxAdvancedSettings.isSelected() == false)
-				{
-				frame.setSize(new Dimension(460,295));
-				frame.repaint();
-				}
-				else if (chckbxAdvancedSettings.isSelected() == true)
-				{
-				frame.setSize(new Dimension(460,465));
-				frame.repaint();
-				}
+				//if (chckbxAdvancedSettings.isSelected() == false)
+				//{
+				//frame.setSize(new Dimension(460,295));
+				//frame.repaint();
+				//}
+				//else if (chckbxAdvancedSettings.isSelected() == true)
+				//{
+				//frame.setSize(new Dimension(460,465));
+				//frame.repaint();
+			//	}
 				
 			}
 		});
@@ -274,8 +302,9 @@ public class NewAnalysis1 extends JFrame {
 		final JPanel gridPanel = new JPanel();
 		gridPanel.setBorder(new TitledBorder(null, "Analysis settings", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		
-		frame.add(gridPanel);
-		gridPanel.setPreferredSize(new Dimension(425, 85));
+		frame.getContentPane().add(gridPanel);
+		gridPanel.setPreferredSize(eighty);
+		//gridPanel.setPreferredSize(null);
 		gridPanel.setLayout(null);
 
 
@@ -319,13 +348,13 @@ public class NewAnalysis1 extends JFrame {
 				{
 					lblRunAnalysis.setVisible(false);
 					textField_2.setVisible(false);
-					contentPane.repaint();
+					//contentPane.repaint();
 				}
 				else if(chckbxSetAnalysisTimer.isSelected() == true)
 				{
 					lblRunAnalysis.setVisible(true);
 					textField_2.setVisible(true);
-					contentPane.repaint();
+					//contentPane.repaint();
 				}				
 			}
 		});
@@ -336,10 +365,11 @@ public class NewAnalysis1 extends JFrame {
 		 */
 		final JPanel calculatorPanel = new JPanel();
 		calculatorPanel.setBorder(new TitledBorder(null, "Calculator", TitledBorder.LEADING, TitledBorder.TOP, null, null));
-		frame.add(calculatorPanel);
+		//frame.add(calculatorPanel);
 		//calculatorPanel.setVisible(false);
-		//calculatorPanel.setPreferredSize(new Dimension(425, 80));
-		calculatorPanel.setPreferredSize(new Dimension(425, 0));
+		calculatorPanel.setPreferredSize(eighty);
+		//calculatorPanel.setPreferredSize(null);
+		//calculatorPanel.setPreferredSize(new Dimension(425, 0));
 		calculatorPanel.setLayout(null);
 		
 		txtMessageBuffer = new JTextField();
@@ -383,14 +413,14 @@ public class NewAnalysis1 extends JFrame {
 					lblShipRotationPer.setVisible(false);
 					lblDegrees.setVisible(false);
 					textField_1.setVisible(false);
-					contentPane.repaint();
+					//contentPane.repaint();
 				}
 				else if(chckbxIncludeTurningShips.isSelected() == true)
 				{
 					lblShipRotationPer.setVisible(true);
 					lblDegrees.setVisible(true);
 					textField_1.setVisible(true);
-					contentPane.repaint();
+					//contentPane.repaint();
 				}				
 			}
 		});
@@ -401,10 +431,11 @@ public class NewAnalysis1 extends JFrame {
 		 */
 		final JPanel mapPanel = new JPanel();
 		mapPanel.setBorder(new TitledBorder(null, "Map", TitledBorder.LEADING, TitledBorder.TOP, null, null));
-		frame.add(mapPanel);
+		//frame.add(mapPanel);
 		//mapPanel.setVisible(false);
-		//mapPanel.setPreferredSize(new Dimension(425, 80));
-		mapPanel.setPreferredSize(new Dimension(425, 0));
+		mapPanel.setPreferredSize(eighty);
+		//mapPanel.setPreferredSize(null);
+		//mapPanel.setPreferredSize(new Dimension(425, 0));
 		mapPanel.setLayout(null);
 		
 		mapTextField = new JTextField();
@@ -455,7 +486,7 @@ public class NewAnalysis1 extends JFrame {
 					textField_3.setVisible(false);
 					textField_4.setVisible(false);
 					mapPanel.repaint();
-					contentPane.repaint();
+					//contentPane.repaint();
 				}
 				else if(chckbxSetMapCenterpoint.isSelected() == true)
 				{
@@ -464,7 +495,7 @@ public class NewAnalysis1 extends JFrame {
 					textField_3.setVisible(true);
 					textField_4.setVisible(true);
 					mapPanel.repaint();
-					contentPane.repaint();
+					//contentPane.repaint();
 				}				
 			}
 		});
@@ -475,10 +506,12 @@ public class NewAnalysis1 extends JFrame {
 		 * button panel
 		 */
 		final JPanel buttonPanel = new JPanel();
-		frame.add(buttonPanel);
-		buttonPanel.setPreferredSize(new Dimension(425, 40));
+		frame.getContentPane().add(buttonPanel);
+		buttonPanel.setPreferredSize(forty);
+		//buttonPanel.setPreferredSize(null);
 		buttonPanel.setLayout(null);
-		chckbxAdvancedSettings.setBounds(0, 5, 115, 23);
+		buttonPanel.setBorder(new TitledBorder(null, "Button", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		chckbxAdvancedSettings.setBounds(6, 11, 115, 23);
 		buttonPanel.add(chckbxAdvancedSettings);
 		
 		
@@ -488,8 +521,10 @@ public class NewAnalysis1 extends JFrame {
 				System.out.print("har");
 				if(chckbxAdvancedSettings.isSelected() == false)
 				{
-					calculatorPanel.setPreferredSize(new Dimension(425, 0));
-					mapPanel.setPreferredSize(new Dimension(425, 0));
+					frame.remove(calculatorPanel);
+					frame.remove(mapPanel);
+					//calculatorPanel.setPreferredSize(new Dimension(425, 0));
+					//mapPanel.setPreferredSize(new Dimension(425, 0));
 					//frame.remove(mapPanel);
 					frame.pack();
 					frame.repaint();
@@ -499,13 +534,13 @@ public class NewAnalysis1 extends JFrame {
 					if (rdbtnInputfromip.isSelected() == false)
 					{
 						//frame.setSize(new Dimension(460,255));
-						contentPane.repaint();
+						//contentPane.repaint();
 						frame.repaint();
 					}
 					else if (rdbtnInputfromip.isSelected() == true)
 					{
 						//frame.setSize(new Dimension(460,295));
-						contentPane.repaint();
+						//contentPane.repaint();
 						frame.repaint();
 					}
 					
@@ -513,8 +548,12 @@ public class NewAnalysis1 extends JFrame {
 				else if(chckbxAdvancedSettings.isSelected() == true)
 				{
 
-					calculatorPanel.setPreferredSize(new Dimension(425, 80));
-					mapPanel.setPreferredSize(new Dimension(425, 80));
+					frame.remove(buttonPanel);
+					frame.getContentPane().add(calculatorPanel);
+					frame.getContentPane().add(mapPanel);
+					frame.getContentPane().add(buttonPanel);
+					//calculatorPanel.setPreferredSize(new Dimension(425, 80));
+					//mapPanel.setPreferredSize(new Dimension(425, 80));
 					//frame.add(calculatorPanel);
 					//frame.add(mapPanel);
 					frame.pack();
@@ -525,20 +564,23 @@ public class NewAnalysis1 extends JFrame {
 					if (rdbtnInputfromip.isSelected() == false)
 					{
 						//frame.setSize(new Dimension(460,425));
-						contentPane.repaint();
+						//contentPane.repaint();
+						frame.pack();
 						frame.repaint();
+						
 					}
 					else if (rdbtnInputfromip.isSelected() == true)
 					{
 						//frame.setSize(new Dimension(460,465));
-						contentPane.repaint();
+						//contentPane.repaint();
+						frame.pack();
 						frame.repaint();
 					}
 					
 				}				
 			}
 		});
-		btnDone.setBounds(287, 5, 53, 23);
+		btnDone.setBounds(286, 11, 53, 23);
 		
 		/*
 		 * new button
@@ -732,7 +774,7 @@ public class NewAnalysis1 extends JFrame {
 		});
 		
 		buttonPanel.add(btnDone);
-		btnCancel.setBounds(350, 5, 65, 23);
+		btnCancel.setBounds(350, 11, 65, 23);
 
 		//JButton btnCancel = new JButton("Cancel");
 		btnCancel.addActionListener(new ActionListener() {
@@ -743,7 +785,7 @@ public class NewAnalysis1 extends JFrame {
 		buttonPanel.add(btnCancel);
 		
 
-		frame.setMaximumSize(new Dimension(460,460));
+		//frame.setMaximumSize(new Dimension(460,460));
 		frame.pack();
 	}
 }
