@@ -127,7 +127,9 @@ public class NewAnalysis extends JFrame {
 		btnSelectFile.setVisible(true);
 		inputPanel.add(btnSelectFile);
 		btnSelectFile.addActionListener(new ActionListener() {	public void actionPerformed(ActionEvent e) 
-		{	txtTypeInInput.setText(guiHelper.openAISFileDialog());	}	});
+		{	txtTypeInInput.setText(guiHelper.openAISFileDialog());	}	
+			
+		});
 		
 		/*
 		 * radiobutton1
@@ -486,8 +488,8 @@ public class NewAnalysis extends JFrame {
 						
 
 						coverageCalc.setCellSize(Integer.parseInt(textField.getText()));
-						analysisPanel.setAnalysisData(txtTypeInInput.getText(), "Advanced", textField.getText(), "999h");
 						
+						String time = "-";
 						if(chckbxSetAnalysisTimer.isSelected() == true)
 						{
 							int hour = Integer.parseInt(textField_2.getText().substring(0, 2));
@@ -496,12 +498,17 @@ public class NewAnalysis extends JFrame {
 							System.out.println(hour);
 							System.out.println(min);
 							project.setTimeout(sec);
+							time = textField_2.getText();
 							
 							//System.out.println("0,2 "+textField_2.getText().substring(0,2));
 							//System.out.println("2,2 "+textField_2.getText().substring(2,2));
 							//System.out.println("2 " +textField_2.getText().substring(2));
 							//System.out.println("3 " + textField_2.getText().substring(3));
 						}
+						
+						String[] chunks = txtTypeInInput.getText().split("\\\\");
+						final String filename = chunks[chunks.length-1];
+						analysisPanel.setAnalysisData(filename, "Advanced", textField.getText(), time);
 						
 						
 						dispose();

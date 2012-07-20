@@ -38,7 +38,7 @@ public class AisCoverageProject implements Serializable {
 	private String filename = null;
 	private String hostPort;
 	private int timeout = -1;
-	transient private List<AbstractCoverageCalculator> calculators = new ArrayList<AbstractCoverageCalculator>();
+	private List<AbstractCoverageCalculator> calculators = new ArrayList<AbstractCoverageCalculator>();
 	transient private List<AisReader> readers = new ArrayList<AisReader>();
 	transient private List<MessageHandler> messageHandlers = new ArrayList<MessageHandler>();
 //	private BaseStationHandler gridHandler = new BaseStationHandler();

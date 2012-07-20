@@ -38,7 +38,7 @@ public class DensityPlotLayer extends OMGraphicHandlerLayer {
 	public DensityPlotLayer(){
 		setRenderPolicy(new com.bbn.openmap.layer.policy.BufferedImageRenderPolicy());
 	}
-	private void updateCell(OMGraphicList graphics, Cell cell){
+	private void updateCell(Cell cell){
 		double longSize = calc.getLongSize();
 		double latSize = calc.getLatSize();
 		List<LatLonPoint> polygon = new ArrayList<LatLonPoint>();
@@ -49,21 +49,23 @@ public class DensityPlotLayer extends OMGraphicHandlerLayer {
 		polygon.add(new LatLonPoint.Double(cell.latitude + latSize, cell.longitude));
 
 		GridPolygon g = new GridPolygon(polygon, Color.BLACK);
-		graphics.add(g);
+		graphicslist.add(g);
 		added.put(cell.id, g);
 	}
 
 	public void doUpdate(DensityPlotCalculator calc) {
-		OMGraphicList graphics = new OMGraphicList();
+//		OMGraphicList graphics = new OMGraphicList();
+//		graphicslist.clear();
 		this.calc = calc;
 		Collection<Cell> cells = calc.getDensityPlotCoverage();
+		if(cells== null) return;
 		System.out.println("density update");
 		for (Cell cell : cells) {
 			if(!added.containsKey(cell.id)){
-				updateCell(graphics, cell);
+				updateCell(cell);
 			}
 		}
-		this.paste(graphics);
+//		this.paste(graphics);
 		doPrepare();
 	}
 	
@@ -77,6 +79,9 @@ public class DensityPlotLayer extends OMGraphicHandlerLayer {
 	public synchronized OMGraphicList prepare() {
 		graphicslist.project(getProjection());
 		return graphicslist;
+	}
+	public void reset() {
+		graphicslist.clear();
 	}
 
 }

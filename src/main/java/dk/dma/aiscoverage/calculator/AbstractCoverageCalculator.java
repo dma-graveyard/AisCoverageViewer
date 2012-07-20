@@ -1,5 +1,6 @@
 package dk.dma.aiscoverage.calculator;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -10,9 +11,9 @@ import dk.dma.aiscoverage.data.CustomMessage;
 import dk.dma.aiscoverage.project.AisCoverageProject;
 import dk.frv.ais.message.AisMessage;
 
-public abstract class AbstractCoverageCalculator {
+public abstract class AbstractCoverageCalculator implements Serializable {
 
-	private List<CellChangedListener> listeners = new ArrayList<CellChangedListener>();
+	transient private List<CellChangedListener> listeners = new ArrayList<CellChangedListener>();
 	protected BaseStationHandler gridHandler = new BaseStationHandler();
 	private double latSize = -1;
 	private double longSize = -1;
@@ -111,6 +112,7 @@ public abstract class AbstractCoverageCalculator {
 			bssmsis[i] = long1;
 			i++;
 		}
+		
 		return bssmsis;
 	}
 	public int getCellSize() {

@@ -22,7 +22,7 @@ import dk.frv.ais.proprietary.IProprietarySourceTag;
 
 public class CoverageCalculator extends AbstractCoverageCalculator {
 
-	private SphereProjection projection = new SphereProjection();
+	transient private SphereProjection projection = new SphereProjection();
 	private int bufferInSeconds = 20;
 	private int degreesPerMinute = 20;
 	private boolean ignoreRotation = true;

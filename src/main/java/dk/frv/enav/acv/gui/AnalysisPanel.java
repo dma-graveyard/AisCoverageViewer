@@ -61,9 +61,6 @@ import javax.swing.JRadioButton;
 
 public class AnalysisPanel extends OMComponentPanel implements ActionListener, AWTEventListener, ProjectHandlerListener {
 
-	/**
-	 * 
-	 */
 	private MapHandler mapHandler;
 	private static final long serialVersionUID = -5409591947155863462L;
 	private JButton btnStartAnalysis;
@@ -193,13 +190,13 @@ public class AnalysisPanel extends OMComponentPanel implements ActionListener, A
 		
 		lblInput = new JLabel("Input");
 		
-		lblAdvanced = new JLabel("Advanced3");
+		lblAdvanced = new JLabel("-");
 		
-		lblFile = new JLabel("<html>\r\ndump.txt<br/>\r\nlocalhost:7756\r\n</html>");
+		lblFile = new JLabel("-");
 		
-		lblm = new JLabel("2500m");
+		lblm = new JLabel("-");
 		
-		lblh = new JLabel("24h");
+		lblh = new JLabel("-");
 		GroupLayout gl_projectPanel = new GroupLayout(projectPanel);
 		gl_projectPanel.setHorizontalGroup(
 			gl_projectPanel.createParallelGroup(Alignment.LEADING)
@@ -446,16 +443,20 @@ public class AnalysisPanel extends OMComponentPanel implements ActionListener, A
 		
 		int i = 0;
 		for(Long bsmmsi : bsmmsis){
-			if(this.bsmmsis.containsKey(bsmmsi)){
-				JCheckBox checkbox = this.bsmmsis.get(bsmmsi);
-				GridBagConstraints constraints = new GridBagConstraints();
-				constraints.insets = new Insets(5, 25, 0, 0);
-				constraints.anchor = GridBagConstraints.WEST;
-				constraints.gridx = 0;
-				constraints.gridy = i;
-				baseStationPanel.add(checkbox, constraints);
-				i++;
+			JCheckBox checkbox = this.bsmmsis.get(bsmmsi);
+			if(checkbox == null){
+				checkbox = addCheckBox(bsmmsi);
 			}
+
+			checkbox = this.bsmmsis.get(bsmmsi);
+			GridBagConstraints constraints = new GridBagConstraints();
+			constraints.insets = new Insets(5, 25, 0, 0);
+			constraints.anchor = GridBagConstraints.WEST;
+			constraints.gridx = 0;
+			constraints.gridy = i;
+			baseStationPanel.add(checkbox, constraints);
+			i++;
+
 		}
 		
 		
@@ -512,7 +513,7 @@ public class AnalysisPanel extends OMComponentPanel implements ActionListener, A
 	
 	private void updateProgress(){
 		if(ProjectHandler.getInstance().getProject() == null){
-			System.out.println("no project");
+//			System.out.println("no project");
 			return;
 		}
 		Long secondsElapsed = ProjectHandler.getInstance().getProject().getRunningTime();
@@ -579,12 +580,14 @@ public class AnalysisPanel extends OMComponentPanel implements ActionListener, A
 			coverageLayer.setVisible(true);
 			densityPlotLayer.setVisible(false);
 			enableBaseStationPanel(true);
+			updateCoverage(1, true);
 		}
 		else if(e.getSource() == densityPlotRadio) {
 			System.out.println("density");
 			coverageLayer.setVisible(false);
 			densityPlotLayer.setVisible(true);
 			enableBaseStationPanel(false);
+			updateCoverage(1, true);
 		}
 
 		
@@ -653,7 +656,8 @@ public class AnalysisPanel extends OMComponentPanel implements ActionListener, A
 	private void resetGui(){
 		this.bsmmsis.clear();
 		updateButtons();
-		updateCoverage(0, true);
+		this.densityPlotLayer.reset();
+		updateCoverage(1, true);
 	}
 
 	@Override
@@ -674,16 +678,26 @@ public class AnalysisPanel extends OMComponentPanel implements ActionListener, A
 	public void basestationAdded(long mmsi) {
 		BaseStation basestation = ProjectHandler.getInstance().getProject().getCoverageCalculator().getBaseStationHandler().getGrid(mmsi);
 		if(basestation == null) return;
+		addCheckBox(mmsi);
+		
+	}
+	private JCheckBox addCheckBox(long mmsi){
+		BaseStation basestation = ProjectHandler.getInstance().getProject().getCoverageCalculator().getBaseStationHandler().getGrid(mmsi);
 		JCheckBox checkbox = new JCheckBox(mmsi+"");
 		checkbox.setHorizontalAlignment(SwingConstants.LEFT);		
 		this.bsmmsis.put(mmsi, checkbox);	
 		checkbox.addActionListener(this);
+		
+		if(!coverageRadio.isSelected())
+			checkbox.setEnabled(false);
+		
 		if(chckbxSelectAll.isSelected()){
 			basestation.setVisible(true);
+		
 			
 		}else{
 			basestation.setVisible(false);
 		}
-		
+		return checkbox;
 	}
 }

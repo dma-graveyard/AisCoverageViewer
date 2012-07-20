@@ -17,9 +17,6 @@ package dk.dma.aiscoverage;
 
 public class GlobalSettings {
 	
-	//global settings
-
-
 
 
 	//Getters and setters

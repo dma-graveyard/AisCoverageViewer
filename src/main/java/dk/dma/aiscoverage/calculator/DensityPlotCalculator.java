@@ -21,7 +21,7 @@ import dk.frv.ais.proprietary.IProprietarySourceTag;
 
 public class DensityPlotCalculator extends AbstractCoverageCalculator {
 
-	private SphereProjection projection = new SphereProjection();
+	transient private SphereProjection projection = new SphereProjection();
 	private BaseStation basestation;
 	
 	public DensityPlotCalculator(AisCoverageProject project, boolean ignoreRotation){
@@ -81,6 +81,7 @@ public class DensityPlotCalculator extends AbstractCoverageCalculator {
 	 * Number of ship in each cell can be used to draw density plot
 	 */
 	public Collection<Cell> getDensityPlotCoverage() {
+		if(basestation == null) return null;
 		return basestation.grid.values();
 	}
 	
