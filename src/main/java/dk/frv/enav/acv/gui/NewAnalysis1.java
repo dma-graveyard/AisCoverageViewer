@@ -78,6 +78,7 @@ public class NewAnalysis1 extends JFrame {
 	private Dimension onetwenty;
 	private Dimension eighty;
 	private Dimension forty;
+	long id;
 	
 	JTextArea ta = new JTextArea("this is a");
 
@@ -89,6 +90,7 @@ public class NewAnalysis1 extends JFrame {
 		onetwenty = new Dimension(425, 120);
 		eighty = new Dimension(425, 80);
 		forty = new Dimension(425, 40);
+		id = 1;
 		
 		setResizable(false);
 		setTitle("New Analysis");
@@ -636,7 +638,24 @@ public class NewAnalysis1 extends JFrame {
 					else
 					{
 						//if(txtTypeInInput.getText().contains("port number")))
-						project.setHostPort(txtTypeInInput.getText());
+						String ips = ta.getText();
+						System.out.println(ips);
+						//System.out.println(ips.split("\n"));
+						//ip = ips.split("\n");
+						System.out.println(ips.split("\n").length);
+						String[] ip;
+						ip = ips.split("\n");
+						
+						for (String ib : ip)
+						{
+							//System.out.println(ib);
+							//assign ip's to the program
+							project.addHostPort(ib, id);
+							id++;
+						}
+						
+						//project.addHostPort(txtTypeInInput.getText(), id );
+						//id++;
 						CoverageCalculatorAdvanced3 calc = new dk.dma.aiscoverage.calculator.CoverageCalculatorAdvanced3();
 						
 						if(chckbxIncludeTurningShips.isSelected() == false)
@@ -707,12 +726,14 @@ public class NewAnalysis1 extends JFrame {
 						{
 							//System.out.println(ib);
 							//assign ip's to the program
+							project.addHostPort(ib, id);
+							id++;
 						}
 						
 						
 						
 						
-						project.setHostPort(ta.getText());
+						//project.addHostPort(ta.getText());
 						CoverageCalculatorAdvanced3 calc = new dk.dma.aiscoverage.calculator.CoverageCalculatorAdvanced3();
 						
 						if(chckbxIncludeTurningShips.isSelected() == false)

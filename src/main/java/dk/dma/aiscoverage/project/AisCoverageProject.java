@@ -38,8 +38,8 @@ public class AisCoverageProject implements Serializable {
 	private String hostPort;
 	private int timeout = -1;
 	transient private AbstractCoverageCalculator calc = new CoverageCalculatorAdvanced3(true);
-	transient private AisReader aisReader = null;
-	transient private MessageHandler messageHandler = null;
+	transient private List<AisReader> readers = new ArrayList<AisReader>();
+	transient private List<MessageHandler> messageHandlers = new ArrayList<MessageHandler>();
 	private BaseStationHandler gridHandler = new BaseStationHandler();
 	private Date starttime;
 	private Date endtime;
@@ -84,54 +84,76 @@ public class AisCoverageProject implements Serializable {
 		
 	}
 	public void setFile(String filepath){
-		this.filename = filepath;
-		//this.filename = "C:\\Users\\silentk\\Desktop\\aisdump.txt"; 
+		AisReader reader = null;
+		try {
+			reader = new AisStreamReader(new FileInputStream(filepath));
+			
+			// Register proprietary handlers (optional)
+			reader.addProprietaryFactory(new DmaFactory());
+			reader.addProprietaryFactory(new GatehouseFactory());
+			readers.add(reader);
+			
+			// Make handler instance
+			MessageHandler messageHandler = new MessageHandler(this, 0l);
+			messageHandlers.add(messageHandler);
+			// register message handler
+			reader.registerHandler(messageHandler);
+			
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
 	}
 	
 	public String getFile()
 	{
 		return filename;
 	}
-	public void setHostPort(String port){
-		this.hostPort = port;
+	public void addHostPort(String port, long defaultID){
+		RoundRobinAisTcpReader reader = new RoundRobinAisTcpReader();
+		reader.setCommaseparatedHostPort(port);
+		
+		// Register proprietary handlers (optional)
+		reader.addProprietaryFactory(new DmaFactory());
+		reader.addProprietaryFactory(new GatehouseFactory());
+		
+		readers.add(reader);
+		
+		// Make handler instance
+		// We create multiple message handlers because we need a default id
+		// if bsmmsi isn't set
+		MessageHandler messageHandler = new MessageHandler(this, defaultID);
+		messageHandlers.add(messageHandler);
+		// register message handler
+		reader.registerHandler(messageHandler);
+
 	}
 	public void startAnalysis() throws FileNotFoundException, InterruptedException{
 		DOMConfigurator.configure("log4j.xml");
 		LOG = Logger.getLogger(AisCoverageProject.class);
 		LOG.info("Starting AisCoverage");
 		
-		if (filename == null && hostPort == null) {
+		if (readers.size() == 0) {
 			LOG.debug("Source missing");
 			return;
 		}
 		
-		// Use TCP or file as source
-		if (filename != null) {
-			LOG.debug("Using file source: " + filename);
-			aisReader = new AisStreamReader(new FileInputStream(filename));
-		} else {
-			LOG.debug("Using TCP source: " + hostPort);
-			RoundRobinAisTcpReader rrAisReader = new RoundRobinAisTcpReader();
-			rrAisReader.setCommaseparatedHostPort(hostPort);
-			aisReader = rrAisReader;
+		
+
+		
+		for (AisReader reader : readers) {
+			
+			// start reader
+			reader.start();
 		}
 		
-		// Register proprietary handlers (optional)
-		aisReader.addProprietaryFactory(new DmaFactory());
-		aisReader.addProprietaryFactory(new GatehouseFactory());
-
-		// Make handler instance
-		messageHandler = new MessageHandler(this);
-
-		// Register handler and start reader
-		aisReader.registerHandler(messageHandler);
-		aisReader.start();
-		
+		// Listen for reader to stop
 		Thread t = new Thread( new Runnable(){
             public void run(){
         		try {
         			started();
-					aisReader.join();
+        			readers.get(0).join();
 					stopped();
 				} catch (InterruptedException e) {
 					e.printStackTrace();
@@ -143,7 +165,9 @@ public class AisCoverageProject implements Serializable {
 		
 	}
 	public void stopAnalysis(){
-		aisReader.stop();
+		for (AisReader reader : readers) {
+			reader.stop();
+		}
 	}
 	private void started(){
 		starttime = new Date();
@@ -195,9 +219,13 @@ public class AisCoverageProject implements Serializable {
 	 * Returns a combined coverage of cells from selected base stations.
 	 * If two base stations cover same area, the best coverage is chosen.
 	 */
-	public Collection<Cell> getCoverage(List<Long> baseStations){
-		return gridHandler.getCoverage(baseStations);
+//	public Collection<Cell> getCoverage(List<Long> baseStations){
+//		return gridHandler.getCoverage(baseStations);
+//	}
+	public Collection<Cell> getCoverage(){
+		return gridHandler.getCoverage();
 	}
+	
 	public void incrementMessageCount(){
 		this.messageCount++;
 	}

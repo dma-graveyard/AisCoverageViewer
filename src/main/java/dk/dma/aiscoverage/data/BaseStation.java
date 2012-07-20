@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
 
 import dk.dma.aiscoverage.GlobalSettings;
+import dk.dma.aiscoverage.project.ProjectHandler;
 
 
 public class BaseStation implements Serializable {
@@ -29,8 +30,25 @@ public class BaseStation implements Serializable {
 	public Long bsMmsi;
 	private double latSize;
 	private double lonSize;
+	public Double latitude;
+	public Double longitude;
+	public long messageCount = 0;
+	private boolean isVisible = true;
 
 	
+	public boolean isVisible() {
+		return isVisible;
+	}
+
+
+
+	public void setVisible(boolean isVisible) {
+		this.isVisible = isVisible;
+		ProjectHandler.getInstance().visibilityChanged(bsMmsi);
+	}
+
+
+
 	public BaseStation(long bsMmsi, double latSize, double lonSize) {
 		this.bsMmsi = bsMmsi;
 		this.latSize = latSize;

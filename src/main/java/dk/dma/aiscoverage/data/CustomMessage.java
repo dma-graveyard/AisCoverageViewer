@@ -15,7 +15,7 @@ public class CustomMessage implements Serializable {
 	public Date timestamp = null;
 	public BaseStation grid;
 	public Ship ship;
-	public Cell cell;
+//	public Cell cell;
 	public long timeSinceLastMsg;
 
 }

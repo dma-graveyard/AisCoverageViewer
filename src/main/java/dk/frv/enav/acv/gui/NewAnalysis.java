@@ -75,12 +75,14 @@ public class NewAnalysis extends JFrame {
 	private JTextField textField_3;
 	private JTextField textField_4;
 	JTextArea ta = new JTextArea("this is a");
+	private long id;
 
 	/**
 	 * Create the frame.
 	 */
 	public NewAnalysis(AnalysisPanel ap) {
 		analysisPanel = ap; 
+		id = 1;
 		
 		setResizable(false);
 		setTitle("New Analysis");
@@ -533,6 +535,7 @@ public class NewAnalysis extends JFrame {
 				
 				
 				System.out.println(textField.getText());
+//<<<<<<< HEAD
 				if(rdbtnInputfile.isSelected())
 				{
 					if(txtTypeInInput.getText() == "Select File")
@@ -574,7 +577,8 @@ public class NewAnalysis extends JFrame {
 					else
 					{
 						//if(txtTypeInInput.getText().contains("port number")))
-						project.setHostPort(txtTypeInInput.getText());
+						project.addHostPort(txtTypeInInput.getText(), id);
+						id++;
 						CoverageCalculatorAdvanced3 calc = new dk.dma.aiscoverage.calculator.CoverageCalculatorAdvanced3();
 						
 						if(chckbxIncludeTurningShips.isSelected() == false)
@@ -645,12 +649,14 @@ public class NewAnalysis extends JFrame {
 						{
 							//System.out.println(ib);
 							//assign ip's to the program
+							project.addHostPort(ib, id);
+							id++;
 						}
 						
 						
 						
 						
-						project.setHostPort(ta.getText());
+						//project.addHostPort(ta.getText());
 						CoverageCalculatorAdvanced3 calc = new dk.dma.aiscoverage.calculator.CoverageCalculatorAdvanced3();
 						
 						if(chckbxIncludeTurningShips.isSelected() == false)
@@ -699,6 +705,27 @@ public class NewAnalysis extends JFrame {
 				}
 				
 				
+//=======
+				project.setFile(txtTypeInInput.getText());
+//				project.addHostPort("172.28.25.66:9240");
+//				project.addHostPort("172.28.37.66:9240");
+//				project.addHostPort("10.3.246.210:9240", 666);
+//				project.addHostPort("10.10.11.30:8030", 777);
+				
+				project.addHostPort("10.10.32.2:9240", 1);
+				project.addHostPort("88.85.35.18:9240", 2);
+				project.addHostPort("93.160.251.222:9240", 3);
+				project.addHostPort("95.209.148.160:9240", 4);
+				
+	
+//				if (comboBox.getSelectedItem() == "Calculator 1") {
+//					System.out.println("calculator 1");
+//					project.setCalculator(new dk.dma.aiscoverage.calculator.CoverageCalculatorAdvanced1());
+//				} else if (comboBox.getSelectedItem() == "Calculator 2") {
+					System.out.println("calculator 2");
+					project.setCalculator(new dk.dma.aiscoverage.calculator.CoverageCalculatorAdvanced3());
+//				}
+//>>>>>>> acf3d52844b593fb2667a0ca28eb8be8299590fb
 
 				System.out.println("set alle settings");
 				

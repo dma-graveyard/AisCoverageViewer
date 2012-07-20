@@ -34,6 +34,8 @@ import java.awt.Color;
 import java.awt.Point;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Properties;
 
@@ -54,9 +56,12 @@ import com.bbn.openmap.proj.Proj;
 import com.bbn.openmap.proj.Projection;
 import com.bbn.openmap.proj.coords.LatLonPoint;
 
+import dk.dma.aiscoverage.data.BaseStation;
 import dk.frv.ais.geo.GeoLocation;
 import dk.frv.enav.acv.ACV;
+import dk.frv.enav.acv.coverage.layers.BaseStationLayer;
 import dk.frv.enav.acv.coverage.layers.CoverageLayer;
+import dk.frv.enav.acv.coverage.layers.DensityPlotLayer;
 import dk.frv.enav.acv.event.NavigationMouseMode;
 import dk.frv.enav.acv.settings.MapSettings;
 
@@ -74,9 +79,11 @@ public class ChartPanel extends OMComponentPanel implements MouseWheelListener {
 	private Layer encLayer;
 	private Layer bgLayer;
 	private CoverageLayer coverageLayer;
+	private BaseStationLayer basestationLayer;
 	private NavigationMouseMode mapNavMouseMode;
 	private MouseDelegator mouseDelegator;
 	public int maxScale = 5000;
+	private DensityPlotLayer densityPlotLayer;
 
 
 	public ChartPanel() {
@@ -108,13 +115,13 @@ public class ChartPanel extends OMComponentPanel implements MouseWheelListener {
 		// Adding NavMouseMode first makes it active.
 		 mapHandler.add(new NavMouseMode());
 		 
-		 //Mouse mode
+		 //Mouse mode	
 		mapNavMouseMode = new NavigationMouseMode(this);
-
 		mouseDelegator.addMouseMode(mapNavMouseMode);
 		mouseDelegator.setActive(mapNavMouseMode);
-
 		mapHandler.add(mapNavMouseMode);
+
+		
 
 
 		// Use the LayerHandler to manage all layers, whether they are
@@ -152,14 +159,21 @@ public class ChartPanel extends OMComponentPanel implements MouseWheelListener {
 		map.setScale(mapSettings.getScale());
 
 		add(map);
-	
-		getMap().addMouseWheelListener(this);
 		
 		// Add coverage layer
 		coverageLayer = new CoverageLayer();
 		coverageLayer.setVisible(true);
 		mapHandler.add(coverageLayer);
-
+		
+		//add basestation layer
+		basestationLayer = new BaseStationLayer();
+		basestationLayer.setVisible(true);
+		mapHandler.add(basestationLayer);
+		
+		//add density plot layer
+		densityPlotLayer = new DensityPlotLayer();
+		densityPlotLayer.setVisible(true);
+		mapHandler.add(densityPlotLayer);
 		
 	}
 
