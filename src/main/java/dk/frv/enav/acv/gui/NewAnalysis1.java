@@ -807,6 +807,6 @@ public class NewAnalysis1 extends JFrame {
 		
 
 		//frame.setMaximumSize(new Dimension(460,460));
-		frame.pack();
+		//frame.pack();
 	}
 }

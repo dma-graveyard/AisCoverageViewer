@@ -76,6 +76,11 @@ public class NewAnalysis extends JFrame {
 	private JTextField textField_4;
 	JTextArea ta = new JTextArea("this is a");
 	private long id;
+	private final JPanel mapPanel = new JPanel();
+	private final JPanel inputPanel = new JPanel();
+	final JPanel gridPanel = new JPanel();
+	final JPanel calculatorPanel = new JPanel();
+	final JPanel buttonPanel = new JPanel();
 
 	/**
 	 * Create the frame.
@@ -93,14 +98,14 @@ public class NewAnalysis extends JFrame {
 		setContentPane(contentPane);
 		contentPane.setLayout(new FlowLayout(FlowLayout.CENTER, 5, 5));
 
-		frame.setSize(new Dimension(460,255));
+		frame.setSize(new Dimension(460,455));
 		ta.setBounds(10, 35, 404, 70);
 	
 
 		/*
 		 * inputpanel
 		 */
-		final JPanel inputPanel = new JPanel();
+		//final JPanel inputPanel = new JPanel();
 		inputPanel.setBorder(new TitledBorder(null, "Input", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		contentPane.add(inputPanel);
 		inputPanel.setPreferredSize(new Dimension(425, 80));
@@ -197,7 +202,7 @@ public class NewAnalysis extends JFrame {
 		/*
 		 * analysis panel
 		 */
-		final JPanel gridPanel = new JPanel();
+		//final JPanel gridPanel = new JPanel();
 		gridPanel.setBorder(new TitledBorder(null, "Analysis settings", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		gridPanel.setPreferredSize(new Dimension(425, 85));
 		contentPane.add(gridPanel);
@@ -254,7 +259,7 @@ public class NewAnalysis extends JFrame {
 		/*
 		 * calculator panel (advanced settings)
 		 */
-		final JPanel calculatorPanel = new JPanel();
+		//final JPanel calculatorPanel = new JPanel();
 		calculatorPanel.setBorder(new TitledBorder(null, "Calculator", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		contentPane.add(calculatorPanel);
 		calculatorPanel.setVisible(false);
@@ -314,7 +319,7 @@ public class NewAnalysis extends JFrame {
 		/*
 		 * map panel (advanced settings)
 		 */
-		final JPanel mapPanel = new JPanel();
+		//final JPanel mapPanel = new JPanel();
 		mapPanel.setBorder(new TitledBorder(null, "Map", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		contentPane.add(mapPanel);
 		mapPanel.setVisible(false);
@@ -387,7 +392,7 @@ public class NewAnalysis extends JFrame {
 		/*
 		 * button panel
 		 */
-		final JPanel buttonPanel = new JPanel();
+		//final JPanel buttonPanel = new JPanel();
 		contentPane.add(buttonPanel);
 		buttonPanel.setPreferredSize(new Dimension(425, 60));
 		buttonPanel.setLayout(null);
@@ -607,7 +612,6 @@ public class NewAnalysis extends JFrame {
 			}
 		});
 		buttonPanel.add(btnCancel);
-		
 
-	}
+	}		
 }
