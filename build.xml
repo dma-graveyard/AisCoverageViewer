@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="AISCoverageViewer" default="dist">
 
-	<property name="version" value="5.0" />
+	<property name="version" value="1.0" />
 
 	<property file="${basedir}/ant.properties" />
 	<property file="${basedir}/.ant.properties" />
