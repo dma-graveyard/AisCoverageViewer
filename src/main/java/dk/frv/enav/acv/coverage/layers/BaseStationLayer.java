@@ -50,7 +50,6 @@ public class BaseStationLayer extends OMGraphicHandlerLayer implements MapMouseL
 	}
 
 	public void doUpdate(Collection<BaseStation> basestations, boolean forceUpdate) {
-		
 		//Only update if new base stations are added
 		if(basestations.size() > basestationCount || forceUpdate){
 			basestationCount = basestations.size();

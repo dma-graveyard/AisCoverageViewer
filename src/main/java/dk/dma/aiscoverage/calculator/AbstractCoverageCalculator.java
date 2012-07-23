@@ -8,11 +8,13 @@ import java.util.Set;
 import dk.dma.aiscoverage.data.BaseStationHandler;
 import dk.dma.aiscoverage.data.Cell;
 import dk.dma.aiscoverage.data.CustomMessage;
+import dk.dma.aiscoverage.geotools.SphereProjection;
 import dk.dma.aiscoverage.project.AisCoverageProject;
 import dk.frv.ais.message.AisMessage;
 
 public abstract class AbstractCoverageCalculator implements Serializable {
 
+	transient protected SphereProjection projection = new SphereProjection();
 	transient private List<CellChangedListener> listeners = new ArrayList<CellChangedListener>();
 	protected BaseStationHandler gridHandler = new BaseStationHandler();
 	private double latSize = -1;
@@ -23,7 +25,7 @@ public abstract class AbstractCoverageCalculator implements Serializable {
 	public AbstractCoverageCalculator(AisCoverageProject project){
 		this.project = project;
 	}
-	abstract public void processMessage(AisMessage message, long defaultID);
+	abstract public void processMessage(AisMessage message, String defaultID);
 	abstract public void calculateCoverage(CustomMessage message);
 	
 	/*
@@ -59,24 +61,20 @@ public abstract class AbstractCoverageCalculator implements Serializable {
 	}
 	
 	public boolean filterMessage(CustomMessage customMessage){
-		boolean filterMessage = false;
+
 		if(customMessage.sog < 3 || customMessage.sog > 50)
-			filterMessage = true;
+			return true;
 		if(customMessage.cog == 360)
-			filterMessage = true;
+			return true;
+
+		CustomMessage lastMessage = customMessage.ship.getLastMessage();
+		if(lastMessage != null){
+			double distance = projection.distBetweenPoints(customMessage.longitude, customMessage.latitude, lastMessage.longitude, lastMessage.latitude);
+			if(distance > 2000)
+				return true;
+		}
+		return false;
 		
-		//if this is the first message for a ship, we don't calculate coverage
-//		if(customMessage.ship.getLastMessage() == null) {
-//			filterMessage = true;
-//		}else{
-//
-//			//If time since last message is > 30 minutes, we filter
-////			if(customMessage.timeSinceLastMsg > 1800)
-////				filterMessage = true;
-////				
-//			}
-		
-		return filterMessage;
 	}
 	protected void cellChanged(Cell cell){
 		for (CellChangedListener listener : listeners) {
@@ -104,12 +102,12 @@ public abstract class AbstractCoverageCalculator implements Serializable {
 	public BaseStationHandler getBaseStationHandler(){
 		return gridHandler;
 	}
-	public Long[] getBaseStationNames(){
-		Set<Long> set = gridHandler.grids.keySet();
-		Long[] bssmsis = new Long[set.size()];
+	public String[] getBaseStationNames(){
+		Set<String> set = gridHandler.grids.keySet();
+		String[] bssmsis = new String[set.size()];
 		int i = 0;
-		for (Long long1 : set) {
-			bssmsis[i] = long1;
+		for (String s : set) {
+			bssmsis[i] = s;
 			i++;
 		}
 		

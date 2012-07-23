@@ -71,7 +71,7 @@ public class AisCoverageProject implements Serializable {
 			readers.add(reader);
 			
 			// Make handler instance
-			MessageHandler messageHandler = new MessageHandler(this, 0l);
+			MessageHandler messageHandler = new MessageHandler(this, "Unidentified");
 			messageHandlers.add(messageHandler);
 			// register message handler
 			reader.registerHandler(messageHandler);
@@ -87,7 +87,7 @@ public class AisCoverageProject implements Serializable {
 	{
 		return filename;
 	}
-	public void addHostPort(String port, long defaultID){
+	public void addHostPort(String port, String defaultID){
 		RoundRobinAisTcpReader reader = new RoundRobinAisTcpReader();
 		reader.setCommaseparatedHostPort(port);
 		

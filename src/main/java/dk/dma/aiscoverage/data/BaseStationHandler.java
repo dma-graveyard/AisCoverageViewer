@@ -28,7 +28,7 @@ import dk.dma.aiscoverage.project.ProjectHandler;
 
 public class BaseStationHandler implements Serializable {
 
-	public ConcurrentHashMap<Long, BaseStation> grids = new ConcurrentHashMap<Long, BaseStation>();
+	public ConcurrentHashMap<String, BaseStation> grids = new ConcurrentHashMap<String, BaseStation>();
 	private double latSize;
 	private double lonSize;
 	
@@ -53,23 +53,23 @@ public class BaseStationHandler implements Serializable {
 	/*
 	 * Create grid associated to a specific transponder
 	 */
-	public BaseStation createGrid(Long bsMmsi){
+	public BaseStation createGrid(String bsMmsi){
 		BaseStation grid = new BaseStation(bsMmsi, latSize, lonSize);
 		grids.put(bsMmsi, grid);
 		ProjectHandler.getInstance().basestationAdded(bsMmsi);
 		return grid;
 	}
 	
-	public BaseStation getGrid(Long bsMmsi){
+	public BaseStation getGrid(String bsMmsi){
 		return grids.get(bsMmsi);
 	}
 	public void setAllVisible(boolean b){
 		Collection<BaseStation> basestations = grids.values();
 		for (BaseStation baseStation : basestations) {	
-			setVisible(baseStation.bsMmsi, b);
+			setVisible(baseStation.identifier, b);
 		}
 	}
-	public void setVisible(long mmsi, boolean b){
+	public void setVisible(String mmsi, boolean b){
 		BaseStation baseStation = grids.get(mmsi);
 		if(baseStation != null){
 			baseStation.setVisible(b);

@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 
 import dk.dma.aiscoverage.data.BaseStation;
+import dk.dma.aiscoverage.data.BaseStation.ReceiverType;
 import dk.dma.aiscoverage.data.BaseStationHandler;
 import dk.dma.aiscoverage.data.Cell;
 import dk.dma.aiscoverage.data.CustomMessage;
@@ -22,7 +23,6 @@ import dk.frv.ais.proprietary.IProprietarySourceTag;
 
 public class CoverageCalculator extends AbstractCoverageCalculator {
 
-	transient private SphereProjection projection = new SphereProjection();
 	private int bufferInSeconds = 20;
 	private int degreesPerMinute = 20;
 	private boolean ignoreRotation = true;
@@ -229,30 +229,45 @@ public class CoverageCalculator extends AbstractCoverageCalculator {
 	}
 
 	@Override
-	public void processMessage(AisMessage aisMessage, long defaultID) {
-		// Check timeout
-		Date now = new Date();
+	public void processMessage(AisMessage aisMessage, String defaultID) {
+
 		long timeSinceStart = project.getRunningTime();
 		if (project.getTimeout() != -1 && timeSinceStart > project.getTimeout())
 			project.stopAnalysis();
 
+		String identifier = null;
+		ReceiverType receiverType = ReceiverType.NOTDEFINED;
 		AisPositionMessage posMessage = null;
 		GeoLocation pos = null;
-		Long bsMmsi = null;
 		Date timestamp = null;
 		Country srcCountry = null;
+
 
 		// Get source tag properties
 		IProprietarySourceTag sourceTag = aisMessage.getSourceTag();
 		if (sourceTag != null) {
-			bsMmsi = sourceTag.getBaseMmsi();
+			Long bsmmsi = sourceTag.getBaseMmsi();
 			timestamp = sourceTag.getTimestamp();
 			srcCountry = sourceTag.getCountry();
+			String region = sourceTag.getRegion();
+			if(bsmmsi == null){
+				if(!region.equals("")){
+					identifier = region;
+					receiverType = ReceiverType.REGION;
+				}
+			}else{
+				identifier = bsmmsi+"";
+				receiverType = ReceiverType.BASESTATION;
+			}
 		}
 
-		// What to do if no bsMmsi or timestamp?
-		if (bsMmsi == null || timestamp == null) {
-			bsMmsi = defaultID; // determine id
+		//Checks if its neither a basestation nor a region
+		if (identifier == null){
+			identifier = defaultID;
+		}
+		
+		// If time stamp is not present, we add one
+		if(timestamp == null){
 			timestamp = new Date();
 		}
 
@@ -294,10 +309,10 @@ public class CoverageCalculator extends AbstractCoverageCalculator {
 		// Check if grid exists (If a message with that bsmmsi has been received
 		// before)
 		// Otherwise create a grid for corresponding base station
-		BaseStation grid = gridHandler.getGrid(bsMmsi);
+		BaseStation grid = gridHandler.getGrid(identifier);
 		if (grid == null) {
-			gridHandler.createGrid(bsMmsi);
-			grid = gridHandler.getGrid(bsMmsi);
+			grid = gridHandler.createGrid(identifier);
+			grid.setReceiverType(receiverType);
 		}
 
 		// Check which ship sent the message.

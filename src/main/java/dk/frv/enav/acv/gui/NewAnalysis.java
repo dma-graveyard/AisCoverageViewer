@@ -538,7 +538,7 @@ public class NewAnalysis extends JFrame {
 						{
 							//System.out.println(ib);
 							//assign ip's to the program
-							project.addHostPort(ib, id);
+							project.addHostPort(ib, id+"");
 							id++;
 						}
 						

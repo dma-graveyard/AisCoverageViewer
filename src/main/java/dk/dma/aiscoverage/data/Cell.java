@@ -16,6 +16,7 @@
 package dk.dma.aiscoverage.data;
 
 import java.io.Serializable;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -29,6 +30,7 @@ public class Cell implements Serializable {
 	public double longitude;
 	public String id;
 	public BaseStation grid;
+	public int shipCount = 0;
 	
 	public Cell(BaseStation grid, double lat, double lon, String id){
 		this.latitude = lat;

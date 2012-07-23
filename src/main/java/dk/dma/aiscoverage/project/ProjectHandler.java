@@ -22,14 +22,14 @@ public class ProjectHandler {
 		}
 		project = null;
 	}
-	public void basestationAdded(long mmsi){
+	public void basestationAdded(String mmsi){
 		for (ProjectHandlerListener listener : listeners) {
 			listener.basestationAdded(mmsi);
 		}
 	}
-	public void visibilityChanged(long mmsi){
+	public void visibilityChanged(String identifier){
 		for (ProjectHandlerListener listener : listeners) {
-			listener.visibilityChanged(mmsi);
+			listener.visibilityChanged(identifier);
 		}
 	}
 	public void analysisStopped(){

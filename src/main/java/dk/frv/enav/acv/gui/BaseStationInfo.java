@@ -95,7 +95,7 @@ public class BaseStationInfo extends OverlayBox implements ActionListener {
 
 	public void setBaseStation(BaseStation basestation) {
 		this.basestation = basestation;
-		this.bsmmsi.setText(basestation.bsMmsi+"");
+		this.bsmmsi.setText(basestation.identifier+"");
 		this.totalMessages.setText(basestation.messageCount+"");
 		this.totalShips.setText(basestation.ships.size()+"");
 		checkBox.setSelected(basestation.isVisible());
@@ -105,7 +105,7 @@ public class BaseStationInfo extends OverlayBox implements ActionListener {
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if(e.getSource() == checkBox) {
-			ProjectHandler.getInstance().getProject().getCoverageCalculator().getBaseStationHandler().setVisible(basestation.bsMmsi, checkBox.isSelected());
+			ProjectHandler.getInstance().getProject().getCoverageCalculator().getBaseStationHandler().setVisible(basestation.identifier, checkBox.isSelected());
 		}
 		
 	}

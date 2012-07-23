@@ -92,7 +92,7 @@ public class KMLGenerator {
 			writeLine("</Style>", out);
 
 			for (BaseStation grid : grids) {
-				generateGrid(grid.bsMmsi, grid.grid.values(), out, calc);
+				generateGrid(grid.identifier, grid.grid.values(), out, calc);
 			}
 
 			writeLine("</Document>", out);
@@ -109,7 +109,7 @@ public class KMLGenerator {
 			System.out.println("baaah");
 		}
 	}
-	private static void generateGrid(Long bsMmsi, Collection<Cell> cells,
+	private static void generateGrid(String bsMmsi, Collection<Cell> cells,
 			BufferedWriter out, CoverageCalculator calc) {
 
 			writeLine("<Folder>", out);

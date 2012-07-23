@@ -27,30 +27,41 @@ public class BaseStation implements Serializable {
 	
 	public ConcurrentHashMap<String, Cell> grid = new ConcurrentHashMap<String, Cell>();
 	public ConcurrentHashMap<Long, Ship> ships = new ConcurrentHashMap<Long, Ship>();
-	public Long bsMmsi;
+	public String identifier;
 	public double latSize;
 	public double lonSize;
 	public Double latitude;
 	public Double longitude;
 	public long messageCount = 0;
 	private boolean isVisible = true;
+	private ReceiverType receiverType = ReceiverType.NOTDEFINED;
+	public enum ReceiverType {
+		BASESTATION, REGION, NOTDEFINED
+	}
 
-	
+
+
+	public ReceiverType getReceiverType() {
+		return receiverType;
+	}
+
+	public void setReceiverType(ReceiverType receiverType) {
+		this.receiverType = receiverType;
+	}
+
 	public boolean isVisible() {
 		return isVisible;
 	}
 
-
-
 	public void setVisible(boolean isVisible) {
 		this.isVisible = isVisible;
-		ProjectHandler.getInstance().visibilityChanged(bsMmsi);
+		ProjectHandler.getInstance().visibilityChanged(identifier);
 	}
 
 
 
-	public BaseStation(long bsMmsi, double latSize, double lonSize) {
-		this.bsMmsi = bsMmsi;
+	public BaseStation(String identifier, double latSize, double lonSize) {
+		this.identifier = identifier;
 		this.latSize = latSize;
 		this.lonSize = lonSize;
 	}

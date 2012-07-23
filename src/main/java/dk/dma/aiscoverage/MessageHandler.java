@@ -45,10 +45,10 @@ public class MessageHandler implements IAisHandler {
 	
 	private static Logger LOG = Logger.getLogger(MessageHandler.class);
 	private AisCoverageProject project = null;
-	private long defaultID;
+	private String defaultID;
 	
 
-	public MessageHandler(AisCoverageProject project, long defaultID){
+	public MessageHandler(AisCoverageProject project, String defaultID){
 		this.project = project;
 		this.defaultID = defaultID;
 	}

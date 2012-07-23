@@ -10,6 +10,7 @@ import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 
@@ -33,6 +34,8 @@ import dk.dma.aiscoverage.calculator.AbstractCoverageCalculator;
 import dk.dma.aiscoverage.calculator.CoverageCalculator;
 import dk.dma.aiscoverage.calculator.DensityPlotCalculator;
 import dk.dma.aiscoverage.data.BaseStation;
+import dk.dma.aiscoverage.data.BaseStation.ReceiverType;
+import dk.dma.aiscoverage.data.BaseStationHandler;
 import dk.dma.aiscoverage.data.Cell;
 import dk.dma.aiscoverage.export.ImageGenerator;
 import dk.dma.aiscoverage.project.ProjectHandler;
@@ -69,7 +72,7 @@ public class AnalysisPanel extends OMComponentPanel implements ActionListener, A
 	private JLabel messagesPerSec;
 	private CoverageLayer coverageLayer;
 	private Thread updateCoverageThread;
-	private HashMap<Long, JCheckBox> bsmmsis = new HashMap<Long, JCheckBox>();
+	private HashMap<String, JCheckBox> bsmmsis = new HashMap<String, JCheckBox>();
 	private JPanel baseStationPanel;
 	private JScrollPane scrollPane;
 	private JPanel baseStationWrapperPanel;
@@ -378,7 +381,7 @@ public class AnalysisPanel extends OMComponentPanel implements ActionListener, A
 							Thread.sleep(1000);
 							waitUpdate--;
 						}
-						waitUpdate = 5; //set standard delay, until next update of coverage
+						waitUpdate = 10; //set standard delay, until next update of coverage
 						
 						//If mouse is down, we wait a little bit
 						while(mouseDown){
@@ -436,13 +439,39 @@ public class AnalysisPanel extends OMComponentPanel implements ActionListener, A
 	/*
 	 * Updates the list of base station
 	 */
-	private void updateBaseStationList(Long[] bsmmsis){
+	private void updateBaseStationList(String[] bsmmsis){
+		BaseStationHandler basestationHandler = ProjectHandler.getInstance().getProject().getCoverageCalculator().getBaseStationHandler();
 		Arrays.sort(bsmmsis);
+		Arrays.sort(bsmmsis, new Comparator<String>(){
+
+			@Override
+			public int compare(String o1, String o2) {
+				try{
+					int first = Integer.parseInt(o1);
+					int second = Integer.parseInt(o2);
+					if(first > second)
+			            return 1;
+			        else if(first < second)
+			            return -1;
+			        else
+			            return 0; 
+				}catch(Exception e){
+					
+				}
+				if(o1.compareTo(o2) > 0)
+					return 1;
+				else if(o1.compareTo(o2) < 0)
+					return -1;
+				else
+					return 0;
+			}
+			
+		});
 		
 		baseStationPanel.removeAll();
 		
 		int i = 0;
-		for(Long bsmmsi : bsmmsis){
+		for(String bsmmsi : bsmmsis){
 			JCheckBox checkbox = this.bsmmsis.get(bsmmsi);
 			if(checkbox == null){
 				checkbox = addCheckBox(bsmmsi);
@@ -455,6 +484,25 @@ public class AnalysisPanel extends OMComponentPanel implements ActionListener, A
 			constraints.gridx = 0;
 			constraints.gridy = i;
 			baseStationPanel.add(checkbox, constraints);
+			
+			
+			JLabel receiverType = new JLabel();
+			receiverType.setEnabled(checkbox.isEnabled());
+			ReceiverType recType = basestationHandler.getGrid(bsmmsi).getReceiverType();
+			if(recType==ReceiverType.BASESTATION)
+				receiverType.setText("Basestation");
+			else if(recType==ReceiverType.REGION)
+				receiverType.setText("Region");
+			else{
+				receiverType.setText("Unknown");
+			}
+			
+			GridBagConstraints receiverTypeConstraints = new GridBagConstraints();
+			receiverTypeConstraints.insets = new Insets(5, 10, 0, 0);
+			receiverTypeConstraints.anchor = GridBagConstraints.WEST;
+			receiverTypeConstraints.gridx = 1;
+			receiverTypeConstraints.gridy = i;
+			baseStationPanel.add(receiverType, receiverTypeConstraints);
 			i++;
 
 		}
@@ -570,7 +618,7 @@ public class AnalysisPanel extends OMComponentPanel implements ActionListener, A
 			else{
 				JCheckBox checkBox = (JCheckBox) e.getSource();
 				chckbxSelectAll.setSelected(false);
-				ProjectHandler.getInstance().getProject().getCoverageCalculator().getBaseStationHandler().setVisible(Long.parseLong(checkBox.getText()), checkBox.isSelected());
+				ProjectHandler.getInstance().getProject().getCoverageCalculator().getBaseStationHandler().setVisible(checkBox.getText(), checkBox.isSelected());
 			}
 		}
 		
@@ -667,7 +715,7 @@ public class AnalysisPanel extends OMComponentPanel implements ActionListener, A
 	}
 
 	@Override
-	public void visibilityChanged(long mmsi) {
+	public void visibilityChanged(String mmsi) {
 		BaseStation basestation = ProjectHandler.getInstance().getProject().getCoverageCalculator().getBaseStationHandler().getGrid(mmsi);
 		JCheckBox checkbox = this.bsmmsis.get(mmsi);
 		checkbox.setSelected(basestation.isVisible());
@@ -675,13 +723,13 @@ public class AnalysisPanel extends OMComponentPanel implements ActionListener, A
 	}
 
 	@Override
-	public void basestationAdded(long mmsi) {
+	public void basestationAdded(String mmsi) {
 		BaseStation basestation = ProjectHandler.getInstance().getProject().getCoverageCalculator().getBaseStationHandler().getGrid(mmsi);
 		if(basestation == null) return;
 		addCheckBox(mmsi);
 		
 	}
-	private JCheckBox addCheckBox(long mmsi){
+	private JCheckBox addCheckBox(String mmsi){
 		BaseStation basestation = ProjectHandler.getInstance().getProject().getCoverageCalculator().getBaseStationHandler().getGrid(mmsi);
 		JCheckBox checkbox = new JCheckBox(mmsi+"");
 		checkbox.setHorizontalAlignment(SwingConstants.LEFT);		

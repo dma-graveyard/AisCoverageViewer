@@ -24,6 +24,16 @@ public class Ship implements Serializable {
 	public Long mmsi;
 	private CustomMessage lastMessage = null;
 	private LinkedList<CustomMessage> messageBuffer = new LinkedList<CustomMessage>();
+	private Cell lastCell = null;
+	
+
+	public Cell getLastCell() {
+		return lastCell;
+	}
+
+	public void setLastCell(Cell lastCell) {
+		this.lastCell = lastCell;
+	}
 
 	public Ship(Long mmsi) {
 		this.mmsi = mmsi;

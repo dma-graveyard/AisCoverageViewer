@@ -5,6 +5,6 @@ public interface ProjectHandlerListener {
 	void projectCreated();
 	void analysisStarted();
 	void analysisStopped();
-	void visibilityChanged(long mmsi);
-	void basestationAdded(long mmsi);
+	void visibilityChanged(String mmsi);
+	void basestationAdded(String mmsi);
 }

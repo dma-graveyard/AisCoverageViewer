@@ -4,6 +4,8 @@ import java.awt.Color;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
@@ -11,8 +13,11 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.apache.log4j.Logger;
 import org.apache.log4j.xml.DOMConfigurator;
 
+import com.bbn.openmap.event.ProjectionEvent;
 import com.bbn.openmap.layer.OMGraphicHandlerLayer;
+import com.bbn.openmap.omGraphics.OMGraphic;
 import com.bbn.openmap.omGraphics.OMGraphicList;
+import com.bbn.openmap.omGraphics.OMRect;
 import com.bbn.openmap.proj.coords.LatLonPoint;
 
 import dk.dma.aiscoverage.GlobalSettings;
@@ -32,41 +37,137 @@ public class DensityPlotLayer extends OMGraphicHandlerLayer {
 	private DensityPlotCalculator calc;
 	private static final long serialVersionUID = 1L;
 	public boolean isRunning = false;
-	HashMap<String, GridPolygon> added = new HashMap<String, GridPolygon>(); 
+	HashMap<String, Color> cellColor = new HashMap<String, Color>(); 
+	HashMap<String, OMRect> addedCell = new HashMap<String, OMRect>(); 
 	private OMGraphicList graphicslist = new OMGraphicList();
+	private Color[] colors = new Color[10];
+
+	
 
 	public DensityPlotLayer(){
-		setRenderPolicy(new com.bbn.openmap.layer.policy.BufferedImageRenderPolicy());
+		setRenderPolicy(new com.bbn.openmap.layer.policy.PanningImageRenderPolicy());
+		
+		colors[0] = Color.WHITE;
+		colors[1] = interpolate(Color.WHITE, Color.YELLOW, 0.2f);
+		colors[2] = interpolate(Color.WHITE, Color.YELLOW, 0.6f);
+		colors[3] = interpolate(Color.WHITE, Color.YELLOW, 0.8f);
+		colors[4] = Color.YELLOW;
+		colors[5] = interpolate(Color.YELLOW, Color.RED, 0.2f);
+		colors[6] = interpolate(Color.YELLOW, Color.RED, 0.4f);
+		colors[7] = interpolate(Color.YELLOW, Color.RED, 0.6f);
+		colors[8] = interpolate(Color.YELLOW, Color.RED, 0.8f);
+		colors[9] = Color.RED;
+		
 	}
+	Color interpolate(Color colorA, Color colorB, float bAmount) {	    
+	    float aAmount = (float) (1.0 - bAmount);
+	    int r =  (int) (colorA.getRed() * aAmount + colorB.getRed() * bAmount);
+	    int g =  (int) (colorA.getGreen() * aAmount + colorB.getGreen() * bAmount);
+	    int b =  (int) (colorA.getBlue() * aAmount + colorB.getBlue() * bAmount);
+	    return new Color(r, g, b);
+	}
+	
+	public Color getColor(Cell c){
+		try{
+			
+		
+			double seconds = calc.getTimeDifference(calc.getFirstMessage().timestamp.getTime(), calc.getCurrentMessage().timestamp.getTime());
+			int shipsPerDay = (int) ((double)c.shipCount/seconds*86400);
+//			System.out.println("ships per day: " + shipsPerDay);
+//			System.out.println("ship count: " + c.shipCount);
+			Color color;
+			if(shipsPerDay < 2)
+				color = colors[0];
+			else if(shipsPerDay < 3)
+				color = colors[1];
+			else if(shipsPerDay < 4)
+				color = colors[2];
+			else if(shipsPerDay < 5)
+				color = colors[3];
+			else if(shipsPerDay < 6)
+				color = colors[4];
+			else if(shipsPerDay < 8)
+				color = colors[5];
+			else if(shipsPerDay < 10)
+				color = colors[6];
+			else if(shipsPerDay < 15)
+				color = colors[7];
+			else if(shipsPerDay < 30)
+				color = colors[8];
+			else
+				color = colors[9];
+			return color;
+		}catch(Exception e){
+			System.out.println("exception");
+			return Color.WHITE;
+		}
+		
+	}
+
 	private void updateCell(Cell cell){
 		double longSize = calc.getLongSize();
 		double latSize = calc.getLatSize();
-		List<LatLonPoint> polygon = new ArrayList<LatLonPoint>();
-
-		polygon.add(new LatLonPoint.Double(cell.latitude, cell.longitude));
-		polygon.add(new LatLonPoint.Double(cell.latitude, cell.longitude + longSize));
-		polygon.add(new LatLonPoint.Double(cell.latitude + latSize, cell.longitude + longSize));
-		polygon.add(new LatLonPoint.Double(cell.latitude + latSize, cell.longitude));
-
-		GridPolygon g = new GridPolygon(polygon, Color.BLACK);
-		graphicslist.add(g);
-		added.put(cell.id, g);
+		
+		OMRect rect = new OMRect(cell.latitude, cell.longitude, cell.latitude + latSize, cell.longitude + longSize, OMGraphic.LINETYPE_STRAIGHT);
+		
+		Color color = this.getColor(cell);
+		
+		
+		rect.setFillColor(color);
+		rect.setLineColor(color);
+		graphicslist.add(rect);
+		cellColor.put(cell.id, color);
+		this.addedCell.put(cell.id, rect);
+		
+		
+	}
+	private OMRect createRect(Cell cell, Color color){
+		double longSize = calc.getLongSize();
+		double latSize = calc.getLatSize();
+		OMRect rect = new OMRect(cell.latitude, cell.longitude, cell.latitude + latSize, cell.longitude + longSize, OMGraphic.LINETYPE_STRAIGHT);
+		rect.setFillColor(color);
+		rect.setLineColor(color);
+		graphicslist.add(rect);
+		cellColor.put(cell.id, color);
+		this.addedCell.put(cell.id, rect);
+		return rect;
 	}
 
 	public void doUpdate(DensityPlotCalculator calc) {
+		System.out.println("max ships: "+calc.getMaxShips().shipCount);
+		System.out.println("min ships: "+calc.getMinShips().shipCount);
 //		OMGraphicList graphics = new OMGraphicList();
 //		graphicslist.clear();
+		System.out.println(this.isRunning);
 		this.calc = calc;
+
 		Collection<Cell> cells = calc.getDensityPlotCoverage();
 		if(cells== null) return;
 		System.out.println("density update");
 		for (Cell cell : cells) {
-			if(!added.containsKey(cell.id)){
+			
+			if(!addedCell.containsKey(cell.id)){
 				updateCell(cell);
+			}else{
+				
+				Color existingColor = cellColor.get(cell.id);
+				Color newColor = this.getColor(cell);
+				if(existingColor != newColor){
+					OMRect rect = this.addedCell.get(cell.id);
+					cellColor.put(cell.id, newColor);
+					rect.setFillColor(newColor);
+					rect.setLineColor(newColor);
+				}
 			}
 		}
 //		this.paste(graphics);
 		doPrepare();
+//		repaint();
+		System.out.println(this.isRunning);
+	}
+	public void projectionChanged(ProjectionEvent pe){
+		super.projectionChanged(pe);
+		reset();
 	}
 	
 	@Override
@@ -82,6 +183,8 @@ public class DensityPlotLayer extends OMGraphicHandlerLayer {
 	}
 	public void reset() {
 		graphicslist.clear();
+		this.addedCell.clear();
+		this.cellColor.clear();
 	}
 
 }
