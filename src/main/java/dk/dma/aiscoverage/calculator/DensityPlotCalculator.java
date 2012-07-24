@@ -24,7 +24,7 @@ import dk.frv.ais.message.AisMessage4;
 import dk.frv.ais.message.AisPositionMessage;
 import dk.frv.ais.proprietary.IProprietarySourceTag;
 
-public class DensityPlotCalculator extends AbstractCoverageCalculator {
+public class DensityPlotCalculator extends AbstractCalculator {
 
 	
 	private BaseStation basestation;

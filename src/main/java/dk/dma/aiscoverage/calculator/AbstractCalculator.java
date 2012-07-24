@@ -12,17 +12,17 @@ import dk.dma.aiscoverage.geotools.SphereProjection;
 import dk.dma.aiscoverage.project.AisCoverageProject;
 import dk.frv.ais.message.AisMessage;
 
-public abstract class AbstractCoverageCalculator implements Serializable {
+public abstract class AbstractCalculator implements Serializable {
 
 	transient protected SphereProjection projection = new SphereProjection();
 	transient private List<CellChangedListener> listeners = new ArrayList<CellChangedListener>();
-	protected BaseStationHandler gridHandler = new BaseStationHandler();
+	protected BaseStationHandler gridHandler = new BaseStationHandler(this);
 	private double latSize = -1;
 	private double longSize = -1;
 	private int cellSize = 2500;
 	protected AisCoverageProject project;
 	
-	public AbstractCoverageCalculator(AisCoverageProject project){
+	public AbstractCalculator(AisCoverageProject project){
 		this.project = project;
 	}
 	abstract public void processMessage(AisMessage message, String defaultID);

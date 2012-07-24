@@ -30,7 +30,7 @@ import javax.swing.LayoutStyle.ComponentPlacement;
 import com.bbn.openmap.MapHandler;
 import com.bbn.openmap.gui.OMComponentPanel;
 
-import dk.dma.aiscoverage.calculator.AbstractCoverageCalculator;
+import dk.dma.aiscoverage.calculator.AbstractCalculator;
 import dk.dma.aiscoverage.calculator.CoverageCalculator;
 import dk.dma.aiscoverage.calculator.DensityPlotCalculator;
 import dk.dma.aiscoverage.data.BaseStation;
@@ -44,6 +44,7 @@ import dk.frv.enav.acv.ACV;
 import dk.frv.enav.acv.coverage.layers.BaseStationLayer;
 import dk.frv.enav.acv.coverage.layers.CoverageLayer;
 import dk.frv.enav.acv.coverage.layers.DensityPlotLayer;
+import dk.frv.enav.acv.event.AisEvent;
 
 import java.awt.AWTEvent;
 import java.awt.Component;
@@ -333,8 +334,6 @@ public class AnalysisPanel extends OMComponentPanel implements ActionListener, A
 
 	}
 	
-//<<<<<<< HEAD
-//=======
 	protected void setAnalysisData(String input, String calculator, String cellSize, String time)
 	{
 		lblAdvanced.setText(calculator);
@@ -350,9 +349,7 @@ public class AnalysisPanel extends OMComponentPanel implements ActionListener, A
 		
 		
 	}
-	
-//>>>>>>> merged
-	
+
 	/*
 	 * Starts timers for updating GUI and coverage layer
 	 */
@@ -368,62 +365,6 @@ public class AnalysisPanel extends OMComponentPanel implements ActionListener, A
 			}
 		}).start();
 		
-		//This thread updates the coverage layer.
-		//We don't use a Swing timer, since this is a bit heavy
-		updateCoverageThread = new Thread(new Runnable(){
-
-			@Override
-			public void run() {
-				while(true){
-					try {
-						
-						while(waitUpdate > 0){
-							Thread.sleep(1000);
-							waitUpdate--;
-						}
-						waitUpdate = 10; //set standard delay, until next update of coverage
-						
-						//If mouse is down, we wait a little bit
-						while(mouseDown){
-							Thread.sleep(500);
-						}
-						
-						//If project is running, or updateCoverageLayer was called, we update layer
-						if(ProjectHandler.getInstance().getProject() != null){
-							if(updateCoverageLayer || ProjectHandler.getInstance().getProject().isRunning()){
-								
-								CoverageCalculator coverageCalc = ProjectHandler.getInstance().getProject().getCoverageCalculator();
-								DensityPlotCalculator densityPlotCalc = ProjectHandler.getInstance().getProject().getDensityPlotCalculator();
-
-								
-								if(coverageRadio.isSelected()){
-									// Update coverage layer
-									if (coverageLayer != null) {
-										coverageLayer.doUpdate(coverageCalc);
-									}
-								}
-								
-								if(densityPlotRadio.isSelected()){
-									if (densityPlotLayer != null) {
-										densityPlotLayer.doUpdate(densityPlotCalc);
-									}
-								}
-								
-								//update base station layer
-								basestationLayer.doUpdate(coverageCalc.getBaseStationHandler().grids.values(), forceUpdateBaseStations);
-								
-								forceUpdateBaseStations = false;
-								updateCoverageLayer = false;
-							}
-						}
-						
-					} catch (InterruptedException e) {}
-				}
-			}
-		});
-		updateCoverageThread.setPriority(1);
-		updateCoverageThread.start();
-
 	}
 	
 	/*
@@ -626,6 +567,7 @@ public class AnalysisPanel extends OMComponentPanel implements ActionListener, A
 		else if(e.getSource() == coverageRadio) {
 			System.out.println("coverage");
 			coverageLayer.setVisible(true);
+			coverageLayer.updateOnce();
 			densityPlotLayer.setVisible(false);
 			enableBaseStationPanel(true);
 			updateCoverage(1, true);
@@ -634,6 +576,7 @@ public class AnalysisPanel extends OMComponentPanel implements ActionListener, A
 			System.out.println("density");
 			coverageLayer.setVisible(false);
 			densityPlotLayer.setVisible(true);
+			densityPlotLayer.updateOnce();
 			enableBaseStationPanel(false);
 			updateCoverage(1, true);
 		}
@@ -664,21 +607,7 @@ public class AnalysisPanel extends OMComponentPanel implements ActionListener, A
 		}
 	}
 
-	@Override
-	public void analysisStarted() {
-		System.out.println("analysis started");
-		updateButtons();
-		
-	}
 
-	@Override
-	public void analysisStopped() {
-		System.out.println("analysis stopped");
-		updateButtons();
-		updateCoverage(0, true);
-		System.out.println("yeah");
-		
-	}
 	
 	/*
 	 * Global mouselistener
@@ -695,12 +624,7 @@ public class AnalysisPanel extends OMComponentPanel implements ActionListener, A
         	waitUpdate = 2;
         }
 	}
-	@Override
-	public void projectLoaded() {
-		System.out.println("loaded");
-		resetGui();
-		
-	}
+
 	private void resetGui(){
 		this.bsmmsis.clear();
 		updateButtons();
@@ -708,27 +632,48 @@ public class AnalysisPanel extends OMComponentPanel implements ActionListener, A
 		updateCoverage(1, true);
 	}
 
-	@Override
-	public void projectCreated() {
-		resetGui();
-		System.out.println("created");
-	}
+
 
 	@Override
-	public void visibilityChanged(String mmsi) {
-		BaseStation basestation = ProjectHandler.getInstance().getProject().getCoverageCalculator().getBaseStationHandler().getGrid(mmsi);
-		JCheckBox checkbox = this.bsmmsis.get(mmsi);
-		checkbox.setSelected(basestation.isVisible());
-		updateCoverage(1, true);
-	}
+	public void aisEventReceived(AisEvent event) {
+		if(event.getEvent() == AisEvent.Event.ANALYSIS_STARTED){
+			System.out.println("analysis started");
+			updateButtons();
+			
+		} 
+		else if(event.getEvent() == AisEvent.Event.ANALYSIS_STOPPED){
+			System.out.println("analysis stopped");
+			updateButtons();
+			updateCoverage(0, true);
 
-	@Override
-	public void basestationAdded(String mmsi) {
-		BaseStation basestation = ProjectHandler.getInstance().getProject().getCoverageCalculator().getBaseStationHandler().getGrid(mmsi);
-		if(basestation == null) return;
-		addCheckBox(mmsi);
+		} 
+		else if(event.getEvent() == AisEvent.Event.BS_ADDED){
+			if(event.getSource() instanceof CoverageCalculator){
+				BaseStation basestation = (BaseStation) event.getEventObject();
+				if(basestation == null) return;
+				addCheckBox(basestation.identifier);
+			}
+		} 
+		else if(event.getEvent() == AisEvent.Event.BS_VISIBILITY_CHANGED){
+			if(event.getSource() instanceof CoverageCalculator){
+				BaseStation basestation = (BaseStation) event.getEventObject();
+				if(basestation == null) return;
+				JCheckBox checkbox = this.bsmmsis.get(basestation.identifier);
+				checkbox.setSelected(basestation.isVisible());
+				updateCoverage(1, true);
+			}
+		} 
+		else if(event.getEvent() == AisEvent.Event.PROJECT_CREATED){
+			resetGui();
+			System.out.println("created");
+
+		} else if(event.getEvent() == AisEvent.Event.PROJECT_LOADED){
+			System.out.println("loaded");
+			resetGui();
+		}
 		
 	}
+	
 	private JCheckBox addCheckBox(String mmsi){
 		BaseStation basestation = ProjectHandler.getInstance().getProject().getCoverageCalculator().getBaseStationHandler().getGrid(mmsi);
 		JCheckBox checkbox = new JCheckBox(mmsi+"");
@@ -739,13 +684,9 @@ public class AnalysisPanel extends OMComponentPanel implements ActionListener, A
 		if(!coverageRadio.isSelected())
 			checkbox.setEnabled(false);
 		
-		if(chckbxSelectAll.isSelected()){
-			basestation.setVisible(true);
-		
+		basestation.setVisible(chckbxSelectAll.isSelected());
+		checkbox.setSelected(chckbxSelectAll.isSelected());
 			
-		}else{
-			basestation.setVisible(false);
-		}
 		return checkbox;
 	}
 }

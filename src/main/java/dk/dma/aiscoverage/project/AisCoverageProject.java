@@ -22,7 +22,7 @@ import org.apache.log4j.xml.DOMConfigurator;
 
 import dk.dma.aiscoverage.GlobalSettings;
 import dk.dma.aiscoverage.MessageHandler;
-import dk.dma.aiscoverage.calculator.AbstractCoverageCalculator;
+import dk.dma.aiscoverage.calculator.AbstractCalculator;
 import dk.dma.aiscoverage.calculator.CoverageCalculator;
 import dk.dma.aiscoverage.calculator.DensityPlotCalculator;
 import dk.dma.aiscoverage.data.BaseStationHandler;
@@ -32,13 +32,14 @@ import dk.frv.ais.proprietary.GatehouseFactory;
 import dk.frv.ais.reader.AisReader;
 import dk.frv.ais.reader.AisStreamReader;
 import dk.frv.ais.reader.RoundRobinAisTcpReader;
+import dk.frv.enav.acv.event.AisEvent;
 
 public class AisCoverageProject implements Serializable {
 	transient private static Logger LOG;
 	private String filename = null;
 	private String hostPort;
 	private int timeout = -1;
-	private List<AbstractCoverageCalculator> calculators = new ArrayList<AbstractCoverageCalculator>();
+	private List<AbstractCalculator> calculators = new ArrayList<AbstractCalculator>();
 	transient private List<AisReader> readers = new ArrayList<AisReader>();
 	transient private List<MessageHandler> messageHandlers = new ArrayList<MessageHandler>();
 //	private BaseStationHandler gridHandler = new BaseStationHandler();
@@ -51,10 +52,10 @@ public class AisCoverageProject implements Serializable {
 	public boolean isRunning() {
 		return isRunning;
 	}
-	public List<AbstractCoverageCalculator> getCalculators() {
+	public List<AbstractCalculator> getCalculators() {
 		return calculators;
 	}
-	public void addCalculator(AbstractCoverageCalculator calc){
+	public void addCalculator(AbstractCalculator calc){
 		calculators.add(calc);
 	}
 	public AisCoverageProject(){
@@ -149,13 +150,19 @@ public class AisCoverageProject implements Serializable {
 	private void started(){
 		starttime = new Date();
 		this.isRunning = true;
-		ProjectHandler.getInstance().analysisStarted();
+		
+		AisEvent event = new AisEvent();
+		event.setEvent(AisEvent.Event.ANALYSIS_STARTED);
+		ProjectHandler.getInstance().broadcastEvent(event);
 	}
 	private void stopped(){
 		endtime = new Date();
 		this.isRunning = false;
 		this.isDone = true;
-		ProjectHandler.getInstance().analysisStopped();
+		
+		AisEvent event = new AisEvent();
+		event.setEvent(AisEvent.Event.ANALYSIS_STOPPED);
+		ProjectHandler.getInstance().broadcastEvent(event);
 	}
 	
 	public boolean isDone() {
@@ -193,14 +200,14 @@ public class AisCoverageProject implements Serializable {
 		this.messageCount++;
 	}
 	public CoverageCalculator getCoverageCalculator(){
-		for (AbstractCoverageCalculator abstractCalc : getCalculators()) {
+		for (AbstractCalculator abstractCalc : getCalculators()) {
 			if(abstractCalc instanceof CoverageCalculator)
 				return (CoverageCalculator) abstractCalc;
 		}
 		return null;
 	}
 	public DensityPlotCalculator getDensityPlotCalculator(){
-		for (AbstractCoverageCalculator abstractCalc : getCalculators()) {
+		for (AbstractCalculator abstractCalc : getCalculators()) {
 			if(abstractCalc instanceof DensityPlotCalculator)
 				return (DensityPlotCalculator) abstractCalc;
 		}

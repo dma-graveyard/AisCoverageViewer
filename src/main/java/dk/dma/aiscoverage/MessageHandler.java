@@ -20,7 +20,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 
-import dk.dma.aiscoverage.calculator.AbstractCoverageCalculator;
+import dk.dma.aiscoverage.calculator.AbstractCalculator;
 import dk.dma.aiscoverage.data.Cell;
 import dk.dma.aiscoverage.data.BaseStation;
 import dk.dma.aiscoverage.data.BaseStationHandler;
@@ -64,8 +64,8 @@ public class MessageHandler implements IAisHandler {
 		project.incrementMessageCount();
 		
 		// Notify each calculator
-		List<AbstractCoverageCalculator> calculators = project.getCalculators();	
-		for (AbstractCoverageCalculator abstractCoverageCalculator : calculators) {
+		List<AbstractCalculator> calculators = project.getCalculators();	
+		for (AbstractCalculator abstractCoverageCalculator : calculators) {
 			//Calculator takes care of filtering of messages and calculation of coverage
 			abstractCoverageCalculator.processMessage(aisMessage, defaultID);
 		}

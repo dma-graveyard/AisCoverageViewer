@@ -9,6 +9,8 @@ import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import dk.frv.enav.acv.event.AisEvent;
+
 public class ProjectHandler {
 
 	private List<ProjectHandlerListener> listeners = new ArrayList<ProjectHandlerListener>();
@@ -22,25 +24,9 @@ public class ProjectHandler {
 		}
 		project = null;
 	}
-	public void basestationAdded(String mmsi){
+	public void broadcastEvent(AisEvent event){
 		for (ProjectHandlerListener listener : listeners) {
-			listener.basestationAdded(mmsi);
-		}
-	}
-	public void visibilityChanged(String identifier){
-		for (ProjectHandlerListener listener : listeners) {
-			listener.visibilityChanged(identifier);
-		}
-	}
-	public void analysisStopped(){
-		for (ProjectHandlerListener listener : listeners) {
-			listener.analysisStopped();
-		}
-	}
-	
-	public void analysisStarted(){
-		for (ProjectHandlerListener listener : listeners) {
-			listener.analysisStarted();
+			listener.aisEventReceived(event);
 		}
 	}
 	
@@ -48,9 +34,10 @@ public class ProjectHandler {
 		terminateProject();
 		this.project = new AisCoverageProject();
 		
-		for (ProjectHandlerListener listener : listeners) {
-			listener.projectCreated();
-		}
+		AisEvent event = new AisEvent();
+		event.setEvent(AisEvent.Event.PROJECT_CREATED);
+		event.setSource(project);
+		broadcastEvent(event);
 			
 		return project;
 	}
@@ -86,9 +73,11 @@ public class ProjectHandler {
 
 //			
 			this.project = project;
-			for (ProjectHandlerListener listener : listeners) {
-				listener.projectLoaded();
-			}
+			AisEvent event = new AisEvent();
+			event.setEvent(AisEvent.Event.PROJECT_LOADED);
+			event.setSource(project);
+			broadcastEvent(event);
+			
 			return project;
 	
 		} catch (FileNotFoundException e) {

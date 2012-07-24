@@ -37,6 +37,7 @@ import java.util.Map;
 import javax.swing.ImageIcon;
 
 import com.bbn.openmap.omGraphics.OMGraphicList;
+import com.bbn.openmap.proj.Projection;
 
 import dk.dma.aiscoverage.data.BaseStation;
 import dk.frv.ais.geo.GeoLocation;
@@ -49,6 +50,50 @@ public class AisTargetGraphic extends OMGraphicList {
 	int imageWidth;
 	int imageHeight;
 	private BaseStation basestation;
+	private double latitude;
+	private double longitude;
+	private boolean awaitingUpdate = true;
+
+
+
+	public boolean isAwaitingUpdate() {
+		return awaitingUpdate;
+	}
+
+
+	public void setAwaitingUpdate(boolean awaitingUpdate) {
+		this.awaitingUpdate = awaitingUpdate;
+	}
+
+
+	public void update() {
+		if(awaitingUpdate == true){
+			if(basestation.isVisible()){
+				targetImage = new ImageIcon(EeINS.class.getResource("/images/atonActive.png"));
+			}else{
+				targetImage = new ImageIcon(EeINS.class.getResource("/images/aton.png"));
+	
+			}
+	
+			remove(selectionGraphics);
+			selectionGraphics = new CenterRaster(latitude,
+						longitude, imageWidth, imageHeight, targetImage, this);
+			add(selectionGraphics);
+			
+			awaitingUpdate = true;
+		}
+
+	}
+	
+	
+	public boolean generate(Projection proj){
+		boolean result = super.generate(proj);
+		selectionGraphics.generate(proj);
+		return result;
+		
+	}
+	
+
 
 	public BaseStation getBasestation() {
 		return basestation;
@@ -67,6 +112,8 @@ public class AisTargetGraphic extends OMGraphicList {
 
 	public AisTargetGraphic(double latitude, double longitude, BaseStation bs) {
 		super();
+		this.latitude=latitude;
+		this.longitude=longitude;
 		this.basestation = bs;
 		createGraphics();
 		selectionGraphics = new CenterRaster(latitude,
@@ -87,6 +134,7 @@ public class AisTargetGraphic extends OMGraphicList {
 
 		selectionGraphics = new CenterRaster(0, 0, imageWidth, imageHeight,
 				targetImage, this);
+
 	}
 
 	public void moveSymbol(GeoLocation pos) {

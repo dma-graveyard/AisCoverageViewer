@@ -1,10 +1,7 @@
 package dk.dma.aiscoverage.project;
 
+import dk.frv.enav.acv.event.AisEvent;
+
 public interface ProjectHandlerListener {
-	void projectLoaded();
-	void projectCreated();
-	void analysisStarted();
-	void analysisStopped();
-	void visibilityChanged(String mmsi);
-	void basestationAdded(String mmsi);
+	void aisEventReceived(AisEvent event);
 }

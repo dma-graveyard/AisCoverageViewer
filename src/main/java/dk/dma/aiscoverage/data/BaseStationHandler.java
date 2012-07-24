@@ -23,7 +23,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
+import dk.dma.aiscoverage.calculator.AbstractCalculator;
 import dk.dma.aiscoverage.project.ProjectHandler;
+import dk.frv.enav.acv.event.AisEvent;
 
 
 public class BaseStationHandler implements Serializable {
@@ -31,6 +33,11 @@ public class BaseStationHandler implements Serializable {
 	public ConcurrentHashMap<String, BaseStation> grids = new ConcurrentHashMap<String, BaseStation>();
 	private double latSize;
 	private double lonSize;
+	private AbstractCalculator calculator;
+	
+	public BaseStationHandler(AbstractCalculator calculator){
+		this.calculator = calculator;
+	}
 	
 	public double getLatSize() {
 		return latSize;
@@ -56,7 +63,13 @@ public class BaseStationHandler implements Serializable {
 	public BaseStation createGrid(String bsMmsi){
 		BaseStation grid = new BaseStation(bsMmsi, latSize, lonSize);
 		grids.put(bsMmsi, grid);
-		ProjectHandler.getInstance().basestationAdded(bsMmsi);
+		
+		AisEvent event = new AisEvent();
+		event.setEvent(AisEvent.Event.BS_ADDED);
+		event.setSource(this);
+		event.setEventObject(grid);
+		ProjectHandler.getInstance().broadcastEvent(event);
+
 		return grid;
 	}
 	
@@ -73,6 +86,9 @@ public class BaseStationHandler implements Serializable {
 		BaseStation baseStation = grids.get(mmsi);
 		if(baseStation != null){
 			baseStation.setVisible(b);
+			
+			ProjectHandler.getInstance().broadcastEvent(new AisEvent(AisEvent.Event.BS_VISIBILITY_CHANGED, calculator, baseStation));
+			
 		}
 	}
 

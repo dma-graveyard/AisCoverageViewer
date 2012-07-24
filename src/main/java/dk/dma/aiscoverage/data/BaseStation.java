@@ -21,6 +21,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import dk.dma.aiscoverage.GlobalSettings;
 import dk.dma.aiscoverage.project.ProjectHandler;
+import dk.frv.enav.acv.event.AisEvent;
 
 
 public class BaseStation implements Serializable {
@@ -55,7 +56,6 @@ public class BaseStation implements Serializable {
 
 	public void setVisible(boolean isVisible) {
 		this.isVisible = isVisible;
-		ProjectHandler.getInstance().visibilityChanged(identifier);
 	}
 
 

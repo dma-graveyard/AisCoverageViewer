@@ -22,7 +22,7 @@ import com.bbn.openmap.proj.coords.LatLonPoint;
 
 import dk.dma.aiscoverage.GlobalSettings;
 import dk.dma.aiscoverage.MessageHandler;
-import dk.dma.aiscoverage.calculator.AbstractCoverageCalculator;
+import dk.dma.aiscoverage.calculator.AbstractCalculator;
 import dk.dma.aiscoverage.calculator.CellChangedListener;
 import dk.dma.aiscoverage.calculator.CoverageCalculator;
 import dk.dma.aiscoverage.calculator.DensityPlotCalculator;
@@ -30,9 +30,11 @@ import dk.dma.aiscoverage.data.Cell;
 import dk.dma.aiscoverage.data.BaseStation;
 import dk.dma.aiscoverage.project.AisCoverageProject;
 import dk.dma.aiscoverage.project.ProjectHandler;
+import dk.dma.aiscoverage.project.ProjectHandlerListener;
+import dk.frv.enav.acv.event.AisEvent;
 
 
-public class DensityPlotLayer extends OMGraphicHandlerLayer {
+public class DensityPlotLayer extends OMGraphicHandlerLayer implements Runnable, ProjectHandlerListener {
 
 	private DensityPlotCalculator calc;
 	private static final long serialVersionUID = 1L;
@@ -41,6 +43,9 @@ public class DensityPlotLayer extends OMGraphicHandlerLayer {
 	HashMap<String, OMRect> addedCell = new HashMap<String, OMRect>(); 
 	private OMGraphicList graphicslist = new OMGraphicList();
 	private Color[] colors = new Color[10];
+	private int updateDelay;
+	private final int defaultUpdatedelay = 100;
+	private boolean updateOnce = true;
 
 	
 
@@ -58,6 +63,11 @@ public class DensityPlotLayer extends OMGraphicHandlerLayer {
 		colors[8] = interpolate(Color.YELLOW, Color.RED, 0.8f);
 		colors[9] = Color.RED;
 		
+		new Thread(this).start();
+		
+		ProjectHandler.getInstance().addProjectHandlerListener(this);
+
+		
 	}
 	Color interpolate(Color colorA, Color colorB, float bAmount) {	    
 	    float aAmount = (float) (1.0 - bAmount);
@@ -69,12 +79,10 @@ public class DensityPlotLayer extends OMGraphicHandlerLayer {
 	
 	public Color getColor(Cell c){
 		try{
-			
-		
+
 			double seconds = calc.getTimeDifference(calc.getFirstMessage().timestamp.getTime(), calc.getCurrentMessage().timestamp.getTime());
 			int shipsPerDay = (int) ((double)c.shipCount/seconds*86400);
-//			System.out.println("ships per day: " + shipsPerDay);
-//			System.out.println("ship count: " + c.shipCount);
+
 			Color color;
 			if(shipsPerDay < 2)
 				color = colors[0];
@@ -133,17 +141,14 @@ public class DensityPlotLayer extends OMGraphicHandlerLayer {
 		return rect;
 	}
 
-	public void doUpdate(DensityPlotCalculator calc) {
+	public void doUpdate() {
+		System.out.println("UPDATING Density Plot");
 		System.out.println("max ships: "+calc.getMaxShips().shipCount);
 		System.out.println("min ships: "+calc.getMinShips().shipCount);
-//		OMGraphicList graphics = new OMGraphicList();
-//		graphicslist.clear();
-		System.out.println(this.isRunning);
-		this.calc = calc;
+
 
 		Collection<Cell> cells = calc.getDensityPlotCoverage();
 		if(cells== null) return;
-		System.out.println("density update");
 		for (Cell cell : cells) {
 			
 			if(!addedCell.containsKey(cell.id)){
@@ -160,14 +165,14 @@ public class DensityPlotLayer extends OMGraphicHandlerLayer {
 				}
 			}
 		}
-//		this.paste(graphics);
+
 		doPrepare();
-//		repaint();
-		System.out.println(this.isRunning);
+
 	}
 	public void projectionChanged(ProjectionEvent pe){
 		super.projectionChanged(pe);
 		reset();
+		updateOnce = true;
 	}
 	
 	@Override
@@ -185,6 +190,46 @@ public class DensityPlotLayer extends OMGraphicHandlerLayer {
 		graphicslist.clear();
 		this.addedCell.clear();
 		this.cellColor.clear();
+	}
+	@Override
+	public void run() {
+		while(true){
+			try {
+				while(updateDelay > 0){
+					Thread.sleep(100);
+					updateDelay--;
+				}
+				updateDelay = defaultUpdatedelay ; //default update delay
+				
+				if(updateOnce || (ProjectHandler.getInstance().getProject().isRunning() && isVisible()) ){
+					
+					AisCoverageProject project = ProjectHandler.getInstance().getProject();
+					
+					if(project != null){
+						this.calc = project.getDensityPlotCalculator();
+						if(calc != null){
+							doUpdate();
+						}
+					}
+					
+					updateOnce = false;
+				}
+				
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+		
+	}
+	@Override
+	public void aisEventReceived(AisEvent event) {
+		if(event.getEvent() == AisEvent.Event.ANALYSIS_STOPPED){
+			updateOnce = false;
+		}
+	}
+
+	public void updateOnce() {
+		this.updateOnce = true;
 	}
 
 }

@@ -14,14 +14,16 @@ import dk.dma.aiscoverage.data.Ship;
 import dk.dma.aiscoverage.geotools.GeoConverter;
 import dk.dma.aiscoverage.geotools.SphereProjection;
 import dk.dma.aiscoverage.project.AisCoverageProject;
+import dk.dma.aiscoverage.project.ProjectHandler;
 import dk.frv.ais.country.Country;
 import dk.frv.ais.geo.GeoLocation;
 import dk.frv.ais.message.AisMessage;
 import dk.frv.ais.message.AisMessage4;
-import dk.frv.ais.message.AisPositionMessage;
+import dk.frv.ais.message.IGeneralPositionMessage;
 import dk.frv.ais.proprietary.IProprietarySourceTag;
+import dk.frv.enav.acv.event.AisEvent;
 
-public class CoverageCalculator extends AbstractCoverageCalculator {
+public class CoverageCalculator extends AbstractCalculator {
 
 	private int bufferInSeconds = 20;
 	private int degreesPerMinute = 20;
@@ -237,7 +239,7 @@ public class CoverageCalculator extends AbstractCoverageCalculator {
 
 		String identifier = null;
 		ReceiverType receiverType = ReceiverType.NOTDEFINED;
-		AisPositionMessage posMessage = null;
+		IGeneralPositionMessage posMessage = null;
 		GeoLocation pos = null;
 		Date timestamp = null;
 		Country srcCountry = null;
@@ -274,20 +276,29 @@ public class CoverageCalculator extends AbstractCoverageCalculator {
 		// It's a base station
 		if (aisMessage instanceof AisMessage4) {
 			AisMessage4 m = (AisMessage4) aisMessage;
-			BaseStation b = gridHandler.grids.get(m
-					.getUserId());
+			BaseStation b = gridHandler.grids.get(m.getUserId()+"");
 			if (b != null) {
 				b.latitude = m.getPos().getGeoLocation().getLatitude();
 				b.longitude = m.getPos().getGeoLocation().getLongitude();
+
+				ProjectHandler.getInstance().broadcastEvent(new AisEvent(AisEvent.Event.BS_POSITION_FOUND, this, b));
 			}
+				
 			return;
 		}
 
 		// Handle position messages
-		if (aisMessage instanceof AisPositionMessage) {
-			posMessage = (AisPositionMessage) aisMessage;
+		if (aisMessage instanceof IGeneralPositionMessage) {
+			posMessage = (IGeneralPositionMessage) aisMessage;
 		} else {
 			return;
+		}
+		
+		if (aisMessage.getMsgId() == 18) {
+			// class B
+		} else {
+			// class A
+//			return;
 		}
 
 		// Validate postion
@@ -318,10 +329,10 @@ public class CoverageCalculator extends AbstractCoverageCalculator {
 		// Check which ship sent the message.
 		// If it's the first message from that ship, create ship and put it in
 		// grid belonging to bsmmsi
-		Ship ship = grid.getShip(posMessage.getUserId());
+		Ship ship = grid.getShip(aisMessage.getUserId());
 		if (ship == null) {
-			grid.createShip(posMessage.getUserId());
-			ship = grid.getShip(posMessage.getUserId());
+			grid.createShip(aisMessage.getUserId());
+			ship = grid.getShip(aisMessage.getUserId());
 		}
 
 		CustomMessage newMessage = new CustomMessage();
