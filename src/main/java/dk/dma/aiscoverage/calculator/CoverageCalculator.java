@@ -272,6 +272,7 @@ public class CoverageCalculator extends AbstractCalculator {
 		if(timestamp == null){
 			timestamp = new Date();
 		}
+		
 
 		// It's a base station
 		if (aisMessage instanceof AisMessage4) {

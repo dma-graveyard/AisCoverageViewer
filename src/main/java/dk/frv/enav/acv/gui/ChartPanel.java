@@ -172,8 +172,8 @@ public class ChartPanel extends OMComponentPanel implements MouseWheelListener {
 		
 		//add density plot layer
 		densityPlotLayer = new DensityPlotLayer();
-		densityPlotLayer.setVisible(true);
 		mapHandler.add(densityPlotLayer);
+		densityPlotLayer.setVisible(false);
 		
 	}
 

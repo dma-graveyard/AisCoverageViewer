@@ -631,6 +631,11 @@ public class NewAnalysis2 extends JFrame implements KeyListener {
 	@Override
 	public void keyTyped(KeyEvent e) {
 
+		
+	}
+
+	@Override
+	public void keyReleased(KeyEvent e) {
 		if (e.getSource() == ta) {
 
 			if(ta.getText().contains(":") == true && ta.getText().length() != 0) {
@@ -641,11 +646,6 @@ public class NewAnalysis2 extends JFrame implements KeyListener {
 				btnNew.setEnabled(false);
 			}
 		}
-	}
-
-	@Override
-	public void keyReleased(KeyEvent e) {
-		// do nothing
 	}
 
 	@Override

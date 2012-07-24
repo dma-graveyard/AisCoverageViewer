@@ -143,8 +143,8 @@ public class DensityPlotLayer extends OMGraphicHandlerLayer implements Runnable,
 
 	public void doUpdate() {
 		System.out.println("UPDATING Density Plot");
-		System.out.println("max ships: "+calc.getMaxShips().shipCount);
-		System.out.println("min ships: "+calc.getMinShips().shipCount);
+//		System.out.println("max ships: "+calc.getMaxShips().shipCount);
+//		System.out.println("min ships: "+calc.getMinShips().shipCount);
 
 
 		Collection<Cell> cells = calc.getDensityPlotCoverage();
@@ -201,18 +201,16 @@ public class DensityPlotLayer extends OMGraphicHandlerLayer implements Runnable,
 				}
 				updateDelay = defaultUpdatedelay ; //default update delay
 				
-				if(updateOnce || (ProjectHandler.getInstance().getProject().isRunning() && isVisible()) ){
-					
-					AisCoverageProject project = ProjectHandler.getInstance().getProject();
-					
-					if(project != null){
-						this.calc = project.getDensityPlotCalculator();
-						if(calc != null){
+				AisCoverageProject project = ProjectHandler.getInstance().getProject();
+				if(project != null){
+					this.calc = project.getDensityPlotCalculator();
+					if(calc != null){
+						if(updateOnce || (ProjectHandler.getInstance().getProject().isRunning() && isVisible()) ){
 							doUpdate();
+							updateOnce = false;
 						}
 					}
 					
-					updateOnce = false;
 				}
 				
 			} catch (InterruptedException e) {

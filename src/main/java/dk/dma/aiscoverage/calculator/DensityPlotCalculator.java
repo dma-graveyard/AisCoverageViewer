@@ -17,12 +17,15 @@ import dk.dma.aiscoverage.data.BaseStation.ReceiverType;
 import dk.dma.aiscoverage.geotools.GeoConverter;
 import dk.dma.aiscoverage.geotools.SphereProjection;
 import dk.dma.aiscoverage.project.AisCoverageProject;
+import dk.dma.aiscoverage.project.ProjectHandler;
 import dk.frv.ais.country.Country;
 import dk.frv.ais.geo.GeoLocation;
 import dk.frv.ais.message.AisMessage;
 import dk.frv.ais.message.AisMessage4;
 import dk.frv.ais.message.AisPositionMessage;
+import dk.frv.ais.message.IGeneralPositionMessage;
 import dk.frv.ais.proprietary.IProprietarySourceTag;
+import dk.frv.enav.acv.event.AisEvent;
 
 public class DensityPlotCalculator extends AbstractCalculator {
 
@@ -257,13 +260,14 @@ public class DensityPlotCalculator extends AbstractCalculator {
 	 */
 	@Override
 	public void processMessage(AisMessage aisMessage, String defaultID) {
+		
 		long timeSinceStart = project.getRunningTime();
 		if (project.getTimeout() != -1 && timeSinceStart > project.getTimeout())
 			project.stopAnalysis();
 
 		String identifier = null;
 		ReceiverType receiverType = ReceiverType.NOTDEFINED;
-		AisPositionMessage posMessage = null;
+		IGeneralPositionMessage posMessage = null;
 		GeoLocation pos = null;
 		Date timestamp = null;
 		Country srcCountry = null;
@@ -272,20 +276,23 @@ public class DensityPlotCalculator extends AbstractCalculator {
 		// Get source tag properties
 		IProprietarySourceTag sourceTag = aisMessage.getSourceTag();
 		if (sourceTag != null) {
-			identifier = sourceTag.getBaseMmsi()+"";
+			Long bsmmsi = sourceTag.getBaseMmsi();
 			timestamp = sourceTag.getTimestamp();
 			srcCountry = sourceTag.getCountry();
 			String region = sourceTag.getRegion();
-			if(identifier == null){
+			if(bsmmsi == null){
 				if(!region.equals("")){
 					identifier = region;
 					receiverType = ReceiverType.REGION;
 				}
-			}	
+			}else{
+				identifier = bsmmsi+"";
+				receiverType = ReceiverType.BASESTATION;
+			}
 		}
 
 		//Checks if its neither a basestation nor a region
-		if (identifier != null){
+		if (identifier == null){
 			identifier = defaultID;
 		}
 		
@@ -293,24 +300,25 @@ public class DensityPlotCalculator extends AbstractCalculator {
 		if(timestamp == null){
 			timestamp = new Date();
 		}
+		
 
 		// It's a base station
 		if (aisMessage instanceof AisMessage4) {
-			AisMessage4 m = (AisMessage4) aisMessage;
-			BaseStation b = gridHandler.grids.get(m
-					.getUserId());
-			if (b != null) {
-				b.latitude = m.getPos().getGeoLocation().getLatitude();
-				b.longitude = m.getPos().getGeoLocation().getLongitude();
-			}
 			return;
 		}
 
 		// Handle position messages
-		if (aisMessage instanceof AisPositionMessage) {
-			posMessage = (AisPositionMessage) aisMessage;
+		if (aisMessage instanceof IGeneralPositionMessage) {
+			posMessage = (IGeneralPositionMessage) aisMessage;
 		} else {
 			return;
+		}
+		
+		if (aisMessage.getMsgId() == 18) {
+			// class B
+		} else {
+			// class A
+//			return;
 		}
 
 		// Validate postion
@@ -326,7 +334,7 @@ public class DensityPlotCalculator extends AbstractCalculator {
 			double cellInMeters= getCellSize(); //cell size in meters
 			setLatSize(GeoConverter.metersToLatDegree(cellInMeters));
 			setLongSize(GeoConverter.metersToLonDegree(pos.getLatitude(), cellInMeters));
-					
+							
 			basestation = getBaseStationHandler().createGrid("density");
 		}
 
@@ -343,10 +351,10 @@ public class DensityPlotCalculator extends AbstractCalculator {
 		// Check which ship sent the message.
 		// If it's the first message from that ship, create ship and put it in
 		// grid belonging to bsmmsi
-		Ship ship = basestation.getShip(posMessage.getUserId());
+		Ship ship = grid.getShip(aisMessage.getUserId());
 		if (ship == null) {
-			basestation.createShip(posMessage.getUserId());
-			ship = basestation.getShip(posMessage.getUserId());
+			grid.createShip(aisMessage.getUserId());
+			ship = grid.getShip(aisMessage.getUserId());
 		}
 
 		CustomMessage newMessage = new CustomMessage();
@@ -357,12 +365,11 @@ public class DensityPlotCalculator extends AbstractCalculator {
 		newMessage.longitude = posMessage.getPos().getGeoLocation()
 				.getLongitude();
 		newMessage.timestamp = timestamp;
-		newMessage.grid = basestation;
+		newMessage.grid = grid;
 		newMessage.ship = ship;
 		if(firstMessage == null)
 			firstMessage = newMessage;
 		currentMessage = newMessage;
-		
 		
 		this.calculateCoverage(newMessage);
 		

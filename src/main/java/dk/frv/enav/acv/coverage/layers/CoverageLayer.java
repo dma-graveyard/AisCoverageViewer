@@ -111,17 +111,16 @@ public class CoverageLayer extends OMGraphicHandlerLayer implements Runnable, Pr
 				}
 				updateDelay = defaultUpdatedelay ; //default update delay
 				
-				if(updateOnce || (ProjectHandler.getInstance().getProject().isRunning() && isVisible()) ){
-					AisCoverageProject project = ProjectHandler.getInstance().getProject();
-					
-					if(project != null){
-						this.calc = project.getCoverageCalculator();
-						if(calc != null){
+				AisCoverageProject project = ProjectHandler.getInstance().getProject();
+				
+				if(project != null){
+					this.calc = project.getCoverageCalculator();
+					if(calc != null){
+						if(updateOnce || (ProjectHandler.getInstance().getProject().isRunning() && isVisible()) ){
 							doUpdate();
+							updateOnce = false;
 						}
 					}
-					
-					updateOnce = false;
 				}
 				
 			} catch (InterruptedException e) {
