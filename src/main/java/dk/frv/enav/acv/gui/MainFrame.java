@@ -157,7 +157,7 @@ public class MainFrame extends JFrame implements WindowListener {
 		JMenuItem mntmNewAnalysis = new JMenuItem("New analysis");
 		menu.add(mntmNewAnalysis);
 		mntmNewAnalysis.addActionListener(new ActionListener()  {public void actionPerformed(ActionEvent e)	
-		{	NewAnalysis newAnalysisframe = new NewAnalysis(leftPanel);
+		{	NewAnalysis2 newAnalysisframe = new NewAnalysis2(leftPanel);
 			newAnalysisframe.setVisible(true);	}	});
 		
 		JMenuItem mntmSave = new JMenuItem("Save");

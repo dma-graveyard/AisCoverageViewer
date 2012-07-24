@@ -15,28 +15,14 @@
  */
 package dk.dma.aiscoverage;
 
-import java.util.Date;
 import java.util.List;
 
 import org.apache.log4j.Logger;
 
 import dk.dma.aiscoverage.calculator.AbstractCalculator;
-import dk.dma.aiscoverage.data.Cell;
-import dk.dma.aiscoverage.data.BaseStation;
-import dk.dma.aiscoverage.data.BaseStationHandler;
-import dk.dma.aiscoverage.data.CustomMessage;
-import dk.dma.aiscoverage.data.Ship;
-import dk.dma.aiscoverage.geotools.GeoConverter;
 import dk.dma.aiscoverage.project.AisCoverageProject;
-import dk.frv.ais.country.Country;
-import dk.frv.ais.geo.GeoLocation;
 import dk.frv.ais.handler.IAisHandler;
 import dk.frv.ais.message.AisMessage;
-import dk.frv.ais.message.AisMessage4;
-import dk.frv.ais.message.AisPositionMessage;
-import dk.frv.ais.proprietary.IProprietarySourceTag;
-import dk.frv.ais.proprietary.IProprietaryTag;
-import dk.frv.ais.reader.AisReader;
 
 /**
  * Class for handling incoming AIS messages
