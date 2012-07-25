@@ -1,12 +1,14 @@
 package dk.frv.enav.acv.gui;
 
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
+import javax.swing.border.Border;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
 
@@ -16,6 +18,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
+import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
 import javax.swing.JTabbedPane;
 import javax.swing.JButton;
@@ -24,11 +27,10 @@ import javax.swing.ScrollPaneConstants;
 import javax.swing.JRadioButton;
 import javax.swing.UIManager;
 
-import dk.dma.aiscoverage.calculator.AbstractCalculator;
 import dk.dma.aiscoverage.calculator.CoverageCalculator;
 import dk.dma.aiscoverage.calculator.DensityPlotCalculator;
-import dk.dma.aiscoverage.data.Ship.ShipClass;
 import dk.dma.aiscoverage.project.ProjectHandler;
+import dk.frv.ais.message.ShipTypeCargo;
 import dk.frv.ais.message.ShipTypeCargo.ShipType;
 
 import javax.swing.JLabel;
@@ -38,6 +40,8 @@ import java.awt.FlowLayout;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 public class NewAnalysis2 extends JFrame implements KeyListener {
 
@@ -116,23 +120,27 @@ public class NewAnalysis2 extends JFrame implements KeyListener {
 			"One more checkbox");
 	private final JCheckBox chckbxAnotherCheckbox = new JCheckBox(
 			"Another checkbox");
+	private ArrayList<JCheckBox> shipTypeFiltering = new ArrayList<JCheckBox>();
+	private HashMap<JCheckBox, ShipType>  typeFiltering= new HashMap<JCheckBox, ShipType>();
+	
 
 	/**
 	 * Create the frame.
 	 */
-	public NewAnalysis2(final AnalysisPanel ap) {
-		lowTxt.setText("5");
+	public NewAnalysis2(final AnalysisPanel ap, final ChartPanel cp) {
+		lowTxt.setText("1");
 		lowTxt.setBounds(66, 80, 80, 20);
-		lowTxt.setColumns(10);
-		mediumTxt.setText("15");
+		lowTxt.setHorizontalAlignment(lowTxt.RIGHT);
+		mediumTxt.setText("5");
 		mediumTxt.setBounds(66, 50, 80, 20);
-		mediumTxt.setColumns(10);
+		mediumTxt.setHorizontalAlignment(mediumTxt.RIGHT);
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		setBounds(100, 100, 400, 487);
+		setBounds(100, 100, 430, 487);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
+
 
 		id = 1;
 
@@ -140,12 +148,17 @@ public class NewAnalysis2 extends JFrame implements KeyListener {
 		// ta.addke
 
 		ta.addKeyListener(this);
-
+	
+		final ShipType[] shippy= ShipTypeCargo.ShipType.values();
+		System.out.println(shippy.length);
+		
+		
+		
 		/*
 		 * tab panel
 		 */
 		tabbedPane.setLocation(10, 5);
-		tabbedPane.setSize(new Dimension(365, 400));
+		tabbedPane.setSize(new Dimension(394, 400));
 		contentPane.add(tabbedPane);
 
 		/*
@@ -155,7 +168,7 @@ public class NewAnalysis2 extends JFrame implements KeyListener {
 		inputPanel.setLayout(null);
 
 		// text area
-		scrollPane.setBounds(15, 40, 335, 80);
+		scrollPane.setBounds(15, 40, 360, 80);
 		inputPanel.add(scrollPane);
 		scrollPane
 				.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
@@ -230,7 +243,7 @@ public class NewAnalysis2 extends JFrame implements KeyListener {
 		inputPanel.add(analysisTime);
 		analysisTime.setColumns(10);
 
-		classABPanel.setBounds(15, 160, 335, 55);
+		classABPanel.setBounds(15, 160, 360, 55);
 		inputPanel.add(classABPanel);
 		classABPanel.setBorder(new TitledBorder(null,
 				"Include class A & B ships", TitledBorder.LEADING,
@@ -248,7 +261,7 @@ public class NewAnalysis2 extends JFrame implements KeyListener {
 		bgShipAB.add(rdbtnClassA_B);
 		bgShipAB.add(rdbtnClassB);
 
-		shipTypePanel.setBounds(14, 224, 335, 135);
+		shipTypePanel.setBounds(14, 224, 361, 135);
 		inputPanel.add(shipTypePanel);
 		shipTypePanel.setBorder(new TitledBorder(null,
 				"Select included ship types", TitledBorder.LEADING,
@@ -258,17 +271,40 @@ public class NewAnalysis2 extends JFrame implements KeyListener {
 		chckbxIncludeAll.setBounds(10, 15, 150, 23);
 		shipTypePanel.add(chckbxIncludeAll);
 
-		scrollPane_1.setBounds(15, 45, 305, 75);
+		scrollPane_1.setBounds(0, 45, 335, 90);
 		shipTypePanel.add(scrollPane_1);
 		scrollPane_1.setViewportView(typePanel);
+		scrollPane_1.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
+		scrollPane_1.getVerticalScrollBar().setUnitIncrement(16);
+		
 
 		typePanel.setLayout(new GridLayout(0, 2, 0, 0));
-		typePanel.add(chckbxAddCheckboxesHere);
-		typePanel.add(chckbxAndManyOf);
+		
+		for (ShipType type : shippy) {
+//			int nr = 0;
+			String chckname = type.toString();
+//			nr++;
+			//JCheckBox chckname = new JCheckBox("Enabled");
+			JCheckBox chck = new JCheckBox(chckname);
 
-		typePanel.add(chckbxOneMoreCheckbox);
-
-		typePanel.add(chckbxAnotherCheckbox);
+			
+			typePanel.add(chck);
+			shipTypeFiltering.add(chck);
+			typeFiltering.put(chck, type);
+			
+			//JCheckBox chckbxEnableCoverage = new JCheckBox("Enabled");
+			
+			//typePanel.add(ch)
+				}
+		
+				
+		
+//		typePanel.add(chckbxAddCheckboxesHere);
+//		typePanel.add(chckbxAndManyOf);
+//
+//		typePanel.add(chckbxOneMoreCheckbox);
+//
+//		typePanel.add(chckbxAnotherCheckbox);
 
 		/*
 		 * coverage tab
@@ -312,7 +348,7 @@ public class NewAnalysis2 extends JFrame implements KeyListener {
 		advancedSettingsPanel.add(messageBufferTxt);
 		messageBufferTxt.setEditable(false);
 		messageBufferTxt.setText("20");
-		messageBufferTxt.setColumns(10);
+		messageBufferTxt.setHorizontalAlignment(messageBufferTxt.RIGHT);
 
 		JLabel lblSekunder = new JLabel("Sekunder");
 		lblSekunder.setBounds(235, 23, 46, 14);
@@ -325,7 +361,7 @@ public class NewAnalysis2 extends JFrame implements KeyListener {
 		advancedSettingsPanel.add(rotationTxt);
 		rotationTxt.setEditable(false);
 		rotationTxt.setText("20");
-		rotationTxt.setColumns(10);
+		rotationTxt.setHorizontalAlignment(rotationTxt.RIGHT);
 
 		JLabel lblDegrees = new JLabel("Degrees per min");
 		lblDegrees.setBounds(235, 48, 96, 14);
@@ -395,6 +431,7 @@ public class NewAnalysis2 extends JFrame implements KeyListener {
 		densityCellSizeTxt.setBounds(75, 40, 80, 20);
 		densityPanel.add(densityCellSizeTxt);
 		densityCellSizeTxt.setEditable(true);
+		densityCellSizeTxt.setHorizontalAlignment(densityCellSizeTxt.RIGHT);
 
 		JLabel lblMeter_1 = new JLabel("Meter");
 		lblMeter_1.setBounds(170, 43, 46, 14);
@@ -414,7 +451,7 @@ public class NewAnalysis2 extends JFrame implements KeyListener {
 		highTxt.setBounds(66, 20, 80, 20);
 		higMedLowPanel.add(highTxt);
 		highTxt.setText("20");
-		highTxt.setColumns(10);
+		highTxt.setHorizontalAlignment(highTxt.RIGHT);
 		lblMedium.setBounds(15, 53, 46, 14);
 
 		higMedLowPanel.add(lblMedium);
@@ -464,13 +501,13 @@ public class NewAnalysis2 extends JFrame implements KeyListener {
 		txtLat.setEditable(false);
 		txtLat.setBounds(50, 37, 46, 20);
 		advancedPanel.add(txtLat);
-		txtLat.setColumns(10);
+		txtLat.setHorizontalAlignment(txtLat.RIGHT);
 
 		txtLong = new JTextField();
 		txtLong.setEditable(false);
 		txtLong.setBounds(50, 65, 46, 20);
 		advancedPanel.add(txtLong);
-		txtLong.setColumns(10);
+		txtLong.setHorizontalAlignment(txtLong.RIGHT);
 
 		JLabel lblLat = new JLabel("Lat");
 		lblLat.setBounds(20, 37, 46, 14);
@@ -511,7 +548,6 @@ public class NewAnalysis2 extends JFrame implements KeyListener {
 				 * adds selected file or stream to the project
 				 */
 				String input = setInput(project);
-				
 
 
 				/*
@@ -525,12 +561,36 @@ public class NewAnalysis2 extends JFrame implements KeyListener {
 
 						if (chckbxIncludeTurningShips.isSelected() == true) {
 							coverageCalc.setIgnoreRotation(false);
+							coverageCalc.setBufferInSeconds(Integer.parseInt(messageBufferTxt.getText()));
 							coverageCalc.setDegreesPerMinute(Integer.parseInt(rotationTxt.getText()));
 							calculator = "Advanced";
 						}
-					coverageCalc.setBufferInSeconds(Integer.parseInt(messageBufferTxt.getText()));
-					coverageCalc.getAllowedShipTypes().put(ShipType.MILITARY, true);
-					filterShipClass(coverageCalc);
+						
+						
+						if (chckbxIncludeAll.isSelected() == false) {
+							
+							for (JCheckBox chckbx : shipTypeFiltering) {
+
+								if(chckbx.isSelected() == true)
+								{
+								//System.out.println(chckbx.getText());
+								
+								//ShipType st = new ShipType(chckbx.getText());
+								//ShipTypeCargo stc = new ShipTypeCargo(1);
+								
+								for (ShipType type : shippy) {
+									System.out.println(type.toString());
+									if(type.toString() == chckbx.getText())
+									{
+										coverageCalc.getAllowedShipTypes().put(type, true);
+									}
+								}
+								
+								}
+					
+							}	
+						}
+						
 					project.addCalculator(coverageCalc);
 				}
 
@@ -540,21 +600,53 @@ public class NewAnalysis2 extends JFrame implements KeyListener {
 				if (chckbxEnableDensity.isSelected() == true) {
 					DensityPlotCalculator densityCalc = new DensityPlotCalculator(project, true);
 					densityCalc.setCellSize(Integer.parseInt(densityCellSizeTxt.getText()));
-					densityCalc.getAllowedShipTypes().put(ShipType.MILITARY, true);
-					filterShipClass(densityCalc);
 					
 					//TODO set these settings
 					//Integer.parseInt(highTxt.getText());
 					//Integer.parseInt(mediumTxt.getText());
 					//Integer.parseInt(lowTxt.getText());
 					
+					cp.getDensityPlotLayer().setHighMedLow(Integer.parseInt(highTxt.getText()), Integer.parseInt(mediumTxt.getText()), Integer.parseInt(lowTxt.getText()));
+					
+					
+					
+					if (chckbxIncludeAll.isSelected() == false) {
+						
+						for (JCheckBox chckbx : shipTypeFiltering) {
+
+							if(chckbx.isSelected() == true)
+							{
+							//System.out.println(chckbx.getText());
+							
+							//ShipType st = new ShipType(chckbx.getText());
+							//ShipTypeCargo stc = new ShipTypeCargo(1);
+							
+							for (ShipType type : shippy) {
+								System.out.println(type.toString());
+								if(type.toString() == chckbx.getText())
+								{
+									densityCalc.getAllowedShipTypes().put(type, true);
+								}
+							}
+							
+							}
+				
+						}	
+					}
+					
+					
+					
 					project.addCalculator(densityCalc);
+					
+					
 					
 					
 					
 				}
 
 				String timer = setAnalysisTimer(project);
+
+				filterShipClass();
 				filterCargoType();
 
 				//sets the recorded data in the analysisPanel
@@ -588,17 +680,14 @@ public class NewAnalysis2 extends JFrame implements KeyListener {
 	/*
 	 * pick ship classes to use in the calculators
 	 */
-	private void filterShipClass(AbstractCalculator calc)
+	private void filterShipClass()
 	{
 		if (rdbtnClassA.isSelected() == true) {
-			calc.getAllowedShipClasses().put(ShipClass.CLASS_A, true);
-			
+			// TODO filter out class B
 		} else if (rdbtnClassA_B.isSelected() == true) {
-			calc.getAllowedShipClasses().put(ShipClass.CLASS_A, true);
-			calc.getAllowedShipClasses().put(ShipClass.CLASS_B, true);
-			
+			// TODO include all
 		} else if (rdbtnClassB.isSelected() == true) {
-			calc.getAllowedShipClasses().put(ShipClass.CLASS_B, true);
+			// TODO filter out class A
 		}
 	}
 	
@@ -609,10 +698,15 @@ public class NewAnalysis2 extends JFrame implements KeyListener {
 	private void filterCargoType()
 	{
 		if (chckbxIncludeAll.isSelected() == false) {
-			// TODO get names of checkboxes checked  in typepanel and filter the rest out
-			// TODO create an array to hold checkboxes in the panel, to genericly extract them here
+			
+			for (JCheckBox chckbx : shipTypeFiltering) {
 
-			// if(chckbx.isSelected() == true) {	add name of chckbx to list	
+				if(chckbx.isSelected() == true)
+				{
+				System.out.println(chckbx.getText());
+				}
+	
+			}	
 		}
 	}
 
