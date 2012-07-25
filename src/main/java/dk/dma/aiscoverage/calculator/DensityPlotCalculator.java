@@ -23,8 +23,10 @@ import dk.frv.ais.country.Country;
 import dk.frv.ais.geo.GeoLocation;
 import dk.frv.ais.message.AisMessage;
 import dk.frv.ais.message.AisMessage4;
+import dk.frv.ais.message.AisMessage5;
 import dk.frv.ais.message.AisPositionMessage;
 import dk.frv.ais.message.IGeneralPositionMessage;
+import dk.frv.ais.message.ShipTypeCargo;
 import dk.frv.ais.proprietary.IProprietarySourceTag;
 import dk.frv.enav.acv.event.AisEvent;
 
@@ -316,6 +318,29 @@ public class DensityPlotCalculator extends AbstractCalculator {
 		// It's a base station
 		if (aisMessage instanceof AisMessage4) {
 			return null;
+		}
+		
+		// if no allowed ship types has been set, we process all ship types
+		if(allowedShipTypes.size() > 0){
+
+			// Ship type message
+			if(aisMessage instanceof AisMessage5){
+
+				//if ship type is allowed, we add ship mmsi to allowedShips map
+				AisMessage5 m = (AisMessage5) aisMessage;
+				ShipTypeCargo shipTypeCargo = new ShipTypeCargo(m.getShipType());
+				if(allowedShipTypes.containsKey(shipTypeCargo.getShipType())){
+					allowedShips.put(m.getUserId(), true);
+				}
+
+				return null;
+
+			}	
+
+			// if ship isn't in allowedShips we don't process the message
+			if(!allowedShips.containsKey(aisMessage.getUserId()) ){
+				return null;
+			}
 		}
 
 		// Handle position messages

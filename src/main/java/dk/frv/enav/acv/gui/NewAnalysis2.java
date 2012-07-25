@@ -29,6 +29,8 @@ import dk.dma.aiscoverage.calculator.CoverageCalculator;
 import dk.dma.aiscoverage.calculator.DensityPlotCalculator;
 import dk.dma.aiscoverage.data.Ship.ShipClass;
 import dk.dma.aiscoverage.project.ProjectHandler;
+import dk.frv.ais.message.ShipTypeCargo.ShipType;
+
 import javax.swing.JLabel;
 import javax.swing.JTextField;
 import javax.swing.JCheckBox;
@@ -527,6 +529,7 @@ public class NewAnalysis2 extends JFrame implements KeyListener {
 							calculator = "Advanced";
 						}
 					coverageCalc.setBufferInSeconds(Integer.parseInt(messageBufferTxt.getText()));
+					coverageCalc.getAllowedShipTypes().put(ShipType.MILITARY, true);
 					filterShipClass(coverageCalc);
 					project.addCalculator(coverageCalc);
 				}
@@ -537,6 +540,7 @@ public class NewAnalysis2 extends JFrame implements KeyListener {
 				if (chckbxEnableDensity.isSelected() == true) {
 					DensityPlotCalculator densityCalc = new DensityPlotCalculator(project, true);
 					densityCalc.setCellSize(Integer.parseInt(densityCellSizeTxt.getText()));
+					densityCalc.getAllowedShipTypes().put(ShipType.MILITARY, true);
 					filterShipClass(densityCalc);
 					
 					//TODO set these settings

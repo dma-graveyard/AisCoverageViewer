@@ -22,6 +22,7 @@ import dk.dma.aiscoverage.project.ProjectHandler;
 import dk.dma.aiscoverage.project.ProjectHandlerListener;
 import dk.frv.enav.acv.event.AisEvent;
 import dk.frv.enav.acv.event.NavigationMouseMode;
+import dk.frv.enav.acv.event.AisEvent.Event;
 import dk.frv.enav.acv.gui.BaseStationInfo;
 import dk.frv.enav.acv.gui.MainFrame;
 
@@ -206,7 +207,16 @@ public class BaseStationLayer extends OMGraphicHandlerLayer implements MapMouseL
 				updateBasestation(bs);
 				forceUpdate(1);
 			}
+		}else if(event.getEvent() == Event.PROJECT_CREATED){
+			reset();
 		}
+	
+	}
+	private void reset() {
+		graphics.clear();
+		graphicMap.clear();
+//		updateOnce = true;
+		updateDelay = 1;
 		
 	}
 }

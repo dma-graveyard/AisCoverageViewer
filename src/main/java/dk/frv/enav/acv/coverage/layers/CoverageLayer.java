@@ -26,6 +26,7 @@ import dk.dma.aiscoverage.project.AisCoverageProject;
 import dk.dma.aiscoverage.project.ProjectHandler;
 import dk.dma.aiscoverage.project.ProjectHandlerListener;
 import dk.frv.enav.acv.event.AisEvent;
+import dk.frv.enav.acv.event.AisEvent.Event;
 
 
 public class CoverageLayer extends OMGraphicHandlerLayer implements Runnable, ProjectHandlerListener {
@@ -137,8 +138,17 @@ public class CoverageLayer extends OMGraphicHandlerLayer implements Runnable, Pr
 			updateOnce = true;
 		}else if(event.getEvent() == AisEvent.Event.ANALYSIS_STOPPED){
 			updateOnce = false;
+		}else if(event.getEvent() == Event.PROJECT_CREATED){
+			reset();
 		}
 	
+	}
+	private void reset() {
+		cellMap.clear();
+		graphics.clear();
+		updateOnce = true;
+		updateDelay = 1;
+		
 	}
 
 }

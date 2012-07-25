@@ -2,11 +2,13 @@ package dk.dma.aiscoverage.calculator;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import dk.dma.aiscoverage.data.BaseStation;
 import dk.dma.aiscoverage.data.BaseStationHandler;
@@ -23,7 +25,10 @@ import dk.frv.ais.country.Country;
 import dk.frv.ais.geo.GeoLocation;
 import dk.frv.ais.message.AisMessage;
 import dk.frv.ais.message.AisMessage4;
+import dk.frv.ais.message.AisMessage5;
 import dk.frv.ais.message.IGeneralPositionMessage;
+import dk.frv.ais.message.ShipTypeCargo;
+import dk.frv.ais.message.ShipTypeCargo.ShipType;
 import dk.frv.ais.proprietary.IProprietarySourceTag;
 import dk.frv.enav.acv.event.AisEvent;
 
@@ -36,8 +41,16 @@ public abstract class AbstractCalculator implements Serializable {
 	private double longSize = -1;
 	private int cellSize = 2500;
 	protected AisCoverageProject project;
-	protected Map<ShipClass, Boolean> allowedShipClasses = new HashMap<ShipClass, Boolean>();
+	protected Map<ShipClass, Boolean> allowedShipClasses = new ConcurrentHashMap<ShipClass, Boolean>();
+	protected Map<ShipType, Boolean> allowedShipTypes = new ConcurrentHashMap<ShipType, Boolean>();
+	protected Map<Long, Boolean> allowedShips = new ConcurrentHashMap<Long, Boolean>();
 	
+	public Map<ShipType, Boolean> getAllowedShipTypes() {
+		return allowedShipTypes;
+	}
+	public void setAllowedShipTypes(Map<ShipType, Boolean> allowedShipTypes) {
+		this.allowedShipTypes = allowedShipTypes;
+	}
 	public Map<ShipClass, Boolean> getAllowedShipClasses() {
 		return allowedShipClasses;
 	}
@@ -211,6 +224,30 @@ public abstract class AbstractCalculator implements Serializable {
 			}
 				
 			return null;
+		}
+		
+		
+		// if no allowed ship types has been set, we process all ship types
+		if(allowedShipTypes.size() > 0){
+			
+			// Ship type message
+			if(aisMessage instanceof AisMessage5){
+				
+				//if ship type is allowed, we add ship mmsi to allowedShips map
+				AisMessage5 m = (AisMessage5) aisMessage;
+				ShipTypeCargo shipTypeCargo = new ShipTypeCargo(m.getShipType());
+				if(allowedShipTypes.containsKey(shipTypeCargo.getShipType())){
+					allowedShips.put(m.getUserId(), true);
+				}
+
+				return null;
+
+			}	
+			
+			// if ship isn't in allowedShips we don't process the message
+			if(!allowedShips.containsKey(aisMessage.getUserId()) ){
+				return null;
+			}
 		}
 
 		// Handle position messages

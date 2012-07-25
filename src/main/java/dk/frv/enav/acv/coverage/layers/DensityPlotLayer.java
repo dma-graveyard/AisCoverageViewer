@@ -32,6 +32,7 @@ import dk.dma.aiscoverage.project.AisCoverageProject;
 import dk.dma.aiscoverage.project.ProjectHandler;
 import dk.dma.aiscoverage.project.ProjectHandlerListener;
 import dk.frv.enav.acv.event.AisEvent;
+import dk.frv.enav.acv.event.AisEvent.Event;
 
 
 public class DensityPlotLayer extends OMGraphicHandlerLayer implements Runnable, ProjectHandlerListener {
@@ -190,6 +191,8 @@ public class DensityPlotLayer extends OMGraphicHandlerLayer implements Runnable,
 		graphicslist.clear();
 		this.addedCell.clear();
 		this.cellColor.clear();
+		updateOnce = true;
+		updateDelay = 1;
 	}
 	@Override
 	public void run() {
@@ -221,8 +224,10 @@ public class DensityPlotLayer extends OMGraphicHandlerLayer implements Runnable,
 	}
 	@Override
 	public void aisEventReceived(AisEvent event) {
-		if(event.getEvent() == AisEvent.Event.ANALYSIS_STOPPED){
+		if(event.getEvent() == Event.ANALYSIS_STOPPED){
 			updateOnce = false;
+		}else if(event.getEvent() == Event.PROJECT_CREATED){
+			reset();
 		}
 	}
 
