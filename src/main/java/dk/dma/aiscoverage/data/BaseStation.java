@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
 
 import dk.dma.aiscoverage.GlobalSettings;
+import dk.dma.aiscoverage.data.Ship.ShipClass;
 import dk.dma.aiscoverage.project.ProjectHandler;
 import dk.frv.enav.acv.event.AisEvent;
 
@@ -117,8 +118,8 @@ public class BaseStation implements Serializable {
 	/*
 	 * Create ship
 	 */
-	public void createShip(Long mmsi){
-		Ship ship = new Ship(mmsi);
+	public void createShip(Long mmsi, ShipClass shipClass){
+		Ship ship = new Ship(mmsi, shipClass);
 		ships.put(mmsi, ship);
 	}
 	

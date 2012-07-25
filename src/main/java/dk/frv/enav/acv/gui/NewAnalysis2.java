@@ -24,8 +24,10 @@ import javax.swing.ScrollPaneConstants;
 import javax.swing.JRadioButton;
 import javax.swing.UIManager;
 
+import dk.dma.aiscoverage.calculator.AbstractCalculator;
 import dk.dma.aiscoverage.calculator.CoverageCalculator;
 import dk.dma.aiscoverage.calculator.DensityPlotCalculator;
+import dk.dma.aiscoverage.data.Ship.ShipClass;
 import dk.dma.aiscoverage.project.ProjectHandler;
 import javax.swing.JLabel;
 import javax.swing.JTextField;
@@ -521,10 +523,11 @@ public class NewAnalysis2 extends JFrame implements KeyListener {
 
 						if (chckbxIncludeTurningShips.isSelected() == true) {
 							coverageCalc.setIgnoreRotation(false);
-							coverageCalc.setBufferInSeconds(Integer.parseInt(messageBufferTxt.getText()));
 							coverageCalc.setDegreesPerMinute(Integer.parseInt(rotationTxt.getText()));
 							calculator = "Advanced";
 						}
+					coverageCalc.setBufferInSeconds(Integer.parseInt(messageBufferTxt.getText()));
+					filterShipClass(coverageCalc);
 					project.addCalculator(coverageCalc);
 				}
 
@@ -534,6 +537,7 @@ public class NewAnalysis2 extends JFrame implements KeyListener {
 				if (chckbxEnableDensity.isSelected() == true) {
 					DensityPlotCalculator densityCalc = new DensityPlotCalculator(project, true);
 					densityCalc.setCellSize(Integer.parseInt(densityCellSizeTxt.getText()));
+					filterShipClass(densityCalc);
 					
 					//TODO set these settings
 					//Integer.parseInt(highTxt.getText());
@@ -547,8 +551,6 @@ public class NewAnalysis2 extends JFrame implements KeyListener {
 				}
 
 				String timer = setAnalysisTimer(project);
-
-				filterShipClass();
 				filterCargoType();
 
 				//sets the recorded data in the analysisPanel
@@ -582,14 +584,17 @@ public class NewAnalysis2 extends JFrame implements KeyListener {
 	/*
 	 * pick ship classes to use in the calculators
 	 */
-	private void filterShipClass()
+	private void filterShipClass(AbstractCalculator calc)
 	{
 		if (rdbtnClassA.isSelected() == true) {
-			// TODO filter out class B
+			calc.getAllowedShipClasses().put(ShipClass.CLASS_A, true);
+			
 		} else if (rdbtnClassA_B.isSelected() == true) {
-			// TODO include all
+			calc.getAllowedShipClasses().put(ShipClass.CLASS_A, true);
+			calc.getAllowedShipClasses().put(ShipClass.CLASS_B, true);
+			
 		} else if (rdbtnClassB.isSelected() == true) {
-			// TODO filter out class A
+			calc.getAllowedShipClasses().put(ShipClass.CLASS_B, true);
 		}
 	}
 	

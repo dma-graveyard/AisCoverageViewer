@@ -117,7 +117,7 @@ public class CoverageCalculator extends AbstractCalculator {
 		
 		double timeSinceLastMessage = getTimeDifference(p1Time, p2Time);
 		int sog = (int) m2.sog;
-		double expectedTransmittingFrequency = getExpectedTransmittingFrequency(sog, rotating);
+		double expectedTransmittingFrequency = getExpectedTransmittingFrequency(sog, rotating, m1.ship.getShipClass());
 		
 		// Calculate missing messages
 		// A Parametric equation is used to find missing points' lat-lon coordinates between point1 and point2.
@@ -233,121 +233,10 @@ public class CoverageCalculator extends AbstractCalculator {
 	@Override
 	public void processMessage(AisMessage aisMessage, String defaultID) {
 
-		long timeSinceStart = project.getRunningTime();
-		if (project.getTimeout() != -1 && timeSinceStart > project.getTimeout())
-			project.stopAnalysis();
-
-		String identifier = null;
-		ReceiverType receiverType = ReceiverType.NOTDEFINED;
-		IGeneralPositionMessage posMessage = null;
-		GeoLocation pos = null;
-		Date timestamp = null;
-		Country srcCountry = null;
-
-
-		// Get source tag properties
-		IProprietarySourceTag sourceTag = aisMessage.getSourceTag();
-		if (sourceTag != null) {
-			Long bsmmsi = sourceTag.getBaseMmsi();
-			timestamp = sourceTag.getTimestamp();
-			srcCountry = sourceTag.getCountry();
-			String region = sourceTag.getRegion();
-			if(bsmmsi == null){
-				if(!region.equals("")){
-					identifier = region;
-					receiverType = ReceiverType.REGION;
-				}
-			}else{
-				identifier = bsmmsi+"";
-				receiverType = ReceiverType.BASESTATION;
-			}
+		CustomMessage newMessage = aisToCustom(aisMessage, defaultID);
+		if(newMessage != null){
+			calculateCoverage(newMessage);
 		}
-
-		//Checks if its neither a basestation nor a region
-		if (identifier == null){
-			identifier = defaultID;
-		}
-		
-		// If time stamp is not present, we add one
-		if(timestamp == null){
-			timestamp = new Date();
-		}
-		
-
-		// It's a base station
-		if (aisMessage instanceof AisMessage4) {
-			AisMessage4 m = (AisMessage4) aisMessage;
-			BaseStation b = gridHandler.grids.get(m.getUserId()+"");
-			if (b != null) {
-				b.latitude = m.getPos().getGeoLocation().getLatitude();
-				b.longitude = m.getPos().getGeoLocation().getLongitude();
-
-				ProjectHandler.getInstance().broadcastEvent(new AisEvent(AisEvent.Event.BS_POSITION_FOUND, this, b));
-			}
-				
-			return;
-		}
-
-		// Handle position messages
-		if (aisMessage instanceof IGeneralPositionMessage) {
-			posMessage = (IGeneralPositionMessage) aisMessage;
-		} else {
-			return;
-		}
-		
-		if (aisMessage.getMsgId() == 18) {
-			// class B
-		} else {
-			// class A
-//			return;
-		}
-
-		// Validate postion
-		if (!posMessage.isPositionValid()) {
-			return;
-		}
-
-		// Get location
-		pos = posMessage.getPos().getGeoLocation();
-		
-		//calculate lat lon size based on first message
-		if(getLatSize() == -1){
-			double cellInMeters= getCellSize(); //cell size in meters
-			setLatSize(GeoConverter.metersToLatDegree(cellInMeters));
-			setLongSize(GeoConverter.metersToLonDegree(pos.getLatitude(), cellInMeters));
-		}
-
-
-		// Check if grid exists (If a message with that bsmmsi has been received
-		// before)
-		// Otherwise create a grid for corresponding base station
-		BaseStation grid = gridHandler.getGrid(identifier);
-		if (grid == null) {
-			grid = gridHandler.createGrid(identifier);
-			grid.setReceiverType(receiverType);
-		}
-
-		// Check which ship sent the message.
-		// If it's the first message from that ship, create ship and put it in
-		// grid belonging to bsmmsi
-		Ship ship = grid.getShip(aisMessage.getUserId());
-		if (ship == null) {
-			grid.createShip(aisMessage.getUserId());
-			ship = grid.getShip(aisMessage.getUserId());
-		}
-
-		CustomMessage newMessage = new CustomMessage();
-		newMessage.cog = (double) posMessage.getCog() / 10;
-		newMessage.sog = (double) posMessage.getSog() / 10;
-		newMessage.latitude = posMessage.getPos().getGeoLocation()
-				.getLatitude();
-		newMessage.longitude = posMessage.getPos().getGeoLocation()
-				.getLongitude();
-		newMessage.timestamp = timestamp;
-		newMessage.grid = grid;
-		newMessage.ship = ship;
-		
-		this.calculateCoverage(newMessage);
 		
 	}
 

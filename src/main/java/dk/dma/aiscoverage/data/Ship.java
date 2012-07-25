@@ -25,6 +25,11 @@ public class Ship implements Serializable {
 	private CustomMessage lastMessage = null;
 	private LinkedList<CustomMessage> messageBuffer = new LinkedList<CustomMessage>();
 	private Cell lastCell = null;
+	private ShipClass shipClass;
+	
+	public enum ShipClass{
+		CLASS_A, CLASS_B
+	}
 	
 
 	public Cell getLastCell() {
@@ -35,8 +40,9 @@ public class Ship implements Serializable {
 		this.lastCell = lastCell;
 	}
 
-	public Ship(Long mmsi) {
+	public Ship(Long mmsi, ShipClass shipClass) {
 		this.mmsi = mmsi;
+		this.shipClass = shipClass;
 	}
 	
 	public void setLastMessage(CustomMessage message){
@@ -55,6 +61,14 @@ public class Ship implements Serializable {
 		CustomMessage last = messageBuffer.getLast();
 		messageBuffer.clear();
 		messageBuffer.add(last); //We still want the last message in the buffer
+	}
+
+	public ShipClass getShipClass() {
+		return shipClass;
+	}
+
+	public void setShipClass(ShipClass shipClass) {
+		this.shipClass = shipClass;
 	}
 	
 

@@ -14,6 +14,7 @@ import dk.dma.aiscoverage.data.Cell;
 import dk.dma.aiscoverage.data.CustomMessage;
 import dk.dma.aiscoverage.data.Ship;
 import dk.dma.aiscoverage.data.BaseStation.ReceiverType;
+import dk.dma.aiscoverage.data.Ship.ShipClass;
 import dk.dma.aiscoverage.geotools.GeoConverter;
 import dk.dma.aiscoverage.geotools.SphereProjection;
 import dk.dma.aiscoverage.project.AisCoverageProject;
@@ -261,6 +262,15 @@ public class DensityPlotCalculator extends AbstractCalculator {
 	@Override
 	public void processMessage(AisMessage aisMessage, String defaultID) {
 		
+		CustomMessage newMessage = aisToCustom(aisMessage, defaultID);
+		if(newMessage != null){
+			calculateCoverage(newMessage);
+		}
+		
+	}
+	
+	@Override
+	public CustomMessage aisToCustom(AisMessage aisMessage, String defaultID){
 		long timeSinceStart = project.getRunningTime();
 		if (project.getTimeout() != -1 && timeSinceStart > project.getTimeout())
 			project.stopAnalysis();
@@ -271,6 +281,7 @@ public class DensityPlotCalculator extends AbstractCalculator {
 		GeoLocation pos = null;
 		Date timestamp = null;
 		Country srcCountry = null;
+		ShipClass shipClass = null;
 
 
 		// Get source tag properties
@@ -304,26 +315,29 @@ public class DensityPlotCalculator extends AbstractCalculator {
 
 		// It's a base station
 		if (aisMessage instanceof AisMessage4) {
-			return;
+			return null;
 		}
 
 		// Handle position messages
 		if (aisMessage instanceof IGeneralPositionMessage) {
 			posMessage = (IGeneralPositionMessage) aisMessage;
 		} else {
-			return;
+			return null;
 		}
 		
 		if (aisMessage.getMsgId() == 18) {
 			// class B
+			shipClass = Ship.ShipClass.CLASS_B;
 		} else {
 			// class A
-//			return;
+			shipClass = Ship.ShipClass.CLASS_A;
 		}
+		if(!allowedShipClasses.containsKey(shipClass))
+			return null;
 
 		// Validate postion
 		if (!posMessage.isPositionValid()) {
-			return;
+			return null;
 		}
 
 		// Get location
@@ -353,7 +367,7 @@ public class DensityPlotCalculator extends AbstractCalculator {
 		// grid belonging to bsmmsi
 		Ship ship = grid.getShip(aisMessage.getUserId());
 		if (ship == null) {
-			grid.createShip(aisMessage.getUserId());
+			grid.createShip(aisMessage.getUserId(), shipClass);
 			ship = grid.getShip(aisMessage.getUserId());
 		}
 
@@ -371,8 +385,7 @@ public class DensityPlotCalculator extends AbstractCalculator {
 			firstMessage = newMessage;
 		currentMessage = newMessage;
 		
-		this.calculateCoverage(newMessage);
-		
+		return newMessage;
 	}
 
 }
