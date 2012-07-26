@@ -45,6 +45,9 @@ public class DensityPlotLayer extends OMGraphicHandlerLayer implements Runnable,
 	private int updateDelay;
 	private final int defaultUpdatedelay = 100;
 	private boolean updateOnce = true;
+	private int dhigh;
+	private int dmedium;
+	private int dlow;
 
 	
 
@@ -76,30 +79,49 @@ public class DensityPlotLayer extends OMGraphicHandlerLayer implements Runnable,
 	    return new Color(r, g, b);
 	}
 	
+
+	public void setHighMedLow(int high, int medium, int low)
+	{
+		dhigh = high;
+		dmedium = medium;
+		dlow = low;
+	}
+	
 	public Color getColor(Cell c){
 		try{
 
+			int x1 = dlow+1;
+			int x2 = (int) (((dmedium - dlow)*0.25) + dlow)+1;
+			int x3 = (int) (((dmedium - dlow)*0.50) + dlow)+1;
+			int x4 = (int) (((dmedium - dlow)*0.75) + dlow)+1;
+			int x5 = dmedium+1;
+			int x6 = (int) (((dhigh - dmedium)*0.25) + dmedium)+1;
+			int x7 = (int) (((dhigh - dmedium)*0.50) + dmedium)+1;
+			int x8 = (int) (((dhigh - dmedium)*0.75) + dmedium)+1;
+			int x9 = dhigh;
+			
+			
 			double seconds = calc.getTimeDifference(calc.getFirstMessage().timestamp.getTime(), calc.getCurrentMessage().timestamp.getTime());
 			int shipsPerDay = (int) ((double)c.shipCount/seconds*86400);
 
 			Color color;
-			if(shipsPerDay < 2)
+			if(shipsPerDay < x1)
 				color = colors[0];
-			else if(shipsPerDay < 3)
+			else if(shipsPerDay < x2)
 				color = colors[1];
-			else if(shipsPerDay < 4)
+			else if(shipsPerDay < x3)
 				color = colors[2];
-			else if(shipsPerDay < 5)
+			else if(shipsPerDay < x4)
 				color = colors[3];
-			else if(shipsPerDay < 6)
+			else if(shipsPerDay < x5)
 				color = colors[4];
-			else if(shipsPerDay < 8)
+			else if(shipsPerDay < x6)
 				color = colors[5];
-			else if(shipsPerDay < 10)
+			else if(shipsPerDay < x7)
 				color = colors[6];
-			else if(shipsPerDay < 15)
+			else if(shipsPerDay < x8)
 				color = colors[7];
-			else if(shipsPerDay < 30)
+			else if(shipsPerDay < x9)
 				color = colors[8];
 			else
 				color = colors[9];
