@@ -734,7 +734,8 @@ public class NewAnalysis2 extends JFrame implements KeyListener, MouseListener {
 	@Override
 	public void mouseClicked(MouseEvent e) {
 		if (e.getSource() == ta) {
-			System.out.println("gurli gris var her");
+			if(rdbtnInputFromFile.isSelected() == true)
+			{
 			filePath = guiHelper.openAISFileDialog();
 			if(filePath != null)
 			{
@@ -742,6 +743,7 @@ public class NewAnalysis2 extends JFrame implements KeyListener, MouseListener {
 			final String filename = chunks[chunks.length - 1];
 			ta.setText(filename);
 			btnNew.setEnabled(true);
+			}
 			}
 		}
 		

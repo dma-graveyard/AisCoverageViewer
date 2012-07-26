@@ -193,12 +193,12 @@ public class MainFrame extends JFrame implements WindowListener {
 		JMenu mnAbout = new JMenu("About");
 		menuBar.add(mnAbout);
 		
-		JMenuItem mntmHelpzor = new JMenuItem("Helpzor");
-		mnAbout.add(mntmHelpzor);
-		mntmHelpzor.addActionListener(new ActionListener()  {public void actionPerformed(ActionEvent e) 
-		{	
-			Help helpframe = new Help();
-			helpframe.setVisible(true);	}	});
+		//JMenuItem mntmHelp = new JMenuItem("Help");
+//		mnAbout.add(mntmHelp);
+//		mntmHelp.addActionListener(new ActionListener()  {public void actionPerformed(ActionEvent e) 
+//		{	
+//			Help helpframe = new Help();
+//			helpframe.setVisible(true);	}	});
 		
 		JMenuItem mntmLicense = new JMenuItem("License");
 		mnAbout.add(mntmLicense);

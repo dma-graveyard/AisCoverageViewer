@@ -27,7 +27,7 @@ public class Help extends JFrame {
 		contentPane.setLayout(null);
 		
 		
-		JTextArea ta = new JTextArea("this is a");
+		JTextArea ta = new JTextArea("This is the help page");
 		ta.setBounds(0, 0, 444, 272);
 		ta.setEditable(false);
 		contentPane.add(ta);
