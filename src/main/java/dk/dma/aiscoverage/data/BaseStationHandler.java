@@ -24,8 +24,8 @@ import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
 import dk.dma.aiscoverage.calculator.AbstractCalculator;
+import dk.dma.aiscoverage.event.AisEvent;
 import dk.dma.aiscoverage.project.ProjectHandler;
-import dk.frv.enav.acv.event.AisEvent;
 
 
 public class BaseStationHandler implements Serializable {

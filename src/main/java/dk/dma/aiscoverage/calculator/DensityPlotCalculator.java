@@ -9,14 +9,15 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import dk.dma.aiscoverage.calculator.geotools.GeoConverter;
+import dk.dma.aiscoverage.calculator.geotools.SphereProjection;
 import dk.dma.aiscoverage.data.BaseStation;
 import dk.dma.aiscoverage.data.Cell;
 import dk.dma.aiscoverage.data.CustomMessage;
 import dk.dma.aiscoverage.data.Ship;
 import dk.dma.aiscoverage.data.BaseStation.ReceiverType;
 import dk.dma.aiscoverage.data.Ship.ShipClass;
-import dk.dma.aiscoverage.geotools.GeoConverter;
-import dk.dma.aiscoverage.geotools.SphereProjection;
+import dk.dma.aiscoverage.event.AisEvent;
 import dk.dma.aiscoverage.project.AisCoverageProject;
 import dk.dma.aiscoverage.project.ProjectHandler;
 import dk.frv.ais.country.Country;
@@ -28,7 +29,6 @@ import dk.frv.ais.message.AisPositionMessage;
 import dk.frv.ais.message.IGeneralPositionMessage;
 import dk.frv.ais.message.ShipTypeCargo;
 import dk.frv.ais.proprietary.IProprietarySourceTag;
-import dk.frv.enav.acv.event.AisEvent;
 
 public class DensityPlotCalculator extends AbstractCalculator {
 
@@ -86,13 +86,6 @@ public class DensityPlotCalculator extends AbstractCalculator {
 	}
 	
 	
-	/*
-	 * This calculator maintains a buffer for each ship. Rotation is determined based on 
-	 * difference between cog in first and last message in buffer.
-	 * If rotation is ignored, missing points will only be calculated for ships that are NOT rotating.
-	 * 
-	 */
-	@Override
 	public void calculateCoverage(CustomMessage message) {
 		CustomMessage lastMessage = message.ship.getLastMessage();
 		if(lastMessage == null){

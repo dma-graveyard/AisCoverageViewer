@@ -9,7 +9,7 @@ import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import dk.frv.enav.acv.event.AisEvent;
+import dk.dma.aiscoverage.event.AisEvent;
 
 public class ProjectHandler {
 

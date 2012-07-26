@@ -19,10 +19,9 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
 
-import dk.dma.aiscoverage.GlobalSettings;
 import dk.dma.aiscoverage.data.Ship.ShipClass;
+import dk.dma.aiscoverage.event.AisEvent;
 import dk.dma.aiscoverage.project.ProjectHandler;
-import dk.frv.enav.acv.event.AisEvent;
 
 
 public class BaseStation implements Serializable {

@@ -21,7 +21,6 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.concurrent.ConcurrentHashMap;
 
-import dk.dma.aiscoverage.GlobalSettings;
 import dk.dma.aiscoverage.calculator.CoverageCalculator;
 import dk.dma.aiscoverage.data.Cell;
 import dk.dma.aiscoverage.data.BaseStation;
@@ -140,7 +139,6 @@ public class KMLGenerator {
 
 	private static void generatePlacemark(String style, Cell cell, int z,
 			BufferedWriter out, CoverageCalculator calc) {
-			GlobalSettings settings = GlobalSettings.getInstance();
 			
 			writeLine("<Placemark>", out);
 			writeLine("<name>" + cell.id + "</name>", out);

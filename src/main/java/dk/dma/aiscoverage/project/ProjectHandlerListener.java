@@ -1,6 +1,6 @@
 package dk.dma.aiscoverage.project;
 
-import dk.frv.enav.acv.event.AisEvent;
+import dk.dma.aiscoverage.event.AisEvent;
 
 public interface ProjectHandlerListener {
 	void aisEventReceived(AisEvent event);

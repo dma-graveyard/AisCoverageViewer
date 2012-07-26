@@ -20,19 +20,20 @@ import java.util.TreeSet;
 import org.apache.log4j.Logger;
 import org.apache.log4j.xml.DOMConfigurator;
 
-import dk.dma.aiscoverage.GlobalSettings;
-import dk.dma.aiscoverage.MessageHandler;
 import dk.dma.aiscoverage.calculator.AbstractCalculator;
 import dk.dma.aiscoverage.calculator.CoverageCalculator;
 import dk.dma.aiscoverage.calculator.DensityPlotCalculator;
 import dk.dma.aiscoverage.data.BaseStationHandler;
 import dk.dma.aiscoverage.data.Cell;
+import dk.dma.aiscoverage.data.MessageHandler;
+import dk.dma.aiscoverage.data.Ship.ShipClass;
+import dk.dma.aiscoverage.event.AisEvent;
+import dk.frv.ais.message.ShipTypeCargo.ShipType;
 import dk.frv.ais.proprietary.DmaFactory;
 import dk.frv.ais.proprietary.GatehouseFactory;
 import dk.frv.ais.reader.AisReader;
 import dk.frv.ais.reader.AisStreamReader;
 import dk.frv.ais.reader.RoundRobinAisTcpReader;
-import dk.frv.enav.acv.event.AisEvent;
 
 public class AisCoverageProject implements Serializable {
 	transient private static Logger LOG;
@@ -42,6 +43,7 @@ public class AisCoverageProject implements Serializable {
 	private List<AbstractCalculator> calculators = new ArrayList<AbstractCalculator>();
 	transient private List<AisReader> readers = new ArrayList<AisReader>();
 	transient private List<MessageHandler> messageHandlers = new ArrayList<MessageHandler>();
+	private List<String> readersText = new ArrayList<String>();
 //	private BaseStationHandler gridHandler = new BaseStationHandler();
 	private Date starttime;
 	private Date endtime;
@@ -70,6 +72,7 @@ public class AisCoverageProject implements Serializable {
 			reader.addProprietaryFactory(new DmaFactory());
 			reader.addProprietaryFactory(new GatehouseFactory());
 			readers.add(reader);
+			readersText.add(filepath);
 			
 			// Make handler instance
 			MessageHandler messageHandler = new MessageHandler(this, "Unidentified");
@@ -97,6 +100,7 @@ public class AisCoverageProject implements Serializable {
 		reader.addProprietaryFactory(new GatehouseFactory());
 		
 		readers.add(reader);
+		readersText.add(port + " DefaultID: "+ defaultID);
 		
 		// Make handler instance
 		// We create multiple message handlers because we need a default id
@@ -187,13 +191,6 @@ public class AisCoverageProject implements Serializable {
 		else
 			return (endtime.getTime() - starttime.getTime()) /1000;
 	}
-	/*
-	 * Returns a combined coverage of cells from selected base stations.
-	 * If two base stations cover same area, the best coverage is chosen.
-	 */
-//	public Collection<Cell> getCoverage(List<Long> baseStations){
-//		return gridHandler.getCoverage(baseStations);
-//	}
 	
 	
 	public void incrementMessageCount(){
@@ -212,6 +209,34 @@ public class AisCoverageProject implements Serializable {
 				return (DensityPlotCalculator) abstractCalc;
 		}
 		return null;
+	}
+	public String getDescription(){
+		CoverageCalculator covCal = getCoverageCalculator();
+		String result = "<html>";
+		result += "INPUT SOURCES<br/>";
+		for (String reader : readersText) {
+			result+=" - "+reader+"<br/>";
+		}
+		result += "<br/>";
+		result += "SHIP CLASSES<br/>";
+		Collection<ShipClass> shipClasses = covCal.getAllowedShipClasses().values();
+		for (ShipClass shipClass : shipClasses) {
+			result += " - "+shipClass+"<br/>";
+		}
+		result += "<br/>";
+		result += "SHIP TYPES<br/>";
+		Collection<ShipType> shipTypes = covCal.getAllowedShipTypes().values();
+		if(covCal.getAllowedShipTypes().size() == 0){
+			result += " - All <br/>";
+		}else{
+			for (ShipType shipType : shipTypes) {
+				result += " - "+shipType+"<br/>";
+			}
+		}
+		
+		
+		result += "</html>";
+		return result;
 	}
 
 }

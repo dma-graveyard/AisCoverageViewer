@@ -5,14 +5,15 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
 
+import dk.dma.aiscoverage.calculator.geotools.GeoConverter;
+import dk.dma.aiscoverage.calculator.geotools.SphereProjection;
 import dk.dma.aiscoverage.data.BaseStation;
 import dk.dma.aiscoverage.data.BaseStation.ReceiverType;
 import dk.dma.aiscoverage.data.BaseStationHandler;
 import dk.dma.aiscoverage.data.Cell;
 import dk.dma.aiscoverage.data.CustomMessage;
 import dk.dma.aiscoverage.data.Ship;
-import dk.dma.aiscoverage.geotools.GeoConverter;
-import dk.dma.aiscoverage.geotools.SphereProjection;
+import dk.dma.aiscoverage.event.AisEvent;
 import dk.dma.aiscoverage.project.AisCoverageProject;
 import dk.dma.aiscoverage.project.ProjectHandler;
 import dk.frv.ais.country.Country;
@@ -21,7 +22,6 @@ import dk.frv.ais.message.AisMessage;
 import dk.frv.ais.message.AisMessage4;
 import dk.frv.ais.message.IGeneralPositionMessage;
 import dk.frv.ais.proprietary.IProprietarySourceTag;
-import dk.frv.enav.acv.event.AisEvent;
 
 public class CoverageCalculator extends AbstractCalculator {
 
@@ -39,7 +39,7 @@ public class CoverageCalculator extends AbstractCalculator {
 	 * If rotation is ignored, missing points will only be calculated for ships that are NOT rotating.
 	 * 
 	 */
-	@Override
+
 	public void calculateCoverage(CustomMessage message) {
 		
 		
@@ -102,7 +102,6 @@ public class CoverageCalculator extends AbstractCalculator {
 		cell.ships.put(m1.ship.mmsi, m1.ship);
 		m1.grid.messageCount++;
 		cell.NOofReceivedSignals++;
-		this.cellChanged(cell);
 		
 		Long p1Time = m1.timestamp.getTime();
 		Long p2Time = m2.timestamp.getTime();
@@ -141,7 +140,6 @@ public class CoverageCalculator extends AbstractCalculator {
 				}
 				c.ships.put(m1.ship.mmsi, m1.ship);
 				c.NOofMissingSignals++;
-				this.cellChanged(c);
 			}
 
 		}
