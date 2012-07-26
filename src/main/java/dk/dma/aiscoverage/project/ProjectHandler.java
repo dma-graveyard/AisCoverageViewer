@@ -10,10 +10,21 @@ import java.util.ArrayList;
 import java.util.List;
 
 import dk.dma.aiscoverage.event.AisEvent;
+import dk.dma.aiscoverage.event.IProjectHandlerListener;
 
+/**
+ * This singleton object gives access to the project instance and
+ * makes it possible to save and load a project.
+ * 
+ * It's also useful for listening for project events, just register a ProjectHandlerListener.
+ * Other objects can broadcast events to listeners via broadcastEvent(AisEvent).
+ * 
+ * Get access to this by calling ProjectHandler.getInstance()
+ * 
+ */
 public class ProjectHandler {
 
-	private List<ProjectHandlerListener> listeners = new ArrayList<ProjectHandlerListener>();
+	private List<IProjectHandlerListener> listeners = new ArrayList<IProjectHandlerListener>();
 	private AisCoverageProject project = null;
 	
 	private void terminateProject(){
@@ -25,7 +36,7 @@ public class ProjectHandler {
 		project = null;
 	}
 	public void broadcastEvent(AisEvent event){
-		for (ProjectHandlerListener listener : listeners) {
+		for (IProjectHandlerListener listener : listeners) {
 			listener.aisEventReceived(event);
 		}
 	}
@@ -42,7 +53,7 @@ public class ProjectHandler {
 		return project;
 	}
 
-	public void addProjectHandlerListener(ProjectHandlerListener listener){
+	public void addProjectHandlerListener(IProjectHandlerListener listener){
 		listeners.add(listener);
 	}
 	public void saveProject(AisCoverageProject project, String filename){
@@ -52,14 +63,10 @@ public class ProjectHandler {
 			out.writeObject(project);
 			out.close();
 			
-//			for (AisCoverageListener listener : listeners) {
-//				listener.projectSaved();
-//			}
 			System.out.println("Project saved");
 			
 		} catch (IOException e) {
 			e.printStackTrace();
-//			LOG.error("Failed to save settings file");
 		}
 	}
 	public AisCoverageProject loadProject(String filename){
@@ -71,7 +78,6 @@ public class ProjectHandler {
 			AisCoverageProject project = (AisCoverageProject) in.readObject();
 			in.close();
 
-//			
 			this.project = project;
 			AisEvent event = new AisEvent();
 			event.setEvent(AisEvent.Event.PROJECT_LOADED);
@@ -85,7 +91,6 @@ public class ProjectHandler {
 		}catch (IOException e) {
 			e.printStackTrace();
 		}catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return null;
@@ -95,22 +100,20 @@ public class ProjectHandler {
 	}
 	
 	//Singleton stuff
-		private static ProjectHandler singletonObject;
+	private static ProjectHandler singletonObject;
 
-		private ProjectHandler() {
+	private ProjectHandler() {
 
-		}
+	}
 		
-		public static synchronized ProjectHandler getInstance() {
-			if (singletonObject == null) {
-				singletonObject = new ProjectHandler();
-			}
-			return singletonObject;
+	public static synchronized ProjectHandler getInstance() {
+		if (singletonObject == null) {
+			singletonObject = new ProjectHandler();
 		}
+		return singletonObject;
+	}
 		
-		
-
-		public Object clone() throws CloneNotSupportedException {
-			throw new CloneNotSupportedException();
-		}
+	public Object clone() throws CloneNotSupportedException {
+		throw new CloneNotSupportedException();
+	}
 }

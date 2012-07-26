@@ -1,33 +1,25 @@
 package dk.dma.aiscoverage.openmap.layers;
 
 import java.awt.Color;
-import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
-
-import org.apache.log4j.Logger;
-import org.apache.log4j.xml.DOMConfigurator;
 
 import com.bbn.openmap.layer.OMGraphicHandlerLayer;
 import com.bbn.openmap.omGraphics.OMGraphicList;
 import com.bbn.openmap.proj.coords.LatLonPoint;
 
-import dk.dma.aiscoverage.calculator.AbstractCalculator;
 import dk.dma.aiscoverage.calculator.CoverageCalculator;
 import dk.dma.aiscoverage.data.Cell;
-import dk.dma.aiscoverage.data.BaseStation;
-import dk.dma.aiscoverage.data.MessageHandler;
 import dk.dma.aiscoverage.event.AisEvent;
+import dk.dma.aiscoverage.event.IProjectHandlerListener;
 import dk.dma.aiscoverage.event.AisEvent.Event;
 import dk.dma.aiscoverage.project.AisCoverageProject;
 import dk.dma.aiscoverage.project.ProjectHandler;
-import dk.dma.aiscoverage.project.ProjectHandlerListener;
 
 
-public class CoverageLayer extends OMGraphicHandlerLayer implements Runnable, ProjectHandlerListener {
+public class CoverageLayer extends OMGraphicHandlerLayer implements Runnable, IProjectHandlerListener {
 
 	private CoverageCalculator calc;
 	private static final long serialVersionUID = 1L;
@@ -53,10 +45,10 @@ public class CoverageLayer extends OMGraphicHandlerLayer implements Runnable, Pr
 		double latSize = calc.getLatSize();
 		List<LatLonPoint> polygon = new ArrayList<LatLonPoint>();
 
-		polygon.add(new LatLonPoint.Double(cell.latitude, cell.longitude));
-		polygon.add(new LatLonPoint.Double(cell.latitude, cell.longitude + longSize));
-		polygon.add(new LatLonPoint.Double(cell.latitude + latSize, cell.longitude + longSize));
-		polygon.add(new LatLonPoint.Double(cell.latitude + latSize, cell.longitude));
+		polygon.add(new LatLonPoint.Double(cell.getLatitude(), cell.getLongitude()));
+		polygon.add(new LatLonPoint.Double(cell.getLatitude(), cell.getLongitude() + longSize));
+		polygon.add(new LatLonPoint.Double(cell.getLatitude() + latSize, cell.getLongitude() + longSize));
+		polygon.add(new LatLonPoint.Double(cell.getLatitude() + latSize, cell.getLongitude()));
 
 		Color color;
 		if (cell.getCoverage() > 0.8) { // green

@@ -53,7 +53,6 @@ import com.bbn.openmap.PropertyConsumer;
 
 import dk.dma.aiscoverage.acv.util.OneInstanceGuard;
 import dk.dma.aiscoverage.gui.MainFrame;
-import dk.dma.aiscoverage.project.ProjectHandler;
 import dk.dma.aiscoverage.settings.Settings;
 
 

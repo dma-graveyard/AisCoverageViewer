@@ -538,7 +538,7 @@ public class NewAnalysis2 extends JFrame implements KeyListener {
 				 * is density enabled, if so, if so add calculator
 				 */
 				if (chckbxEnableDensity.isSelected() == true) {
-					DensityPlotCalculator densityCalc = new DensityPlotCalculator(project, true);
+					DensityPlotCalculator densityCalc = new DensityPlotCalculator(project);
 					densityCalc.setCellSize(Integer.parseInt(densityCellSizeTxt.getText()));
 					densityCellSize = densityCellSizeTxt.getText();
 //					densityCalc.getAllowedShipTypes().put(ShipType.FISHING, true);

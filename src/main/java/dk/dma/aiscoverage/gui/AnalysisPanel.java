@@ -2,17 +2,13 @@ package dk.dma.aiscoverage.gui;
 import javax.swing.JPanel;
 import javax.swing.JButton;
 import java.awt.BorderLayout;
-import java.awt.event.AWTEventListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseEvent;
 import java.io.FileNotFoundException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.BorderFactory;
@@ -27,53 +23,40 @@ import javax.swing.border.TitledBorder;
 import javax.swing.JScrollPane;
 import javax.swing.LayoutStyle.ComponentPlacement;
 
-import com.bbn.openmap.MapHandler;
 import com.bbn.openmap.gui.OMComponentPanel;
 
-import dk.dma.aiscoverage.acv.ACV;
-import dk.dma.aiscoverage.calculator.AbstractCalculator;
 import dk.dma.aiscoverage.calculator.CoverageCalculator;
-import dk.dma.aiscoverage.calculator.DensityPlotCalculator;
 import dk.dma.aiscoverage.data.BaseStation;
 import dk.dma.aiscoverage.data.BaseStation.ReceiverType;
 import dk.dma.aiscoverage.data.BaseStationHandler;
-import dk.dma.aiscoverage.data.Cell;
 import dk.dma.aiscoverage.event.AisEvent;
-import dk.dma.aiscoverage.export.ImageGenerator;
-import dk.dma.aiscoverage.openmap.layers.BaseStationLayer;
+import dk.dma.aiscoverage.event.IProjectHandlerListener;
 import dk.dma.aiscoverage.openmap.layers.CoverageLayer;
 import dk.dma.aiscoverage.openmap.layers.DensityPlotLayer;
 import dk.dma.aiscoverage.project.ProjectHandler;
-import dk.dma.aiscoverage.project.ProjectHandlerListener;
 
-import java.awt.AWTEvent;
 import java.awt.Component;
 import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
 import java.awt.FlowLayout;
-import java.awt.Toolkit;
 
 import javax.swing.SwingConstants;
 import javax.swing.JSeparator;
 import javax.swing.border.MatteBorder;
 import java.awt.Color;
 import javax.swing.UIManager;
-import java.awt.GridLayout;
 import javax.swing.JRadioButton;
-import javax.swing.BoxLayout;
 
 
-public class AnalysisPanel extends OMComponentPanel implements ActionListener, AWTEventListener, ProjectHandlerListener {
+public class AnalysisPanel extends OMComponentPanel implements ActionListener, IProjectHandlerListener {
 
-	private MapHandler mapHandler;
 	private static final long serialVersionUID = -5409591947155863462L;
 	private JButton btnStartAnalysis;
 	private JButton btnStopAnalysis;
 	private JLabel totalMessages;
 	private JLabel messagesPerSec;
 	private CoverageLayer coverageLayer;
-	private Thread updateCoverageThread;
 	private HashMap<String, JCheckBox> bsmmsis = new HashMap<String, JCheckBox>();
 	private JPanel baseStationPanel;
 	private JScrollPane scrollPane;
@@ -81,8 +64,6 @@ public class AnalysisPanel extends OMComponentPanel implements ActionListener, A
 	private JCheckBox chckbxSelectAll;
 	private JPanel selectAllPanel;
 	private JSeparator separator;
-	private boolean updateCoverageLayer = false;
-	private int waitUpdate = 0;
 	private JPanel bottomPanel;
 	private JPanel projectPanel;
 	private JLabel lblDuration;
@@ -93,15 +74,9 @@ public class AnalysisPanel extends OMComponentPanel implements ActionListener, A
 	private JLabel lblFile;
 	private JLabel densityCellSize;
 	private JLabel lblh;
-	private MainFrame mainFrame;
 	private boolean mouseDown = false;
-	private static Toolkit tk = Toolkit.getDefaultToolkit();
-    private static long eventMask = AWTEvent.MOUSE_EVENT_MASK +AWTEvent.MOUSE_WHEEL_EVENT_MASK+AWTEvent.MOUSE_MOTION_EVENT_MASK;
     private JLabel lblRunningTime;
     private JLabel runningTime;
-    private BaseStationLayer basestationLayer;
-    private ChartPanel chartPanel;
-    private boolean forceUpdateBaseStations = false;
     private JPanel panel;
     private JRadioButton coverageRadio;
     private JRadioButton densityPlotRadio;
@@ -112,7 +87,6 @@ public class AnalysisPanel extends OMComponentPanel implements ActionListener, A
 	 * Create the panel.
 	 */
 	public AnalysisPanel() {
-		mapHandler = ACV.getMapHandler();
 		setBorder(null);
 		setLayout(new BorderLayout(0, 0));
 		
@@ -317,7 +291,6 @@ public class AnalysisPanel extends OMComponentPanel implements ActionListener, A
 		btnStartAnalysis.addActionListener(this);
 		btnStopAnalysis.addActionListener(this);
 		chckbxSelectAll.addActionListener(this);
-		tk.addAWTEventListener(this, eventMask);
 		densityPlotRadio.addActionListener(this);
 		coverageRadio.addActionListener(this);
 		
@@ -354,12 +327,13 @@ public class AnalysisPanel extends OMComponentPanel implements ActionListener, A
 	}
 
 	/*
-	 * Starts timers for updating GUI and coverage layer
+	 * Starts timers for updating GUI
 	 */
 	private void startTimers() {
 		//This is only for updating GUI elements
 		//Don't perform lengthy work
 		new Timer(1000, new AbstractAction() {
+			private static final long serialVersionUID = 1L;
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				if(!mouseDown){
@@ -477,17 +451,6 @@ public class AnalysisPanel extends OMComponentPanel implements ActionListener, A
 		SwingUtilities.invokeLater(doWorkRunnable);
 	}
 	
-	/*
-	 * When this method is called, the coverage updater thread
-	 * will update the coverage layer.
-	 * If it is called multiple times before an update, the layer will
-	 * only be updated once.
-	 */
-	public void updateCoverage(int delay, boolean forceUpdate){
-		waitUpdate = delay;
-		updateCoverageLayer = true;
-		forceUpdateBaseStations = forceUpdate;
-	}
 	
 	private String runningTimeToString(Long secondsElapsed){
 		String hoursString= null, minutesString = null, secondsString = null;
@@ -573,7 +536,6 @@ public class AnalysisPanel extends OMComponentPanel implements ActionListener, A
 			coverageLayer.updateOnce();
 			densityPlotLayer.setVisible(false);
 			enableBaseStationPanel(true);
-			updateCoverage(1, true);
 		}
 		else if(e.getSource() == densityPlotRadio) {
 			System.out.println("density");
@@ -581,7 +543,6 @@ public class AnalysisPanel extends OMComponentPanel implements ActionListener, A
 			densityPlotLayer.setVisible(true);
 			densityPlotLayer.updateOnce();
 			enableBaseStationPanel(false);
-			updateCoverage(1, true);
 		}
 
 		
@@ -597,14 +558,8 @@ public class AnalysisPanel extends OMComponentPanel implements ActionListener, A
 	
 	@Override
 	public void findAndInit(Object obj) {
-		if (obj instanceof MainFrame) {
-			mainFrame = (MainFrame) obj;
-		}else if (obj instanceof CoverageLayer) {
+		if (obj instanceof CoverageLayer) {
 			coverageLayer = (CoverageLayer) obj;
-		}else if (obj instanceof BaseStationLayer) {
-			basestationLayer = (BaseStationLayer) obj;
-		}else if (obj instanceof ChartPanel) {
-			chartPanel = (ChartPanel) obj;
 		}else if (obj instanceof DensityPlotLayer) {
 			densityPlotLayer = (DensityPlotLayer) obj;
 		}
@@ -612,27 +567,11 @@ public class AnalysisPanel extends OMComponentPanel implements ActionListener, A
 
 
 	
-	/*
-	 * Global mouselistener
-	 * For a more responsive GUI, Don't refresh layer when mouse events occur
-	 */
-	@Override
-	public void eventDispatched(AWTEvent e) {
-		if(MouseEvent.MOUSE_PRESSED == e.getID()){
-			mouseDown = true;
-		}else if(MouseEvent.MOUSE_RELEASED == e.getID()){
-            mouseDown = false;
-            waitUpdate = 2;
-        }else if(MouseEvent.MOUSE_WHEEL == e.getID()){
-        	waitUpdate = 2;
-        }
-	}
 
 	private void resetGui(){
 		this.bsmmsis.clear();
 		updateButtons();
 		this.densityPlotLayer.reset();
-		updateCoverage(1, true);
 	}
 
 
@@ -647,23 +586,21 @@ public class AnalysisPanel extends OMComponentPanel implements ActionListener, A
 		else if(event.getEvent() == AisEvent.Event.ANALYSIS_STOPPED){
 			System.out.println("analysis stopped");
 			updateButtons();
-			updateCoverage(0, true);
 
 		} 
 		else if(event.getEvent() == AisEvent.Event.BS_ADDED){
 			if(event.getSource() instanceof CoverageCalculator){
 				BaseStation basestation = (BaseStation) event.getEventObject();
 				if(basestation == null) return;
-				addCheckBox(basestation.identifier);
+				addCheckBox(basestation.getIdentifier());
 			}
 		} 
 		else if(event.getEvent() == AisEvent.Event.BS_VISIBILITY_CHANGED){
 			if(event.getSource() instanceof CoverageCalculator){
 				BaseStation basestation = (BaseStation) event.getEventObject();
 				if(basestation == null) return;
-				JCheckBox checkbox = this.bsmmsis.get(basestation.identifier);
+				JCheckBox checkbox = this.bsmmsis.get(basestation.getIdentifier());
 				checkbox.setSelected(basestation.isVisible());
-				updateCoverage(1, true);
 			}
 		} 
 		else if(event.getEvent() == AisEvent.Event.PROJECT_CREATED){

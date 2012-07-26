@@ -1,39 +1,26 @@
 package dk.dma.aiscoverage.openmap.layers;
 
 import java.awt.Color;
-import java.io.FileNotFoundException;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
-import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
 
-import org.apache.log4j.Logger;
-import org.apache.log4j.xml.DOMConfigurator;
 
 import com.bbn.openmap.event.ProjectionEvent;
 import com.bbn.openmap.layer.OMGraphicHandlerLayer;
 import com.bbn.openmap.omGraphics.OMGraphic;
 import com.bbn.openmap.omGraphics.OMGraphicList;
 import com.bbn.openmap.omGraphics.OMRect;
-import com.bbn.openmap.proj.coords.LatLonPoint;
 
-import dk.dma.aiscoverage.calculator.AbstractCalculator;
-import dk.dma.aiscoverage.calculator.CoverageCalculator;
 import dk.dma.aiscoverage.calculator.DensityPlotCalculator;
 import dk.dma.aiscoverage.data.Cell;
-import dk.dma.aiscoverage.data.BaseStation;
-import dk.dma.aiscoverage.data.MessageHandler;
 import dk.dma.aiscoverage.event.AisEvent;
+import dk.dma.aiscoverage.event.IProjectHandlerListener;
 import dk.dma.aiscoverage.event.AisEvent.Event;
 import dk.dma.aiscoverage.project.AisCoverageProject;
 import dk.dma.aiscoverage.project.ProjectHandler;
-import dk.dma.aiscoverage.project.ProjectHandlerListener;
 
 
-public class DensityPlotLayer extends OMGraphicHandlerLayer implements Runnable, ProjectHandlerListener {
+public class DensityPlotLayer extends OMGraphicHandlerLayer implements Runnable, IProjectHandlerListener {
 
 	private DensityPlotCalculator calc;
 	private static final long serialVersionUID = 1L;
@@ -79,8 +66,8 @@ public class DensityPlotLayer extends OMGraphicHandlerLayer implements Runnable,
 	public Color getColor(Cell c){
 		try{
 
-			double seconds = calc.getTimeDifference(calc.getFirstMessage().timestamp.getTime(), calc.getCurrentMessage().timestamp.getTime());
-			int shipsPerDay = (int) ((double)c.shipCount/seconds*86400);
+			double seconds = calc.getTimeDifference(calc.getFirstMessage().getTimestamp().getTime(), calc.getCurrentMessage().getTimestamp().getTime());
+			int shipsPerDay = (int) ((double)c.getShipCount()/seconds*86400);
 
 			Color color;
 			if(shipsPerDay < 2)
@@ -115,7 +102,7 @@ public class DensityPlotLayer extends OMGraphicHandlerLayer implements Runnable,
 		double longSize = calc.getLongSize();
 		double latSize = calc.getLatSize();
 		
-		OMRect rect = new OMRect(cell.latitude, cell.longitude, cell.latitude + latSize, cell.longitude + longSize, OMGraphic.LINETYPE_STRAIGHT);
+		OMRect rect = new OMRect(cell.getLatitude(), cell.getLongitude(), cell.getLatitude() + latSize, cell.getLongitude() + longSize, OMGraphic.LINETYPE_STRAIGHT);
 		
 		Color color = this.getColor(cell);
 		
@@ -123,21 +110,10 @@ public class DensityPlotLayer extends OMGraphicHandlerLayer implements Runnable,
 		rect.setFillColor(color);
 		rect.setLineColor(color);
 		graphicslist.add(rect);
-		cellColor.put(cell.id, color);
-		this.addedCell.put(cell.id, rect);
+		cellColor.put(cell.getId(), color);
+		this.addedCell.put(cell.getId(), rect);
 		
 		
-	}
-	private OMRect createRect(Cell cell, Color color){
-		double longSize = calc.getLongSize();
-		double latSize = calc.getLatSize();
-		OMRect rect = new OMRect(cell.latitude, cell.longitude, cell.latitude + latSize, cell.longitude + longSize, OMGraphic.LINETYPE_STRAIGHT);
-		rect.setFillColor(color);
-		rect.setLineColor(color);
-		graphicslist.add(rect);
-		cellColor.put(cell.id, color);
-		this.addedCell.put(cell.id, rect);
-		return rect;
 	}
 
 	public void doUpdate() {
@@ -150,15 +126,15 @@ public class DensityPlotLayer extends OMGraphicHandlerLayer implements Runnable,
 		if(cells== null) return;
 		for (Cell cell : cells) {
 			
-			if(!addedCell.containsKey(cell.id)){
+			if(!addedCell.containsKey(cell.getId())){
 				updateCell(cell);
 			}else{
 				
-				Color existingColor = cellColor.get(cell.id);
+				Color existingColor = cellColor.get(cell.getId());
 				Color newColor = this.getColor(cell);
 				if(existingColor != newColor){
-					OMRect rect = this.addedCell.get(cell.id);
-					cellColor.put(cell.id, newColor);
+					OMRect rect = this.addedCell.get(cell.getId());
+					cellColor.put(cell.getId(), newColor);
 					rect.setFillColor(newColor);
 					rect.setLineColor(newColor);
 				}

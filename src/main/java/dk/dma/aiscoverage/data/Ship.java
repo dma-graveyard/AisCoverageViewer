@@ -16,14 +16,16 @@
 package dk.dma.aiscoverage.data;
 
 import java.io.Serializable;
-import java.util.LinkedList;
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class Ship implements Serializable {
 	
-	public Long mmsi;
+	private static final long serialVersionUID = 1L;
+	private Long mmsi;
 	private CustomMessage lastMessage = null;
-	private LinkedList<CustomMessage> messageBuffer = new LinkedList<CustomMessage>();
+	private List<CustomMessage> messageBuffer = new ArrayList<CustomMessage>();
 	private Cell lastCell = null;
 	private ShipClass shipClass;
 	
@@ -54,11 +56,11 @@ public class Ship implements Serializable {
 	public void addToBuffer(CustomMessage m){
 		messageBuffer.add(m);
 	}
-	public LinkedList<CustomMessage> getMessages(){
+	public List<CustomMessage> getMessages(){
 		return messageBuffer;
 	}
 	public void emptyBuffer(){
-		CustomMessage last = messageBuffer.getLast();
+		CustomMessage last = getLastMessageInBuffer();
 		messageBuffer.clear();
 		messageBuffer.add(last); //We still want the last message in the buffer
 	}
@@ -69,6 +71,15 @@ public class Ship implements Serializable {
 
 	public void setShipClass(ShipClass shipClass) {
 		this.shipClass = shipClass;
+	}
+	public CustomMessage getFirstMessageInBuffer(){
+		return messageBuffer.get(0);
+	}
+	public CustomMessage getLastMessageInBuffer(){
+		return messageBuffer.get(messageBuffer.size()-1);
+	}
+	public long getMmsi(){
+		return mmsi;
 	}
 	
 

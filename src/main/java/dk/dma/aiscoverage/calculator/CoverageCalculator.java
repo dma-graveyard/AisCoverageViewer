@@ -1,126 +1,115 @@
 package dk.dma.aiscoverage.calculator;
 
 import java.util.Collection;
-import java.util.Date;
 import java.util.HashMap;
-import java.util.LinkedList;
+import java.util.List;
 
-import dk.dma.aiscoverage.calculator.geotools.GeoConverter;
-import dk.dma.aiscoverage.calculator.geotools.SphereProjection;
 import dk.dma.aiscoverage.data.BaseStation;
-import dk.dma.aiscoverage.data.BaseStation.ReceiverType;
-import dk.dma.aiscoverage.data.BaseStationHandler;
 import dk.dma.aiscoverage.data.Cell;
 import dk.dma.aiscoverage.data.CustomMessage;
-import dk.dma.aiscoverage.data.Ship;
-import dk.dma.aiscoverage.event.AisEvent;
 import dk.dma.aiscoverage.project.AisCoverageProject;
-import dk.dma.aiscoverage.project.ProjectHandler;
-import dk.frv.ais.country.Country;
-import dk.frv.ais.geo.GeoLocation;
-import dk.frv.ais.message.AisMessage;
-import dk.frv.ais.message.AisMessage4;
-import dk.frv.ais.message.IGeneralPositionMessage;
-import dk.frv.ais.proprietary.IProprietarySourceTag;
 
+
+/** This calculator maintains a buffer for each Ship instance. 
+ * 
+ * If more than one base station receives messages from a single real world ship
+ * a ship instance will be created and associated with each corresponding base station.
+ * This is because ship instances holds a message buffer, and this buffer can't be mixed up between base stations.
+ * 
+ * Rotation is determined based on difference between course over ground (cog) from first and last message in buffer.
+ * If rotation is ignored, missing points will only be calculated for ships that are NOT rotating.
+ */
 public class CoverageCalculator extends AbstractCalculator {
 
+	private static final long serialVersionUID = 1L;
 	private int bufferInSeconds = 20;
 	private int degreesPerMinute = 20;
-	private boolean ignoreRotation = true;
+	private boolean ignoreRotation;
 	
 	public CoverageCalculator(AisCoverageProject project, boolean ignoreRotation){
 		super(project);
+		this.ignoreRotation = ignoreRotation;
 	}
 
-	/*
-	 * This calculator maintains a buffer for each ship. Rotation is determined based on 
-	 * difference between cog in first and last message in buffer.
-	 * If rotation is ignored, missing points will only be calculated for ships that are NOT rotating.
-	 * 
+	/**
+	 * This is called whenever a message is received
 	 */
+	public void calculate(CustomMessage message) {
 
-	public void calculateCoverage(CustomMessage message) {
-		
-		
 		//put message in ships' buffer
-		message.ship.addToBuffer(message);
-		
-		
+		message.getShip().addToBuffer(message);
 		
 		// If this message is filtered, we empty the ships' buffer and returns
 		if( filterMessage(message) ){
-			message.ship.emptyBuffer();
+			message.getShip().emptyBuffer();
 			return;
 		}
 		
-		
-		
 		//Time difference between first and last message in buffer
-		CustomMessage firstMessage = message.ship.getMessages().peekFirst();
-		CustomMessage lastMessage = message.ship.getMessages().peekLast();
+		CustomMessage firstMessage = message.getShip().getFirstMessageInBuffer();
+		CustomMessage lastMessage = message.getShip().getLastMessageInBuffer();
 		double timeDifference = this.getTimeDifference(firstMessage, lastMessage);
 		
-		//
+		// Check if it is time to process the buffer
 		if(timeDifference >= bufferInSeconds){
 			
 			if(timeDifference < 1800){
-				LinkedList<CustomMessage> buffer = message.ship.getMessages();
-				double rotation = Math.abs( angleDiff((double)firstMessage.cog, (double)lastMessage.cog) );
+				List<CustomMessage> buffer = message.getShip().getMessages();
+				double rotation = Math.abs( angleDiff((double)firstMessage.getCog(), (double)lastMessage.getCog()) );
 				
 				//Ship is rotating
 				if(rotation > ((double)degreesPerMinute/60)*timeDifference){
 					if(!ignoreRotation){
-						for (int i = 0; i < message.ship.getMessages().size()-1; i++) {
+						for (int i = 0; i < message.getShip().getMessages().size()-1; i++) {
 							calculateMissingPoints(buffer.get(i), buffer.get(i+1), true);
 						}
 					}
 				}
 				else{
-					for (int i = 0; i < message.ship.getMessages().size()-1; i++) {
+					for (int i = 0; i < message.getShip().getMessages().size()-1; i++) {
 						calculateMissingPoints(buffer.get(i), buffer.get(i+1), false);
 					}
 				}
 			}
 			
 			//empty buffer
-			message.ship.emptyBuffer();
+			message.getShip().emptyBuffer();
 		}
 		
 	}
 	
-	/*
+	/**
 	 * Calculates missing points between two messages and add them to corresponding cells
 	 */
 	private void calculateMissingPoints(CustomMessage m1, CustomMessage m2, boolean rotating){
 		
-		//WHERE TO PUT THIS??
-		Cell cell = m1.grid.getCell(m1.latitude, m1.longitude);
+		//Get cell from first message and increment message count
+		Cell cell = m1.getGrid().getCell(m1.getLatitude(), m1.getLongitude());
 		if(cell == null){
-			cell = m1.grid.createCell(m1.latitude, m1.longitude);
+			cell = m1.getGrid().createCell(m1.getLatitude(), m1.getLongitude());
 		}
-		cell.ships.put(m1.ship.mmsi, m1.ship);
-		m1.grid.messageCount++;
-		cell.NOofReceivedSignals++;
+		cell.getShips().put(m1.getShip().getMmsi(), m1.getShip());
+		m1.getGrid().incrementMessageCount();
+		cell.incrementNOofReceivedSignals();
 		
-		Long p1Time = m1.timestamp.getTime();
-		Long p2Time = m2.timestamp.getTime();
-		double p1Lat = m1.latitude;
-		double p1Lon = m1.longitude;
-		double p2Lat = m2.latitude;
-		double p2Lon = m2.longitude;
+		Long p1Time = m1.getTimestamp().getTime();
+		Long p2Time = m2.getTimestamp().getTime();
+		double p1Lat = m1.getLatitude();
+		double p1Lon = m1.getLongitude();
+		double p2Lat = m2.getLatitude();
+		double p2Lon = m2.getLongitude();
 		double p1X = projection.lon2x(p1Lon, p1Lat);
 		double p1Y = projection.lat2y(p1Lon, p1Lat);
 		double p2X = projection.lon2x(p2Lon, p2Lat);
 		double p2Y = projection.lat2y(p2Lon, p2Lat);
 		
 		double timeSinceLastMessage = getTimeDifference(p1Time, p2Time);
-		int sog = (int) m2.sog;
-		double expectedTransmittingFrequency = getExpectedTransmittingFrequency(sog, rotating, m1.ship.getShipClass());
+		int sog = (int) m2.getSog();
+		double expectedTransmittingFrequency = getExpectedTransmittingFrequency(sog, rotating, m1.getShip().getShipClass());
 		
-		// Calculate missing messages
-		// A Parametric equation is used to find missing points' lat-lon coordinates between point1 and point2.
-		// These points are not converted to metric x-y coordinates before calculating missing points.
+		// Calculate missing messages and increment missing signal to corresponding cell.
+		// Lat-lon points are calculated to metric x-y coordinates before missing points are calculated.
+		// In order to find corresponding cell, x-y coords are converted back to lat-lon.
 		int missingMessages; 
 		if(timeSinceLastMessage > expectedTransmittingFrequency) {
 
@@ -134,12 +123,12 @@ public class CoverageCalculator extends AbstractCalculator {
 				double yMissing = getY(i*expectedTransmittingFrequency,p1Time, p2Time, p1Y, p2Y);
 
 				//Add number of missing messages to cell
-				Cell c = m2.grid.getCell(projection.y2Lat(xMissing, yMissing), projection.x2Lon(xMissing, yMissing));
+				Cell c = m2.getGrid().getCell(projection.y2Lat(xMissing, yMissing), projection.x2Lon(xMissing, yMissing));
 				if(c == null){
-					c = m2.grid.createCell(projection.y2Lat(xMissing, yMissing), projection.x2Lon(xMissing, yMissing));
+					c = m2.getGrid().createCell(projection.y2Lat(xMissing, yMissing), projection.x2Lon(xMissing, yMissing));
 				}
-				c.ships.put(m1.ship.mmsi, m1.ship);
-				c.NOofMissingSignals++;
+				c.getShips().put(m1.getShip().getMmsi(), m1.getShip());
+				c.incrementNOofMissingSignals();
 			}
 
 		}
@@ -166,6 +155,40 @@ public class CoverageCalculator extends AbstractCalculator {
 
 	
 	
+	
+	
+	/**
+	 * @return 
+	 * A combined coverage of cells from selected base stations.
+	 * If two base stations cover same area, the best coverage is chosen.
+	 * 
+	 * Consider optimizing?
+	 */
+	public Collection<Cell> getCoverage() {
+		HashMap<String, Cell> cells = new HashMap<String, Cell>();
+		//For each base station
+		Collection<BaseStation> basestations = gridHandler.getBaseStations().values();
+		for (BaseStation basestation : basestations) {
+
+			if(basestation.isVisible()){
+				//For each cell
+				Collection<Cell> bscells = basestation.getGrid().values();
+				for (Cell cell : bscells) {
+					Cell existing = cells.get(cell.getId());
+					if(existing == null)
+						cells.put(cell.getId(), cell);
+					else
+						if(cell.getCoverage() > existing.getCoverage())
+							cells.put(cell.getId(), cell);
+				}
+			}
+			
+		}
+		return cells.values();
+	}
+	
+	
+	//Getters and setters
 	private double getY(double seconds, Long p1Time, Long p2Time, double p1y, double p2y){
 		double distanceInMeters = p2y-p1y;
 		double timeDiff = getTimeDifference(p1Time, p2Time);
@@ -178,37 +201,6 @@ public class CoverageCalculator extends AbstractCalculator {
 		double metersPerSec = distanceInMeters/timeDiff;
 		return p1x + (metersPerSec * seconds);
 	}
-	
-	/*
-	 * Consider optimizing?
-	 *
-	 * Returns a combined coverage of cells from selected base stations.
-	 * If two base stations cover same area, the best coverage is chosen.
-	 */
-	public Collection<Cell> getCoverage() {
-		HashMap<String, Cell> cells = new HashMap<String, Cell>();
-		//For each base station
-		Collection<BaseStation> basestations = gridHandler.grids.values();
-		for (BaseStation basestation : basestations) {
-
-			if(basestation.isVisible()){
-				//For each cell
-				Collection<Cell> bscells = basestation.grid.values();
-				for (Cell cell : bscells) {
-					Cell existing = cells.get(cell.id);
-					if(existing == null)
-						cells.put(cell.id, cell);
-					else
-						if(cell.getCoverage() > existing.getCoverage())
-							cells.put(cell.id, cell);
-				}
-			}
-			
-		}
-		return cells.values();
-	}
-	
-	
 	public int getBufferInSeconds() {
 		return bufferInSeconds;
 	}
@@ -226,16 +218,6 @@ public class CoverageCalculator extends AbstractCalculator {
 	}
 	public void setIgnoreRotation(boolean ignoreRotation) {
 		this.ignoreRotation = ignoreRotation;
-	}
-
-	@Override
-	public void processMessage(AisMessage aisMessage, String defaultID) {
-
-		CustomMessage newMessage = aisToCustom(aisMessage, defaultID);
-		if(newMessage != null){
-			calculateCoverage(newMessage);
-		}
-		
 	}
 
 }

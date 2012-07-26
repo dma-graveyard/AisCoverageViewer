@@ -2,20 +2,11 @@ package dk.dma.aiscoverage.project;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.PrintWriter;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.xml.DOMConfigurator;
@@ -23,8 +14,6 @@ import org.apache.log4j.xml.DOMConfigurator;
 import dk.dma.aiscoverage.calculator.AbstractCalculator;
 import dk.dma.aiscoverage.calculator.CoverageCalculator;
 import dk.dma.aiscoverage.calculator.DensityPlotCalculator;
-import dk.dma.aiscoverage.data.BaseStationHandler;
-import dk.dma.aiscoverage.data.Cell;
 import dk.dma.aiscoverage.data.MessageHandler;
 import dk.dma.aiscoverage.data.Ship.ShipClass;
 import dk.dma.aiscoverage.event.AisEvent;
@@ -35,16 +24,18 @@ import dk.frv.ais.reader.AisReader;
 import dk.frv.ais.reader.AisStreamReader;
 import dk.frv.ais.reader.RoundRobinAisTcpReader;
 
+
+/**
+ * 
+ */
 public class AisCoverageProject implements Serializable {
+	private static final long serialVersionUID = 1L;
 	transient private static Logger LOG;
-	private String filename = null;
-	private String hostPort;
 	private int timeout = -1;
 	private List<AbstractCalculator> calculators = new ArrayList<AbstractCalculator>();
 	transient private List<AisReader> readers = new ArrayList<AisReader>();
 	transient private List<MessageHandler> messageHandlers = new ArrayList<MessageHandler>();
 	private List<String> readersText = new ArrayList<String>();
-//	private BaseStationHandler gridHandler = new BaseStationHandler();
 	private Date starttime;
 	private Date endtime;
 	private boolean isRunning = false;
@@ -86,11 +77,7 @@ public class AisCoverageProject implements Serializable {
 		}
 
 	}
-	
-	public String getFile()
-	{
-		return filename;
-	}
+
 	public void addHostPort(String port, String defaultID){
 		RoundRobinAisTcpReader reader = new RoundRobinAisTcpReader();
 		reader.setCommaseparatedHostPort(port);

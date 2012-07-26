@@ -19,17 +19,14 @@ import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Collection;
-import java.util.concurrent.ConcurrentHashMap;
-
 import dk.dma.aiscoverage.calculator.CoverageCalculator;
 import dk.dma.aiscoverage.data.Cell;
 import dk.dma.aiscoverage.data.BaseStation;
-import dk.dma.aiscoverage.project.ProjectHandler;
 
 public class KMLGenerator {
 
 	public static void generateKML(CoverageCalculator calc, String path) {
-		Collection<BaseStation> grids = calc.getBaseStationHandler().grids.values();
+		Collection<BaseStation> grids = calc.getBaseStationHandler().getBaseStations().values();
 		FileWriter fstream = null;
 		BufferedWriter out = null;
 
@@ -91,7 +88,7 @@ public class KMLGenerator {
 			writeLine("</Style>", out);
 
 			for (BaseStation grid : grids) {
-				generateGrid(grid.identifier, grid.grid.values(), out, calc);
+				generateGrid(grid.getIdentifier(), grid.getGrid().values(), out, calc);
 			}
 
 			writeLine("</Document>", out);
@@ -141,7 +138,7 @@ public class KMLGenerator {
 			BufferedWriter out, CoverageCalculator calc) {
 			
 			writeLine("<Placemark>", out);
-			writeLine("<name>" + cell.id + "</name>", out);
+			writeLine("<name>" + cell.getId() + "</name>", out);
 			writeLine("<styleUrl>" + style + "</styleUrl>", out);
 			writeLine("<Polygon>", out);
 			writeLine("<altitudeMode>relativeToGround</altitudeMode>", out);
@@ -150,10 +147,10 @@ public class KMLGenerator {
 			writeLine("<LinearRing>", out);
 			writeLine("<coordinates>", out);
 
-			writeLine(		cell.longitude + "," + cell.latitude + "," + z+ " " + 
-							(cell.longitude + calc.getLongSize()) + "," + cell.latitude + ","  + z + " " + 
-							(cell.longitude +calc.getLongSize()) + "," + (cell.latitude + calc.getLatSize()) + "," + z + " " + 
-							cell.longitude + "," + (cell.latitude + calc.getLatSize()) + "," + z, out);
+			writeLine(		cell.getLongitude() + "," + cell.getLatitude() + "," + z+ " " + 
+							(cell.getLongitude() + calc.getLongSize()) + "," + cell.getLatitude() + ","  + z + " " + 
+							(cell.getLongitude() +calc.getLongSize()) + "," + (cell.getLatitude() + calc.getLatSize()) + "," + z + " " + 
+							cell.getLongitude() + "," + (cell.getLatitude() + calc.getLatSize()) + "," + z, out);
 
 
 			writeLine("</coordinates>", out);

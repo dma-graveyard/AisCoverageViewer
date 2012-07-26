@@ -1,12 +1,7 @@
 package dk.dma.aiscoverage.openmap.layers;
 
-import java.awt.AWTEvent;
-import java.awt.Toolkit;
-import java.awt.event.AWTEventListener;
 import java.awt.event.MouseEvent;
 import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -19,22 +14,19 @@ import com.bbn.openmap.omGraphics.OMList;
 import dk.dma.aiscoverage.calculator.CoverageCalculator;
 import dk.dma.aiscoverage.data.BaseStation;
 import dk.dma.aiscoverage.event.AisEvent;
+import dk.dma.aiscoverage.event.IProjectHandlerListener;
 import dk.dma.aiscoverage.event.NavigationMouseMode;
 import dk.dma.aiscoverage.event.AisEvent.Event;
 import dk.dma.aiscoverage.gui.BaseStationInfo;
-import dk.dma.aiscoverage.gui.MainFrame;
 import dk.dma.aiscoverage.project.ProjectHandler;
-import dk.dma.aiscoverage.project.ProjectHandlerListener;
 
 
-public class BaseStationLayer extends OMGraphicHandlerLayer implements MapMouseListener, Runnable, ProjectHandlerListener {
+public class BaseStationLayer extends OMGraphicHandlerLayer implements MapMouseListener, Runnable, IProjectHandlerListener {
 
 	private static final long serialVersionUID = 1L;
 	private OMGraphicList graphics = new OMGraphicList();
 	private OMGraphic current;
-	private MainFrame mainFrame;
 	BaseStationInfo box = new BaseStationInfo(this, 170, 110);
-	private MouseEvent e;
 	private CoverageCalculator calc;
 	private Map<String, AisTargetGraphic> graphicMap = new ConcurrentHashMap<String, AisTargetGraphic>();
 	private int updateDelay;
@@ -50,16 +42,16 @@ public class BaseStationLayer extends OMGraphicHandlerLayer implements MapMouseL
 			return;
 		
 		//If lat/lon isn't set, we can't display base station
-		if(basestation.latitude == null)
+		if(basestation.getLatitude() == null)
 			return;
 				
 
 		// if graphic doesnt exist we create, else we update
-		AisTargetGraphic g = graphicMap.get(basestation.identifier);
+		AisTargetGraphic g = graphicMap.get(basestation.getIdentifier());
 		if(g == null){ 
-			AisTargetGraphic graphic = new AisTargetGraphic(basestation.latitude, basestation.longitude, basestation);
+			AisTargetGraphic graphic = new AisTargetGraphic(basestation.getLatitude(), basestation.getLongitude(), basestation);
 			graphics.add(graphic);
-			graphicMap.put(basestation.identifier, graphic);
+			graphicMap.put(basestation.getIdentifier(), graphic);
 		}else{
 			g.setAwaitingUpdate(true);
 		}
@@ -80,10 +72,6 @@ public class BaseStationLayer extends OMGraphicHandlerLayer implements MapMouseL
 	@Override
 	public void findAndInit(Object obj) {
 		//This is used in case we need to communicate with other handler objects such as AIS 
-		if (obj instanceof MainFrame) {
-			mainFrame = (MainFrame) obj;
-
-		}
 	}
 
 	
@@ -132,7 +120,7 @@ public class BaseStationLayer extends OMGraphicHandlerLayer implements MapMouseL
 
 	@Override
 	public boolean mouseMoved(MouseEvent e) {
-		this.e = e;
+
 		OMList<OMGraphic> allClosest = graphics.findAll(e.getX(), e.getY(), 3.0f);
 
 		if(!allClosest.isEmpty()){
@@ -195,7 +183,7 @@ public class BaseStationLayer extends OMGraphicHandlerLayer implements MapMouseL
 		if(event.getEvent() == AisEvent.Event.BS_POSITION_FOUND){
 			if(event.getSource() instanceof CoverageCalculator){
 				BaseStation bs = (BaseStation) event.getEventObject();
-				if(graphicMap.get(bs.identifier) == null){
+				if(graphicMap.get(bs.getIdentifier()) == null){
 					updateBasestation(bs);
 					forceUpdate(1);
 				}

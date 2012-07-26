@@ -15,14 +15,10 @@
  */
 package dk.dma.aiscoverage.data;
 
-import java.awt.AWTEvent;
-import java.awt.Toolkit;
 import java.io.Serializable;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-
 import dk.dma.aiscoverage.calculator.AbstractCalculator;
 import dk.dma.aiscoverage.event.AisEvent;
 import dk.dma.aiscoverage.project.ProjectHandler;
@@ -30,11 +26,52 @@ import dk.dma.aiscoverage.project.ProjectHandler;
 
 public class BaseStationHandler implements Serializable {
 
-	public ConcurrentHashMap<String, BaseStation> grids = new ConcurrentHashMap<String, BaseStation>();
+	private static final long serialVersionUID = 1L;
+	private ConcurrentHashMap<String, BaseStation> baseStations = new ConcurrentHashMap<String, BaseStation>();
 	private double latSize;
 	private double lonSize;
 	private AbstractCalculator calculator;
 	
+	/*
+	 * Create grid associated to a specific transponder
+	 */
+	public BaseStation createGrid(String bsMmsi){
+		BaseStation grid = new BaseStation(bsMmsi, latSize, lonSize);
+		baseStations.put(bsMmsi, grid);
+		
+		AisEvent event = new AisEvent();
+		event.setEvent(AisEvent.Event.BS_ADDED);
+		event.setSource(this);
+		event.setEventObject(grid);
+		ProjectHandler.getInstance().broadcastEvent(event);
+
+		return grid;
+	}
+	
+	
+	public void setAllVisible(boolean b){
+		Collection<BaseStation> basestations = baseStations.values();
+		for (BaseStation baseStation : basestations) {	
+			setVisible(baseStation.getIdentifier(), b);
+		}
+	}
+	public void setVisible(String mmsi, boolean b){
+		BaseStation baseStation = baseStations.get(mmsi);
+		if(baseStation != null){
+			baseStation.setVisible(b);
+			
+			ProjectHandler.getInstance().broadcastEvent(new AisEvent(AisEvent.Event.BS_VISIBILITY_CHANGED, calculator, baseStation));
+			
+		}
+	}
+	
+	
+	public BaseStation getGrid(String bsMmsi){
+		return baseStations.get(bsMmsi);
+	}
+	public Map<String, BaseStation> getBaseStations() {
+		return baseStations;
+	}
 	public BaseStationHandler(AbstractCalculator calculator){
 		this.calculator = calculator;
 	}
@@ -54,47 +91,5 @@ public class BaseStationHandler implements Serializable {
 	public void setLonSize(double lonSize) {
 		this.lonSize = lonSize;
 	}
-
-	
-	
-	/*
-	 * Create grid associated to a specific transponder
-	 */
-	public BaseStation createGrid(String bsMmsi){
-		BaseStation grid = new BaseStation(bsMmsi, latSize, lonSize);
-		grids.put(bsMmsi, grid);
-		
-		AisEvent event = new AisEvent();
-		event.setEvent(AisEvent.Event.BS_ADDED);
-		event.setSource(this);
-		event.setEventObject(grid);
-		ProjectHandler.getInstance().broadcastEvent(event);
-
-		return grid;
-	}
-	
-	public BaseStation getGrid(String bsMmsi){
-		return grids.get(bsMmsi);
-	}
-	public void setAllVisible(boolean b){
-		Collection<BaseStation> basestations = grids.values();
-		for (BaseStation baseStation : basestations) {	
-			setVisible(baseStation.identifier, b);
-		}
-	}
-	public void setVisible(String mmsi, boolean b){
-		BaseStation baseStation = grids.get(mmsi);
-		if(baseStation != null){
-			baseStation.setVisible(b);
-			
-			ProjectHandler.getInstance().broadcastEvent(new AisEvent(AisEvent.Event.BS_VISIBILITY_CHANGED, calculator, baseStation));
-			
-		}
-	}
-
-	
-	
-	
-	
 	
 }

@@ -16,21 +16,21 @@
 package dk.dma.aiscoverage.data;
 
 import java.io.Serializable;
-import java.util.Date;
-import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 
 public class Cell implements Serializable {
 	
-	public ConcurrentHashMap<Long, Ship> ships = new ConcurrentHashMap<Long, Ship>();
-	public Long NOofReceivedSignals=0L; 
-	public Long NOofMissingSignals=0L;
-	public double latitude;
-	public double longitude;
-	public String id;
-	public BaseStation grid;
-	public int shipCount = 0;
+	private static final long serialVersionUID = 1L;
+	private Map<Long, Ship> ships = new ConcurrentHashMap<Long, Ship>();
+	private Long NOofReceivedSignals=0L; 
+	private Long NOofMissingSignals=0L;
+	private double latitude;
+	private double longitude;
+	private String id;
+	private BaseStation grid;
+	private int shipCount = 0;
 	
 	public Cell(BaseStation grid, double lat, double lon, String id){
 		this.latitude = lat;
@@ -38,11 +38,66 @@ public class Cell implements Serializable {
 		this.grid = grid;
 		this.id = id;
 	}
+	public void incrementNOofReceivedSignals(){
+		NOofReceivedSignals++;
+	}
+	public void incrementNOofMissingSignals(){
+		NOofMissingSignals++;
+	}
+	public void incrementShipCount(){
+		shipCount++;
+	}
 	
 	public long getTotalNumberOfMessages(){
 		return NOofReceivedSignals+NOofMissingSignals;
 	}
 	public double getCoverage(){
 		return (double)NOofReceivedSignals/ (double)getTotalNumberOfMessages();
+	}
+	public Map<Long, Ship> getShips() {
+		return ships;
+	}
+
+	public double getLatitude() {
+		return latitude;
+	}
+
+	public void setLatitude(double latitude) {
+		this.latitude = latitude;
+	}
+
+	public double getLongitude() {
+		return longitude;
+	}
+
+	public void setLongitude(double longitude) {
+		this.longitude = longitude;
+	}
+
+	public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
+	}
+
+	public BaseStation getGrid() {
+		return grid;
+	}
+
+	public void setGrid(BaseStation grid) {
+		this.grid = grid;
+	}
+
+	public int getShipCount() {
+		return shipCount;
+	}
+	public Long getNOofReceivedSignals() {
+		return NOofReceivedSignals;
+	}
+
+	public Long getNOofMissingSignals() {
+		return NOofMissingSignals;
 	}
 }

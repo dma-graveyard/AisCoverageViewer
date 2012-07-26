@@ -16,9 +16,6 @@
 package dk.dma.aiscoverage.data;
 
 import java.util.List;
-
-import org.apache.log4j.Logger;
-
 import dk.dma.aiscoverage.calculator.AbstractCalculator;
 import dk.dma.aiscoverage.project.AisCoverageProject;
 import dk.frv.ais.handler.IAisHandler;
@@ -29,7 +26,6 @@ import dk.frv.ais.message.AisMessage;
  */
 public class MessageHandler implements IAisHandler {
 	
-	private static Logger LOG = Logger.getLogger(MessageHandler.class);
 	private AisCoverageProject project = null;
 	private String defaultID;
 	
