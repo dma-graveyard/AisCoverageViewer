@@ -279,6 +279,7 @@ public class NewAnalysis2 extends JFrame implements KeyListener, MouseListener {
 
 		scrollPane_1.setBounds(15, 45, 185, 135);
 		shipTypePanel.add(scrollPane_1);
+		typePanel.setToolTipText("Select the ship types you want the calculation to be based on");
 		scrollPane_1.setViewportView(typePanel);
 		scrollPane_1.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
 		scrollPane_1.getVerticalScrollBar().setUnitIncrement(16);
@@ -290,7 +291,7 @@ public class NewAnalysis2 extends JFrame implements KeyListener, MouseListener {
 		panel_1.setBounds(15, 131, 135, 80);
 		inputPanel.add(panel_1);
 		panel_1.setLayout(null);
-		chckbxSetAnalysisTimer.setBounds(10, 16, 123, 28);
+		chckbxSetAnalysisTimer.setBounds(10, 16, 93, 28);
 		chckbxSetAnalysisTimer.setHorizontalAlignment(SwingConstants.LEFT);
 		panel_1.add(chckbxSetAnalysisTimer);
 		
