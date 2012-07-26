@@ -115,15 +115,8 @@ public class NewAnalysis2 extends JFrame implements KeyListener {
 	private final JCheckBox chckbxIncludeAll = new JCheckBox("Include all");
 	private final JScrollPane scrollPane_1 = new JScrollPane();
 	private final JPanel typePanel = new JPanel();
-	private final JCheckBox chckbxAddCheckboxesHere = new JCheckBox(
-			"add checkboxes here");
-	private final JCheckBox chckbxAndManyOf = new JCheckBox("and many of them");
-	private final JCheckBox chckbxOneMoreCheckbox = new JCheckBox(
-			"One more checkbox");
-	private final JCheckBox chckbxAnotherCheckbox = new JCheckBox(
-			"Another checkbox");
 	private ArrayList<JCheckBox> shipTypeFiltering = new ArrayList<JCheckBox>();
-	private HashMap<JCheckBox, ShipType>  typeFiltering= new HashMap<JCheckBox, ShipType>();
+	private final ShipType[] shippy= ShipTypeCargo.ShipType.values();
 	
 
 	/**
@@ -151,7 +144,7 @@ public class NewAnalysis2 extends JFrame implements KeyListener {
 
 		ta.addKeyListener(this);
 	
-		final ShipType[] shippy= ShipTypeCargo.ShipType.values();
+		//final ShipType[] shippy= ShipTypeCargo.ShipType.values();
 		System.out.println(shippy.length);
 		
 		
@@ -292,7 +285,6 @@ public class NewAnalysis2 extends JFrame implements KeyListener {
 			
 			typePanel.add(chck);
 			shipTypeFiltering.add(chck);
-			typeFiltering.put(chck, type);
 			
 			//JCheckBox chckbxEnableCoverage = new JCheckBox("Enabled");
 			
@@ -545,11 +537,11 @@ public class NewAnalysis2 extends JFrame implements KeyListener {
 				//the used project
 				dk.dma.aiscoverage.project.AisCoverageProject project = projectHandler.createProject();
 
-				/*
-				 * is input is from file or streams
-				 * adds selected file or stream to the project
-				 */
+
+				 //adds selected file, or loop thru selected streams and add them to the project
+
 				String input = setInput(project);
+				String timer = setAnalysisTimer(project);
 
 
 				/*
@@ -560,37 +552,14 @@ public class NewAnalysis2 extends JFrame implements KeyListener {
 					CoverageCalculator coverageCalc = new CoverageCalculator(project, true);
 					coverageCalc.setCellSize(Integer.parseInt(coverageCellsizeTxt.getText()));
 					cellSize = coverageCellsizeTxt.getText();
+					filterShipClass(coverageCalc);
+					filterCargoType(coverageCalc);
 
 						if (chckbxIncludeTurningShips.isSelected() == true) {
 							coverageCalc.setIgnoreRotation(false);
 							coverageCalc.setBufferInSeconds(Integer.parseInt(messageBufferTxt.getText()));
 							coverageCalc.setDegreesPerMinute(Integer.parseInt(rotationTxt.getText()));
 							calculator = "Advanced";
-						}
-						
-						
-						if (chckbxIncludeAll.isSelected() == false) {
-							
-							for (JCheckBox chckbx : shipTypeFiltering) {
-
-								if(chckbx.isSelected() == true)
-								{
-								//System.out.println(chckbx.getText());
-								
-								//ShipType st = new ShipType(chckbx.getText());
-								//ShipTypeCargo stc = new ShipTypeCargo(1);
-								
-								for (ShipType type : shippy) {
-									System.out.println(type.toString());
-									if(type.toString() == chckbx.getText())
-									{
-										coverageCalc.getAllowedShipTypes().put(type, true);
-									}
-								}
-								
-								}
-					
-							}	
 						}
 						
 					project.addCalculator(coverageCalc);
@@ -602,54 +571,13 @@ public class NewAnalysis2 extends JFrame implements KeyListener {
 				if (chckbxEnableDensity.isSelected() == true) {
 					DensityPlotCalculator densityCalc = new DensityPlotCalculator(project, true);
 					densityCalc.setCellSize(Integer.parseInt(densityCellSizeTxt.getText()));
-					
-					//TODO set these settings
-					//Integer.parseInt(highTxt.getText());
-					//Integer.parseInt(mediumTxt.getText());
-					//Integer.parseInt(lowTxt.getText());
+					filterShipClass(densityCalc);
+					filterCargoType(densityCalc);
 					
 					cp.getDensityPlotLayer().setHighMedLow(Integer.parseInt(highTxt.getText()), Integer.parseInt(mediumTxt.getText()), Integer.parseInt(lowTxt.getText()));
 					
-					
-					
-					if (chckbxIncludeAll.isSelected() == false) {
-						
-						for (JCheckBox chckbx : shipTypeFiltering) {
-
-							if(chckbx.isSelected() == true)
-							{
-							//System.out.println(chckbx.getText());
-							
-							//ShipType st = new ShipType(chckbx.getText());
-							//ShipTypeCargo stc = new ShipTypeCargo(1);
-							
-							for (ShipType type : shippy) {
-								System.out.println(type.toString());
-								if(type.toString() == chckbx.getText())
-								{
-									densityCalc.getAllowedShipTypes().put(type, true);
-								}
-							}
-							
-							}
-				
-						}	
-					}
-					
-					
-					
 					project.addCalculator(densityCalc);
-					
-					
-					
-					
-					
 				}
-
-				String timer = setAnalysisTimer(project);
-
-				filterShipClass();
-				filterCargoType();
 
 				//sets the recorded data in the analysisPanel
 				ap.setAnalysisData(input, calculator, cellSize, timer);
@@ -700,7 +628,7 @@ public class NewAnalysis2 extends JFrame implements KeyListener {
 	/*
 	 * if user only wants to track certain ship types, set the message filter here
 	 */
-	private void filterCargoType()
+	private void filterCargoType(AbstractCalculator calc)
 	{
 		if (chckbxIncludeAll.isSelected() == false) {
 			
@@ -708,7 +636,15 @@ public class NewAnalysis2 extends JFrame implements KeyListener {
 
 				if(chckbx.isSelected() == true)
 				{
-				System.out.println(chckbx.getText());
+				
+				for (ShipType type : shippy) {
+					System.out.println(type.toString());
+					if(type.toString() == chckbx.getText())
+					{
+						calc.getAllowedShipTypes().put(type, true);
+					}
+				}
+				
 				}
 	
 			}	
