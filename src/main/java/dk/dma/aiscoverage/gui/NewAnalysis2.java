@@ -124,10 +124,12 @@ public class NewAnalysis2 extends JFrame implements KeyListener, MouseListener {
 	 */
 	public NewAnalysis2(final AnalysisPanel ap, final ChartPanel cp) {
 		setAlwaysOnTop(true);
+		lowTxt.setToolTipText("When there are this many ships in a cell per day, it's considered to have a very light load");
 		lowTxt.setHorizontalAlignment(SwingConstants.RIGHT);
 		lowTxt.setText("1");
 		lowTxt.setBounds(66, 80, 80, 20);
 		lowTxt.setColumns(10);
+		mediumTxt.setToolTipText("When there are this many ships in a cell per day, it's considered to have a moderate load");
 		mediumTxt.setHorizontalAlignment(SwingConstants.RIGHT);
 		mediumTxt.setText("5");
 		mediumTxt.setBounds(66, 50, 80, 20);
@@ -283,6 +285,7 @@ public class NewAnalysis2 extends JFrame implements KeyListener, MouseListener {
 		typePanel.setLayout(new GridLayout(0, 1, 0, 0));
 		
 		JPanel panel_1 = new JPanel();
+		panel_1.setToolTipText("Set a timer for how long the analysis should run. \\nMost usefull when tracking live streams");
 		panel_1.setBorder(new TitledBorder(null, "Analysis Timer", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 		panel_1.setBounds(15, 131, 135, 80);
 		inputPanel.add(panel_1);
@@ -331,6 +334,7 @@ public class NewAnalysis2 extends JFrame implements KeyListener, MouseListener {
 		coveragePanel.add(lblCellsize);
 
 		coverageCellsizeTxt = new JTextField();
+		coverageCellsizeTxt.setToolTipText("The width and height of each tile. \\nUnless  map centerpoint is selected, the meter representation will be translated into a lat/long degree difference based on the first message read");
 		coverageCellsizeTxt.setText("2500");
 		coverageCellsizeTxt.setBounds(75, 40, 80, 20);
 		coveragePanel.add(coverageCellsizeTxt);
@@ -357,6 +361,7 @@ public class NewAnalysis2 extends JFrame implements KeyListener, MouseListener {
 		advancedSettingsPanel.add(lblMessageBuffer);
 
 		messageBufferTxt = new JTextField();
+		messageBufferTxt.setToolTipText("The amount of time between the messages saved in the message buffer. When the time limit is meet, the calculation will start on the messages in the buffer.");
 		messageBufferTxt.setHorizontalAlignment(SwingConstants.RIGHT);
 		messageBufferTxt.setBounds(180, 20, 45, 20);
 		advancedSettingsPanel.add(messageBufferTxt);
@@ -372,6 +377,7 @@ public class NewAnalysis2 extends JFrame implements KeyListener, MouseListener {
 		advancedSettingsPanel.add(chckbxIncludeTurningShips);
 
 		rotationTxt = new JTextField();
+		rotationTxt.setToolTipText("The limit which the rotation has to be over, to be counted as turning in the system.");
 		rotationTxt.setHorizontalAlignment(SwingConstants.RIGHT);
 		rotationTxt.setBounds(180, 45, 45, 20);
 		advancedSettingsPanel.add(rotationTxt);
@@ -446,6 +452,7 @@ public class NewAnalysis2 extends JFrame implements KeyListener, MouseListener {
 		densityPanel.add(lblCellsize_1);
 
 		densityCellSizeTxt = new JTextField();
+		densityCellSizeTxt.setToolTipText("The size of cells in the density plot");
 		densityCellSizeTxt.setHorizontalAlignment(SwingConstants.RIGHT);
 		densityCellSizeTxt.setText("200");
 		densityCellSizeTxt.setBounds(80, 40, 80, 20);
@@ -459,6 +466,7 @@ public class NewAnalysis2 extends JFrame implements KeyListener, MouseListener {
 		chckbxEnableDensity.setSelected(true);
 		chckbxEnableDensity.setBounds(15, 10, 97, 23);
 		densityPanel.add(chckbxEnableDensity);
+		higMedLowPanel.setToolTipText("The amount of ships in each cell per day.");
 		higMedLowPanel.setBounds(15, 68, 335, 110);
 		higMedLowPanel.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Threshold values", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 
@@ -466,6 +474,7 @@ public class NewAnalysis2 extends JFrame implements KeyListener, MouseListener {
 		higMedLowPanel.setLayout(null);
 		lblHigh.setBounds(15, 23, 46, 14);
 		higMedLowPanel.add(lblHigh);
+		highTxt.setToolTipText("When there are more ships then this value in a cell per day, it's considered heavy loaded");
 		highTxt.setHorizontalAlignment(SwingConstants.RIGHT);
 		highTxt.setBounds(66, 20, 80, 20);
 		higMedLowPanel.add(highTxt);
