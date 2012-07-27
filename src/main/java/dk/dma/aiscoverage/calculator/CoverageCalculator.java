@@ -25,7 +25,10 @@ public class CoverageCalculator extends AbstractCalculator {
 	private int bufferInSeconds = 20;
 	private int degreesPerMinute = 20;
 	private boolean ignoreRotation;
+	private double highThreshold = .8;
+	private double lowThreshold = .3;
 	
+
 	public CoverageCalculator(AisCoverageProject project, boolean ignoreRotation){
 		super(project);
 		this.ignoreRotation = ignoreRotation;
@@ -218,6 +221,20 @@ public class CoverageCalculator extends AbstractCalculator {
 	}
 	public void setIgnoreRotation(boolean ignoreRotation) {
 		this.ignoreRotation = ignoreRotation;
+	}
+	public double getHighThreshold() {
+		return highThreshold;
+	}
+
+	public void setHighThreshold(double highThreshold) {
+		this.highThreshold = highThreshold;
+	}
+
+	public double getLowThreshold() {
+		return lowThreshold;
+	}
+	public void setLowThreshold(double lowTHreshold) {
+		this.lowThreshold = lowTHreshold;
 	}
 
 }

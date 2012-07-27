@@ -86,6 +86,11 @@ public class ChartPanel extends OMComponentPanel implements MouseWheelListener {
 	private DensityPlotLayer densityPlotLayer;
 
 
+	public DensityPlotLayer getDensityPlotLayer() {
+		return densityPlotLayer;
+	}
+
+
 	public ChartPanel() {
 		super();
 		// Set map handler

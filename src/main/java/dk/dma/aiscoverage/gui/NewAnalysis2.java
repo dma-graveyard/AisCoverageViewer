@@ -15,8 +15,12 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 
+import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
+import javax.swing.JDialog;
 import javax.swing.JTabbedPane;
 import javax.swing.JButton;
 import javax.swing.JScrollPane;
@@ -39,8 +43,13 @@ import java.awt.FlowLayout;
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
+import javax.swing.SwingConstants;
+import javax.swing.GroupLayout;
+import javax.swing.GroupLayout.Alignment;
+import javax.swing.LayoutStyle.ComponentPlacement;
 
-public class NewAnalysis2 extends JFrame implements KeyListener {
+public class NewAnalysis2 extends JDialog implements KeyListener, MouseListener {
 
 	private String filePath;
 	private long id;
@@ -55,7 +64,7 @@ public class NewAnalysis2 extends JFrame implements KeyListener {
 	JScrollPane scrollPane = new JScrollPane();
 
 	// panel filling
-	JTextArea ta = new JTextArea("Select File");
+	JTextArea ta = new JTextArea("Click here to select file");
 
 	// buttons
 	// input panel
@@ -63,7 +72,7 @@ public class NewAnalysis2 extends JFrame implements KeyListener {
 	JRadioButton rdbtnInputFromStream = new JRadioButton("Input from Stream");
 	JRadioButton rdbtnInputFromFile = new JRadioButton("Input from File");
 	JButton btnSelectFile = new JButton("Select File");
-	final JCheckBox chckbxSetAnalysisTimer = new JCheckBox("Set Analysis Timer");
+	final JCheckBox chckbxSetAnalysisTimer = new JCheckBox("Enable timer");
 	ButtonGroup bgShipAB = new ButtonGroup();
 
 	// coverage panel
@@ -110,26 +119,36 @@ public class NewAnalysis2 extends JFrame implements KeyListener {
 	private final JCheckBox chckbxIncludeAll = new JCheckBox("Include all");
 	private final JScrollPane scrollPane_1 = new JScrollPane();
 	private final JPanel typePanel = new JPanel();
-	private final JCheckBox chckbxAddCheckboxesHere = new JCheckBox(
-			"add checkboxes here");
-	private final JCheckBox chckbxAndManyOf = new JCheckBox("and many of them");
-	private final JCheckBox chckbxOneMoreCheckbox = new JCheckBox(
-			"One more checkbox");
-	private final JCheckBox chckbxAnotherCheckbox = new JCheckBox(
-			"Another checkbox");
+	private ArrayList<JCheckBox> shipTypeFiltering = new ArrayList<JCheckBox>();
+	private final ShipType[] shippy= ShipTypeCargo.ShipType.values();
+	private JTextField highThreshold;
+	private final JTextField lowThreshold = new JTextField();
+	private final JLabel label = new JLabel("%");
+	private final JLabel label_1 = new JLabel("%");
+
 
 	/**
 	 * Create the frame.
 	 */
-	public NewAnalysis2(final AnalysisPanel ap) {
-		lowTxt.setText("5");
+	public NewAnalysis2(final AnalysisPanel ap, final ChartPanel cp) {
+		lowThreshold.setHorizontalAlignment(SwingConstants.RIGHT);
+		lowThreshold.setText("30");
+		lowThreshold.setToolTipText("Cell coverage below this percentage is considered poor.");
+		lowThreshold.setColumns(10);
+		setModalityType(ModalityType.APPLICATION_MODAL);
+		setResizable(false);
+		lowTxt.setToolTipText("When there are this many ships in a cell per day, it's considered to have a very light load");
+		lowTxt.setHorizontalAlignment(SwingConstants.RIGHT);
+		lowTxt.setText("1");
 		lowTxt.setBounds(66, 80, 80, 20);
 		lowTxt.setColumns(10);
-		mediumTxt.setText("15");
+		mediumTxt.setToolTipText("When there are this many ships in a cell per day, it's considered to have a moderate load");
+		mediumTxt.setHorizontalAlignment(SwingConstants.RIGHT);
+		mediumTxt.setText("5");
 		mediumTxt.setBounds(66, 50, 80, 20);
 		mediumTxt.setColumns(10);
 		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		setBounds(100, 100, 400, 487);
+		setBounds(100, 100, 430, 460);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 		setContentPane(contentPane);
@@ -146,7 +165,7 @@ public class NewAnalysis2 extends JFrame implements KeyListener {
 		 * tab panel
 		 */
 		tabbedPane.setLocation(10, 5);
-		tabbedPane.setSize(new Dimension(365, 400));
+		tabbedPane.setSize(new Dimension(394, 370));
 		contentPane.add(tabbedPane);
 
 		/*
@@ -156,17 +175,34 @@ public class NewAnalysis2 extends JFrame implements KeyListener {
 		inputPanel.setLayout(null);
 
 		// text area
-		scrollPane.setBounds(15, 40, 335, 80);
+		scrollPane.setBounds(15, 40, 360, 80);
 		inputPanel.add(scrollPane);
 		scrollPane
 				.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
 		scrollPane.setViewportView(ta);
 		ta.setEditable(false);
 		ta.setEnabled(false);
+		ta.addMouseListener(this);
+		
+//		addActionListener(new ActionListener() {
+//			public void actionPerformed(ActionEvent e) {
+//				filePath = guiHelper.openAISFileDialog();
+//				if(filePath != null)
+//				{
+//				String[] chunks = filePath.split("\\\\");
+//				final String filename = chunks[chunks.length - 1];
+//				ta.setText(filename);
+//				btnNew.setEnabled(true);
+//				}
+//			}
+//		});
+		
+		
+		
 
 		// select file button
-		btnSelectFile.setBounds(260, 130, 90, 23);
-		inputPanel.add(btnSelectFile);
+		btnSelectFile.setBounds(285, 131, 90, 23);
+		//inputPanel.add(btnSelectFile);
 		btnSelectFile.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				filePath = guiHelper.openAISFileDialog();
@@ -181,7 +217,7 @@ public class NewAnalysis2 extends JFrame implements KeyListener {
 		});
 
 		// input from stream selection
-		rdbtnInputFromStream.setBounds(240, 10, 135, 23);
+		rdbtnInputFromStream.setBounds(265, 10, 135, 23);
 		inputPanel.add(rdbtnInputFromStream);
 		bg.add(rdbtnInputFromStream);
 		rdbtnInputFromStream.addActionListener(new ActionListener() {
@@ -195,7 +231,7 @@ public class NewAnalysis2 extends JFrame implements KeyListener {
 		});
 
 		// input from file selection
-		rdbtnInputFromFile.setBounds(140, 10, 100, 23);
+		rdbtnInputFromFile.setBounds(160, 10, 100, 23);
 		inputPanel.add(rdbtnInputFromFile);
 		bg.add(rdbtnInputFromFile);
 		rdbtnInputFromFile.setSelected(true);
@@ -209,34 +245,12 @@ public class NewAnalysis2 extends JFrame implements KeyListener {
 			}
 		});
 
-		// set analysis timer?
-		chckbxSetAnalysisTimer.setBounds(15, 130, 113, 23);
-		inputPanel.add(chckbxSetAnalysisTimer);
-		chckbxSetAnalysisTimer.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent e) {
-				if (chckbxSetAnalysisTimer.isSelected() == true) {
-					analysisTime.setEditable(true);
-					contentPane.repaint();
-				} else {
-					analysisTime.setEditable(false);
-					contentPane.repaint();
-				}
-			}
-		});
-
-		analysisTime = new JTextField();
-		analysisTime.setEditable(false);
-		analysisTime.setText("00:00:00");
-		analysisTime.setBounds(140, 130, 55, 20);
-		inputPanel.add(analysisTime);
-		analysisTime.setColumns(10);
-
-		classABPanel.setBounds(15, 160, 335, 55);
+		classABPanel.setBounds(15, 222, 135, 106);
 		inputPanel.add(classABPanel);
 		classABPanel.setBorder(new TitledBorder(null,
 				"Include class A & B ships", TitledBorder.LEADING,
 				TitledBorder.TOP, null, null));
-		classABPanel.setLayout(new FlowLayout(FlowLayout.LEADING, 5, 5)); // FlowLayout.LEADING
+		classABPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 5, 5));
 		rdbtnClassA.setSelected(true);
 
 		classABPanel.add(rdbtnClassA);
@@ -249,7 +263,7 @@ public class NewAnalysis2 extends JFrame implements KeyListener {
 		bgShipAB.add(rdbtnClassA_B);
 		bgShipAB.add(rdbtnClassB);
 
-		shipTypePanel.setBounds(14, 224, 335, 135);
+		shipTypePanel.setBounds(160, 131, 215, 197);
 		inputPanel.add(shipTypePanel);
 		shipTypePanel.setBorder(new TitledBorder(null,
 				"Select included ship types", TitledBorder.LEADING,
@@ -258,18 +272,69 @@ public class NewAnalysis2 extends JFrame implements KeyListener {
 		chckbxIncludeAll.setSelected(true);
 		chckbxIncludeAll.setBounds(10, 15, 150, 23);
 		shipTypePanel.add(chckbxIncludeAll);
+		chckbxIncludeAll.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				
+				if(chckbxIncludeAll.isSelected() == true)
+				{
+					for (JCheckBox chckbx : shipTypeFiltering) {
+						chckbx.setEnabled(false);
+					}
+				}
+				else
+				{
+					for (JCheckBox chckbx : shipTypeFiltering) {
+						chckbx.setEnabled(true);
+					}
+				}
+			}
+		});
 
-		scrollPane_1.setBounds(15, 45, 305, 75);
+		scrollPane_1.setBounds(15, 45, 185, 135);
 		shipTypePanel.add(scrollPane_1);
+		typePanel.setToolTipText("Select the ship types you want the calculation to be based on");
 		scrollPane_1.setViewportView(typePanel);
+		scrollPane_1.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
+		scrollPane_1.getVerticalScrollBar().setUnitIncrement(16);
+		typePanel.setLayout(new GridLayout(0, 1, 0, 0));
+		
+		JPanel panel_1 = new JPanel();
+		panel_1.setToolTipText("Set a timer for how long the analysis should run. \\nMost usefull when tracking live streams");
+		panel_1.setBorder(new TitledBorder(null, "Analysis Timer", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		panel_1.setBounds(15, 131, 135, 80);
+		inputPanel.add(panel_1);
+		panel_1.setLayout(null);
+		chckbxSetAnalysisTimer.setBounds(10, 16, 93, 28);
+		chckbxSetAnalysisTimer.setHorizontalAlignment(SwingConstants.LEFT);
+		panel_1.add(chckbxSetAnalysisTimer);
+		
+				analysisTime = new JTextField();
+				analysisTime.setLocation(12, 45);
+				panel_1.add(analysisTime);
+				analysisTime.setHorizontalAlignment(SwingConstants.LEFT);
+				analysisTime.setEditable(false);
+				analysisTime.setText("00:00:00");
+				analysisTime.setSize(new Dimension(52, 20));
+		chckbxSetAnalysisTimer.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				if (chckbxSetAnalysisTimer.isSelected() == true) {
+					analysisTime.setEditable(true);
+					contentPane.repaint();
+				} else {
+					analysisTime.setEditable(false);
+					contentPane.repaint();
+				}
+			}
+		});
 
-		typePanel.setLayout(new GridLayout(0, 2, 0, 0));
-		typePanel.add(chckbxAddCheckboxesHere);
-		typePanel.add(chckbxAndManyOf);
-
-		typePanel.add(chckbxOneMoreCheckbox);
-
-		typePanel.add(chckbxAnotherCheckbox);
+		for (ShipType type : shippy) {
+			String chckname = type.toString();
+			JCheckBox chck = new JCheckBox(chckname);
+			chck.setEnabled(false);
+			typePanel.add(chck);
+			shipTypeFiltering.add(chck);
+		}
+		
 
 		/*
 		 * coverage tab
@@ -283,6 +348,7 @@ public class NewAnalysis2 extends JFrame implements KeyListener {
 		coveragePanel.add(lblCellsize);
 
 		coverageCellsizeTxt = new JTextField();
+		coverageCellsizeTxt.setToolTipText("The width and height of each tile. \\nUnless  map centerpoint is selected, the meter representation will be translated into a lat/long degree difference based on the first message read");
 		coverageCellsizeTxt.setText("2500");
 		coverageCellsizeTxt.setBounds(75, 40, 80, 20);
 		coveragePanel.add(coverageCellsizeTxt);
@@ -297,7 +363,7 @@ public class NewAnalysis2 extends JFrame implements KeyListener {
 		chckbxEnableCoverage.setBounds(15, 10, 97, 23);
 		coveragePanel.add(chckbxEnableCoverage);
 
-		advancedSettingsPanel.setBounds(15, 100, 335, 80);
+		advancedSettingsPanel.setBounds(15, 226, 360, 80);
 		coveragePanel.add(advancedSettingsPanel);
 		advancedSettingsPanel.setLayout(null);
 		advancedSettingsPanel.setBorder(new TitledBorder(null,
@@ -309,7 +375,9 @@ public class NewAnalysis2 extends JFrame implements KeyListener {
 		advancedSettingsPanel.add(lblMessageBuffer);
 
 		messageBufferTxt = new JTextField();
-		messageBufferTxt.setBounds(180, 20, 44, 20);
+		messageBufferTxt.setToolTipText("The amount of time between the messages saved in the message buffer. When the time limit is meet, the calculation will start on the messages in the buffer.");
+		messageBufferTxt.setHorizontalAlignment(SwingConstants.RIGHT);
+		messageBufferTxt.setBounds(180, 20, 45, 20);
 		advancedSettingsPanel.add(messageBufferTxt);
 		messageBufferTxt.setEditable(false);
 		messageBufferTxt.setText("20");
@@ -319,10 +387,13 @@ public class NewAnalysis2 extends JFrame implements KeyListener {
 		lblSekunder.setBounds(235, 23, 46, 14);
 		advancedSettingsPanel.add(lblSekunder);
 		chckbxIncludeTurningShips.setBounds(10, 45, 167, 23);
+		chckbxIncludeTurningShips.setEnabled(false);
 		advancedSettingsPanel.add(chckbxIncludeTurningShips);
 
 		rotationTxt = new JTextField();
-		rotationTxt.setBounds(180, 45, 46, 20);
+		rotationTxt.setToolTipText("The limit which the rotation has to be over, to be counted as turning in the system.");
+		rotationTxt.setHorizontalAlignment(SwingConstants.RIGHT);
+		rotationTxt.setBounds(180, 45, 45, 20);
 		advancedSettingsPanel.add(rotationTxt);
 		rotationTxt.setEditable(false);
 		rotationTxt.setText("20");
@@ -342,12 +413,65 @@ public class NewAnalysis2 extends JFrame implements KeyListener {
 				}
 			}
 		});
-		chckbxCoverageAdvancedSettings.setBounds(15, 75, 186, 23);
+		chckbxCoverageAdvancedSettings.setBounds(15, 201, 186, 23);
 		coveragePanel.add(chckbxCoverageAdvancedSettings);
+		
+		JPanel panel_2 = new JPanel();
+		panel_2.setBorder(new TitledBorder(null, "Threshold values", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		panel_2.setBounds(15, 84, 360, 97);
+		coveragePanel.add(panel_2);
+		
+		JLabel lblNewLabel = new JLabel("Good coverage");
+		
+		JLabel lblBadCoverage = new JLabel("Bad coverage");
+		
+		highThreshold = new JTextField();
+		highThreshold.setHorizontalAlignment(SwingConstants.RIGHT);
+		highThreshold.setText("80");
+		highThreshold.setToolTipText("Cell coverage above this value is considered good. ");
+		highThreshold.setColumns(10);
+		GroupLayout gl_panel_2 = new GroupLayout(panel_2);
+		gl_panel_2.setHorizontalGroup(
+			gl_panel_2.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_panel_2.createSequentialGroup()
+					.addContainerGap()
+					.addGroup(gl_panel_2.createParallelGroup(Alignment.LEADING)
+						.addComponent(lblNewLabel)
+						.addComponent(lblBadCoverage))
+					.addGap(18)
+					.addGroup(gl_panel_2.createParallelGroup(Alignment.LEADING)
+						.addGroup(gl_panel_2.createSequentialGroup()
+							.addComponent(highThreshold, GroupLayout.PREFERRED_SIZE, 48, GroupLayout.PREFERRED_SIZE)
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(label))
+						.addGroup(gl_panel_2.createSequentialGroup()
+							.addComponent(lowThreshold, GroupLayout.PREFERRED_SIZE, 48, GroupLayout.PREFERRED_SIZE)
+							.addPreferredGap(ComponentPlacement.RELATED)
+							.addComponent(label_1, GroupLayout.PREFERRED_SIZE, 11, GroupLayout.PREFERRED_SIZE)))
+					.addContainerGap(184, Short.MAX_VALUE))
+		);
+		gl_panel_2.setVerticalGroup(
+			gl_panel_2.createParallelGroup(Alignment.LEADING)
+				.addGroup(gl_panel_2.createSequentialGroup()
+					.addContainerGap()
+					.addGroup(gl_panel_2.createParallelGroup(Alignment.BASELINE)
+						.addComponent(lblNewLabel)
+						.addComponent(highThreshold, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+						.addComponent(label))
+					.addPreferredGap(ComponentPlacement.UNRELATED)
+					.addGroup(gl_panel_2.createParallelGroup(Alignment.LEADING)
+						.addComponent(lblBadCoverage)
+						.addGroup(gl_panel_2.createParallelGroup(Alignment.BASELINE)
+							.addComponent(lowThreshold, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
+							.addComponent(label_1)))
+					.addContainerGap(46, Short.MAX_VALUE))
+		);
+		panel_2.setLayout(gl_panel_2);
 		chckbxCoverageAdvancedSettings.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if (chckbxCoverageAdvancedSettings.isSelected() == true) {
 					messageBufferTxt.setEditable(true);
+					chckbxIncludeTurningShips.setEnabled(true);
 
 					if (chckbxIncludeTurningShips.isSelected() == true) {
 						rotationTxt.setEditable(true);
@@ -356,10 +480,12 @@ public class NewAnalysis2 extends JFrame implements KeyListener {
 				} else {
 					messageBufferTxt.setEditable(false);
 					rotationTxt.setEditable(false);
+					chckbxIncludeTurningShips.setEnabled(false);
 					contentPane.repaint();
 				}
 			}
 		});
+		
 		chckbxEnableCoverage.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if (chckbxEnableCoverage.isSelected() == true) {
@@ -388,12 +514,14 @@ public class NewAnalysis2 extends JFrame implements KeyListener {
 		densityPanel.setLayout(null);
 
 		JLabel lblCellsize_1 = new JLabel("Cellsize");
-		lblCellsize_1.setBounds(20, 43, 46, 14);
+		lblCellsize_1.setBounds(30, 43, 46, 14);
 		densityPanel.add(lblCellsize_1);
 
 		densityCellSizeTxt = new JTextField();
+		densityCellSizeTxt.setToolTipText("The size of cells in the density plot");
+		densityCellSizeTxt.setHorizontalAlignment(SwingConstants.RIGHT);
 		densityCellSizeTxt.setText("200");
-		densityCellSizeTxt.setBounds(75, 40, 80, 20);
+		densityCellSizeTxt.setBounds(80, 40, 80, 20);
 		densityPanel.add(densityCellSizeTxt);
 		densityCellSizeTxt.setEditable(true);
 
@@ -404,14 +532,16 @@ public class NewAnalysis2 extends JFrame implements KeyListener {
 		chckbxEnableDensity.setSelected(true);
 		chckbxEnableDensity.setBounds(15, 10, 97, 23);
 		densityPanel.add(chckbxEnableDensity);
+		higMedLowPanel.setToolTipText("The amount of ships in each cell per day.");
 		higMedLowPanel.setBounds(15, 68, 335, 110);
-		higMedLowPanel.setBorder(new TitledBorder(null, "Density layout",
-				TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		higMedLowPanel.setBorder(new TitledBorder(UIManager.getBorder("TitledBorder.border"), "Threshold values", TitledBorder.LEADING, TitledBorder.TOP, null, null));
 
 		densityPanel.add(higMedLowPanel);
 		higMedLowPanel.setLayout(null);
 		lblHigh.setBounds(15, 23, 46, 14);
 		higMedLowPanel.add(lblHigh);
+		highTxt.setToolTipText("When there are more ships then this value in a cell per day, it's considered heavy loaded");
+		highTxt.setHorizontalAlignment(SwingConstants.RIGHT);
 		highTxt.setBounds(66, 20, 80, 20);
 		higMedLowPanel.add(highTxt);
 		highTxt.setText("20");
@@ -444,9 +574,34 @@ public class NewAnalysis2 extends JFrame implements KeyListener {
 		JPanel advancedPanel = new JPanel();
 		tabbedPane.addTab("Advanced Settings", null, advancedPanel, null);
 		advancedPanel.setLayout(null);
-
-		chckbxSetMapCenterpoint.setBounds(15, 7, 125, 23);
-		advancedPanel.add(chckbxSetMapCenterpoint);
+		
+		JPanel panel = new JPanel();
+		panel.setBorder(new TitledBorder(null, "Map settings", TitledBorder.LEADING, TitledBorder.TOP, null, null));
+		panel.setBounds(10, 11, 369, 125);
+		advancedPanel.add(panel);
+		panel.setLayout(null);
+		chckbxSetMapCenterpoint.setBounds(10, 20, 125, 23);
+		panel.add(chckbxSetMapCenterpoint);
+		
+				JLabel lblLat = new JLabel("Lat");
+				lblLat.setBounds(15, 60, 46, 14);
+				panel.add(lblLat);
+				
+						txtLat = new JTextField();
+						txtLat.setBounds(46, 57, 46, 20);
+						panel.add(txtLat);
+						txtLat.setEditable(false);
+						txtLat.setColumns(10);
+						
+								JLabel lblLong = new JLabel("Long");
+								lblLong.setBounds(15, 92, 46, 14);
+								panel.add(lblLong);
+								
+										txtLong = new JTextField();
+										txtLong.setBounds(46, 89, 46, 20);
+										panel.add(txtLong);
+										txtLong.setEditable(false);
+										txtLong.setColumns(10);
 		chckbxSetMapCenterpoint.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if (chckbxSetMapCenterpoint.isSelected() == true) {
@@ -461,31 +616,11 @@ public class NewAnalysis2 extends JFrame implements KeyListener {
 			}
 		});
 
-		txtLat = new JTextField();
-		txtLat.setEditable(false);
-		txtLat.setBounds(50, 37, 46, 20);
-		advancedPanel.add(txtLat);
-		txtLat.setColumns(10);
-
-		txtLong = new JTextField();
-		txtLong.setEditable(false);
-		txtLong.setBounds(50, 65, 46, 20);
-		advancedPanel.add(txtLong);
-		txtLong.setColumns(10);
-
-		JLabel lblLat = new JLabel("Lat");
-		lblLat.setBounds(20, 37, 46, 14);
-		advancedPanel.add(lblLat);
-
-		JLabel lblLong = new JLabel("Long");
-		lblLong.setBounds(20, 68, 46, 14);
-		advancedPanel.add(lblLong);
-
 		/*
 		 * frame buttons
 		 */
 
-		btnCancel.setBounds(285, 415, 89, 23);
+		btnCancel.setBounds(315, 386, 89, 23);
 		contentPane.add(btnCancel);
 		btnCancel.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -498,7 +633,7 @@ public class NewAnalysis2 extends JFrame implements KeyListener {
 		 */
 		// JButton btnNew = new JButton("New");
 		btnNew.setEnabled(false);
-		btnNew.setBounds(186, 415, 89, 23);
+		btnNew.setBounds(212, 386, 89, 23);
 		contentPane.add(btnNew);
 		btnNew.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -507,12 +642,9 @@ public class NewAnalysis2 extends JFrame implements KeyListener {
 				//the used project
 				dk.dma.aiscoverage.project.AisCoverageProject project = projectHandler.createProject();
 
-				/*
-				 * is input is from file or streams
-				 * adds selected file or stream to the project
-				 */
+				 //adds selected file, or loop thru selected streams and add them to the project
 				String input = setInput(project);
-				
+				String timer = setAnalysisTimer(project);
 
 
 				/*
@@ -523,14 +655,17 @@ public class NewAnalysis2 extends JFrame implements KeyListener {
 					CoverageCalculator coverageCalc = new CoverageCalculator(project, true);
 					coverageCalc.setCellSize(Integer.parseInt(coverageCellsizeTxt.getText()));
 					coverageCellSize = coverageCellsizeTxt.getText();
+					coverageCalc.setHighThreshold(Double.parseDouble(highThreshold.getText())/100);
+					coverageCalc.setLowThreshold(Double.parseDouble(lowThreshold.getText())/100);
+					filterShipClass(coverageCalc);
+					filterCargoType(coverageCalc);
+					coverageCalc.setBufferInSeconds(Integer.parseInt(messageBufferTxt.getText()));
 
 						if (chckbxIncludeTurningShips.isSelected() == true) {
 							coverageCalc.setIgnoreRotation(false);
 							coverageCalc.setDegreesPerMinute(Integer.parseInt(rotationTxt.getText()));
 						}
-					coverageCalc.setBufferInSeconds(Integer.parseInt(messageBufferTxt.getText()));
-//					coverageCalc.getAllowedShipTypes().put(ShipType.FISHING, true);
-					filterShipClass(coverageCalc);
+					
 					project.addCalculator(coverageCalc);
 				}
 
@@ -541,22 +676,16 @@ public class NewAnalysis2 extends JFrame implements KeyListener {
 					DensityPlotCalculator densityCalc = new DensityPlotCalculator(project);
 					densityCalc.setCellSize(Integer.parseInt(densityCellSizeTxt.getText()));
 					densityCellSize = densityCellSizeTxt.getText();
-//					densityCalc.getAllowedShipTypes().put(ShipType.FISHING, true);
 					filterShipClass(densityCalc);
+					filterCargoType(densityCalc);
 					
-					//TODO set these settings
-					//Integer.parseInt(highTxt.getText());
-					//Integer.parseInt(mediumTxt.getText());
-					//Integer.parseInt(lowTxt.getText());
+					cp.getDensityPlotLayer().setHighMedLow(Integer.parseInt(highTxt.getText()), Integer.parseInt(mediumTxt.getText()), Integer.parseInt(lowTxt.getText()));
 					
 					project.addCalculator(densityCalc);
 					
 					
 					
 				}
-
-				String timer = setAnalysisTimer(project);
-				filterCargoType();
 
 				//sets the recorded data in the analysisPanel
 				ap.setAnalysisData(input, coverageCellSize, densityCellSize, timer);
@@ -607,13 +736,26 @@ public class NewAnalysis2 extends JFrame implements KeyListener {
 	/*
 	 * if user only wants to track certain ship types, set the message filter here
 	 */
-	private void filterCargoType()
+	private void filterCargoType(AbstractCalculator calc)
 	{
 		if (chckbxIncludeAll.isSelected() == false) {
-			// TODO get names of checkboxes checked  in typepanel and filter the rest out
-			// TODO create an array to hold checkboxes in the panel, to genericly extract them here
+			
+			for (JCheckBox chckbx : shipTypeFiltering) {
 
-			// if(chckbx.isSelected() == true) {	add name of chckbx to list	
+				if(chckbx.isSelected() == true)
+				{
+				
+				for (ShipType type : shippy) {
+					System.out.println(type.toString());
+					if(type.toString() == chckbx.getText())
+					{
+						calc.getAllowedShipTypes().put(type, type);
+					}
+				}
+				
+				}
+	
+			}	
 		}
 	}
 
@@ -640,7 +782,7 @@ public class NewAnalysis2 extends JFrame implements KeyListener {
 	
 	@Override
 	public void keyTyped(KeyEvent e) {
-
+		//do nothing
 		
 	}
 
@@ -664,4 +806,55 @@ public class NewAnalysis2 extends JFrame implements KeyListener {
 		
 	}
 
+
+
+	@Override
+	public void mouseClicked(MouseEvent e) {
+		if (e.getSource() == ta) {
+			if(rdbtnInputFromFile.isSelected() == true)
+			{
+			filePath = guiHelper.openAISFileDialog();
+			if(filePath != null)
+			{
+			String[] chunks = filePath.split("\\\\");
+			final String filename = chunks[chunks.length - 1];
+			ta.setText(filename);
+			btnNew.setEnabled(true);
+			}
+			}
+		}
+		
+	}
+
+
+
+	@Override
+	public void mousePressed(MouseEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+
+	@Override
+	public void mouseReleased(MouseEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+
+	@Override
+	public void mouseEntered(MouseEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
+
+	@Override
+	public void mouseExited(MouseEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
 }

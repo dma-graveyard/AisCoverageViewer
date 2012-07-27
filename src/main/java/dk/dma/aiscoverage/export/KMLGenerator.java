@@ -23,6 +23,10 @@ import dk.dma.aiscoverage.calculator.CoverageCalculator;
 import dk.dma.aiscoverage.data.Cell;
 import dk.dma.aiscoverage.data.BaseStation;
 
+/*
+ * This KML-generator doesn't use the same color scale as CoverageLayer.
+ * Fix this..
+ */
 public class KMLGenerator {
 
 	public static void generateKML(CoverageCalculator calc, String path) {

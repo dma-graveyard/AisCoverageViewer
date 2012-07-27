@@ -12,6 +12,7 @@ import com.bbn.openmap.proj.coords.LatLonPoint;
 
 import dk.dma.aiscoverage.calculator.CoverageCalculator;
 import dk.dma.aiscoverage.data.Cell;
+import dk.dma.aiscoverage.data.ColorGenerator;
 import dk.dma.aiscoverage.event.AisEvent;
 import dk.dma.aiscoverage.event.IProjectHandlerListener;
 import dk.dma.aiscoverage.event.AisEvent.Event;
@@ -35,11 +36,15 @@ public class CoverageLayer extends OMGraphicHandlerLayer implements Runnable, IP
 	}
 	public CoverageLayer(){
 		setRenderPolicy(new com.bbn.openmap.layer.policy.BufferedImageRenderPolicy());
+		
 		new Thread(this).start();
 		ProjectHandler.getInstance().addProjectHandlerListener(this);
 		
-		
 	}
+	
+
+	
+	
 	private void updateCell(Cell cell){
 		double longSize = calc.getLongSize();
 		double latSize = calc.getLatSize();
@@ -50,14 +55,8 @@ public class CoverageLayer extends OMGraphicHandlerLayer implements Runnable, IP
 		polygon.add(new LatLonPoint.Double(cell.getLatitude() + latSize, cell.getLongitude() + longSize));
 		polygon.add(new LatLonPoint.Double(cell.getLatitude() + latSize, cell.getLongitude()));
 
-		Color color;
-		if (cell.getCoverage() > 0.8) { // green
-			color = Color.GREEN;
-		} else if (cell.getCoverage() > 0.5) { // orange
-			color = Color.ORANGE;
-		} else { // red
-			color = Color.RED;
-		}
+		Color color = ColorGenerator.getCoverageColor(cell, calc.getHighThreshold(), calc.getLowThreshold());
+
 		GridPolygon g = new GridPolygon(polygon, color);
 		graphics.add(g);
 	}
@@ -130,6 +129,8 @@ public class CoverageLayer extends OMGraphicHandlerLayer implements Runnable, IP
 			updateOnce = false;
 		}else if(event.getEvent() == Event.PROJECT_CREATED){
 			reset();
+		}else if(event.getEvent() == Event.PROJECT_LOADED){
+			updateOnce();
 		}
 	
 	}
