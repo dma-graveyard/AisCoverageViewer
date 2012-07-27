@@ -48,6 +48,8 @@ public class GUIHelper {
 	};
 	
 
+	
+	
 	//JFileChooser fileChooser = null;
 	FileFilter internalFilter = null;
 	FileFilter kmlFilter = null;
@@ -58,17 +60,17 @@ public class GUIHelper {
 	
 	public GUIHelper()
 	{
+
 		internalFilter = new FileNameExtensionFilter("aiscoverage", "aiscoverage"); 
 		kmlFilter = new FileNameExtensionFilter("kml", "kml"); 
-//<<<<<<< HEAD
-		//shapeFilter = new FileNameExtensionFilter("shape", "shape"); 	
-		//fileChooser.setBounds(0, 0, 600, 400);
-//=======
+
 		shapeFilter = new FileNameExtensionFilter("shape", "shape"); 
 		pngFilter = new FileNameExtensionFilter("png", "png"); 
 		fileChooser.setBounds(0, 0, 600, 400);
-//>>>>>>> acf3d52844b593fb2667a0ca28eb8be8299590fb
+
 	}
+	
+	
 	
 	
 	public String openShapeFileDialog()

@@ -123,7 +123,6 @@ public class NewAnalysis2 extends JFrame implements KeyListener, MouseListener {
 	 * Create the frame.
 	 */
 	public NewAnalysis2(final AnalysisPanel ap, final ChartPanel cp) {
-		setAlwaysOnTop(true);
 		lowTxt.setToolTipText("When there are this many ships in a cell per day, it's considered to have a very light load");
 		lowTxt.setHorizontalAlignment(SwingConstants.RIGHT);
 		lowTxt.setText("1");
