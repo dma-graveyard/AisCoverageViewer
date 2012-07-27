@@ -123,6 +123,7 @@ public class CoverageLayer extends OMGraphicHandlerLayer implements Runnable, IP
 	public void aisEventReceived(AisEvent event) {
 		if(event.getEvent() == AisEvent.Event.BS_VISIBILITY_CHANGED){
 			updateDelay = 1;
+			updateOnce = true;
 		}else if(event.getEvent() == AisEvent.Event.ANALYSIS_STARTED){
 			updateOnce = true;
 		}else if(event.getEvent() == AisEvent.Event.ANALYSIS_STOPPED){

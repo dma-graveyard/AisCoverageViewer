@@ -173,17 +173,12 @@ public class GUIHelper {
 			String fileUrl = fileChooser.getSelectedFile().getPath();
 			System.out.println(""+fileUrl);
 			
-//<<<<<<< HEAD
 			KMLGenerator.generateKML(ProjectHandler.getInstance().getProject().getCoverageCalculator() , fileUrl+".kml");
-//=======
+
 			if(!fileUrl.endsWith(".kml"))
 			{
 			    fileUrl = (fileUrl + ".kml");
 			}
-			
-			//ArrayList<BaseStation> list = new ArrayList<BaseStation>(projectHandler.getProject().getBaseStationHandler().grids.values());
-			//KMLGenerator.generateKML(list , fileUrl+".kml");
-//>>>>>>> merged
 			
 			System.out.println(fileUrl + " printet");
 		}

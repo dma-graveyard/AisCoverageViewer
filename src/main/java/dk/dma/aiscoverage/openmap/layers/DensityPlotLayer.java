@@ -222,7 +222,7 @@ public class DensityPlotLayer extends OMGraphicHandlerLayer implements Runnable,
 	@Override
 	public void aisEventReceived(AisEvent event) {
 		if(event.getEvent() == Event.ANALYSIS_STOPPED){
-			updateOnce = false;
+			updateOnce = true;
 		}else if(event.getEvent() == Event.PROJECT_CREATED){
 			reset();
 		}else if(event.getEvent() == Event.PROJECT_LOADED){
