@@ -164,7 +164,7 @@ public class BaseStationLayer extends OMGraphicHandlerLayer implements MapMouseL
 
 					updateDelay--;
 				}
-				System.out.println("UPDATING Base Stations");
+//				System.out.println("UPDATING Base Stations");
 				updateDelay = defaultUpdatedelay; //default update delay
 				doUpdate();
 			} catch (InterruptedException e) {

@@ -81,6 +81,7 @@ public class ChartPanel extends OMComponentPanel implements MouseWheelListener {
 	private MouseDelegator mouseDelegator;
 	public int maxScale = 5000;
 	private DensityPlotLayer densityPlotLayer;
+	private Color background = new Color(168, 228, 255);
 
 
 	public DensityPlotLayer getDensityPlotLayer() {
@@ -134,6 +135,8 @@ public class ChartPanel extends OMComponentPanel implements MouseWheelListener {
 		// Get plugin layers
 		createPluginLayers(props);
 
+		map.setBackground(background);
+		
 		// Add layer handler to map handler
 		mapHandler.add(layerHandler);
 

@@ -114,7 +114,7 @@ public class DensityPlotLayer extends OMGraphicHandlerLayer implements Runnable,
 				color = colors[9];
 			return color;
 		}catch(Exception e){
-			System.out.println("exception");
+//			System.out.println("exception");
 			return Color.WHITE;
 		}
 		
@@ -141,7 +141,7 @@ public class DensityPlotLayer extends OMGraphicHandlerLayer implements Runnable,
 
 	@SuppressWarnings("deprecation")
 	public void doUpdate() {
-		System.out.println("UPDATING Density Plot");
+//		System.out.println("UPDATING Density Plot");
 //		System.out.println("max ships: "+calc.getMaxShips().shipCount);
 //		System.out.println("min ships: "+calc.getMinShips().shipCount);
 
