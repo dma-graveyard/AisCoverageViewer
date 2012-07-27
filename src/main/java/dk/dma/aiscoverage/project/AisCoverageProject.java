@@ -133,6 +133,7 @@ public class AisCoverageProject implements Serializable {
 
 		
 	}
+	@SuppressWarnings("deprecation")
 	public void stopAnalysis(){
 		for (AisReader reader : readers) {
 			reader.stop();

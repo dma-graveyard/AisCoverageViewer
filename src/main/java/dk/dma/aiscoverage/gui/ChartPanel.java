@@ -34,8 +34,6 @@ import java.awt.Color;
 import java.awt.Point;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Properties;
 
@@ -57,7 +55,6 @@ import com.bbn.openmap.proj.Projection;
 import com.bbn.openmap.proj.coords.LatLonPoint;
 
 import dk.dma.aiscoverage.acv.ACV;
-import dk.dma.aiscoverage.data.BaseStation;
 import dk.dma.aiscoverage.event.NavigationMouseMode;
 import dk.dma.aiscoverage.openmap.layers.BaseStationLayer;
 import dk.dma.aiscoverage.openmap.layers.CoverageLayer;

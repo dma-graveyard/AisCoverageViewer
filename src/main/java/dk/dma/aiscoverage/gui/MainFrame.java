@@ -30,18 +30,12 @@
 package dk.dma.aiscoverage.gui;
 
 
-import java.awt.AWTEvent;
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Image;
-import java.awt.Toolkit;
-import java.awt.event.AWTEventListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 
@@ -49,6 +43,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
@@ -59,8 +54,6 @@ import com.bbn.openmap.MapHandler;
 import dk.dma.aiscoverage.acv.ACV;
 import dk.dma.aiscoverage.project.ProjectHandler;
 import dk.dma.aiscoverage.settings.GuiSettings;
-
-import javax.swing.JMenuItem;
 
 /**
  * The main frame containing map and panels 

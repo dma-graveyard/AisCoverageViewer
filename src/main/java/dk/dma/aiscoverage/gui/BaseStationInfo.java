@@ -1,24 +1,24 @@
 package dk.dma.aiscoverage.gui;
 
 import java.awt.Component;
-import java.awt.Dimension;
-
-import javax.swing.JLabel;
-import javax.swing.GroupLayout;
-import javax.swing.GroupLayout.Alignment;
-
-import dk.dma.aiscoverage.data.BaseStation;
-import dk.dma.aiscoverage.project.ProjectHandler;
-
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import javax.swing.LayoutStyle.ComponentPlacement;
-import javax.swing.JPanel;
+import javax.swing.GroupLayout;
+import javax.swing.GroupLayout.Alignment;
 import javax.swing.JCheckBox;
+import javax.swing.JLabel;
+import javax.swing.LayoutStyle.ComponentPlacement;
+
+import dk.dma.aiscoverage.data.BaseStation;
+import dk.dma.aiscoverage.project.ProjectHandler;
 
 public class BaseStationInfo extends OverlayBox implements ActionListener {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private JLabel bsmmsi;
 	private JLabel totalMessages;
 	private JLabel totalShips;

@@ -4,7 +4,6 @@ import java.awt.Color;
 import java.util.Collection;
 import java.util.HashMap;
 
-
 import com.bbn.openmap.event.ProjectionEvent;
 import com.bbn.openmap.layer.OMGraphicHandlerLayer;
 import com.bbn.openmap.omGraphics.OMGraphic;
@@ -14,8 +13,8 @@ import com.bbn.openmap.omGraphics.OMRect;
 import dk.dma.aiscoverage.calculator.DensityPlotCalculator;
 import dk.dma.aiscoverage.data.Cell;
 import dk.dma.aiscoverage.event.AisEvent;
-import dk.dma.aiscoverage.event.IProjectHandlerListener;
 import dk.dma.aiscoverage.event.AisEvent.Event;
+import dk.dma.aiscoverage.event.IProjectHandlerListener;
 import dk.dma.aiscoverage.project.AisCoverageProject;
 import dk.dma.aiscoverage.project.ProjectHandler;
 
@@ -121,6 +120,7 @@ public class DensityPlotLayer extends OMGraphicHandlerLayer implements Runnable,
 		
 	}
 
+	@SuppressWarnings("deprecation")
 	private void updateCell(Cell cell){
 		double longSize = calc.getLongSize();
 		double latSize = calc.getLatSize();
@@ -139,6 +139,7 @@ public class DensityPlotLayer extends OMGraphicHandlerLayer implements Runnable,
 		
 	}
 
+	@SuppressWarnings("deprecation")
 	public void doUpdate() {
 		System.out.println("UPDATING Density Plot");
 //		System.out.println("max ships: "+calc.getMaxShips().shipCount);

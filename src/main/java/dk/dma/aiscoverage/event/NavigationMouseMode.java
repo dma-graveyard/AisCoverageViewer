@@ -62,7 +62,7 @@ public class NavigationMouseMode extends AbstractCoordMouseMode {
 	private boolean mouseDragged = false;
 	boolean layerMouseDrag = false;
 	private int maxScale;
-	private ChartPanel chartPanel;
+//	private ChartPanel chartPanel;
 
     /**
      * Construct a NavMouseMode. Sets the ID of the mode to the modeID, the
@@ -70,7 +70,7 @@ public class NavigationMouseMode extends AbstractCoordMouseMode {
      */
     public NavigationMouseMode(ChartPanel chartPanel) {
         this(true);
-        this.chartPanel = chartPanel;
+//        this.chartPanel = chartPanel;
         clickTimer = ClickTimer.getClickTimer();
         maxScale = ACV.getSettings().getMapSettings().getMaxScale();
     }
