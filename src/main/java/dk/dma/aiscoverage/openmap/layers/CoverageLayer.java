@@ -52,9 +52,9 @@ public class CoverageLayer extends OMGraphicHandlerLayer implements Runnable, IP
 		Graphics2D g = bi.createGraphics();
 		int width = getProjection().getWidth();
 		int height = getProjection().getHeight();
-		System.out.println("start get map");
+//		System.out.println("start get map");
 		Collection<Cell> cs = calc.getCoverage();
-		System.out.println("end get map");
+//		System.out.println("end get map");
 		for (Cell cell : cs) {
 			
 			//Convert lat lon coords to x-y pixel coords
@@ -83,11 +83,11 @@ public class CoverageLayer extends OMGraphicHandlerLayer implements Runnable, IP
 			}
 		}
 
-		System.out.println("end update");
+//		System.out.println("end update");
 		raster = new OMRaster(0, 0, bi);		
 		graphics.clear();
 		graphics.add(raster);
-		System.out.println("UPDATING coverage layer");
+//		System.out.println("UPDATING coverage layer");
 
 		doPrepare();
 	}
