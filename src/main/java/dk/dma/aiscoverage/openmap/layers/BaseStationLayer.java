@@ -14,9 +14,9 @@ import com.bbn.openmap.omGraphics.OMList;
 import dk.dma.aiscoverage.calculator.CoverageCalculator;
 import dk.dma.aiscoverage.data.BaseStation;
 import dk.dma.aiscoverage.event.AisEvent;
+import dk.dma.aiscoverage.event.AisEvent.Event;
 import dk.dma.aiscoverage.event.IProjectHandlerListener;
 import dk.dma.aiscoverage.event.NavigationMouseMode;
-import dk.dma.aiscoverage.event.AisEvent.Event;
 import dk.dma.aiscoverage.gui.BaseStationInfo;
 import dk.dma.aiscoverage.project.ProjectHandler;
 
@@ -27,7 +27,7 @@ public class BaseStationLayer extends OMGraphicHandlerLayer implements MapMouseL
 	private OMGraphicList graphics = new OMGraphicList();
 	private OMGraphic current;
 	BaseStationInfo box = new BaseStationInfo(this, 170, 110);
-	private CoverageCalculator calc;
+//	private CoverageCalculator calc;
 	private Map<String, AisTargetGraphic> graphicMap = new ConcurrentHashMap<String, AisTargetGraphic>();
 	private int updateDelay;
 	private final int defaultUpdatedelay = 100;
@@ -164,7 +164,7 @@ public class BaseStationLayer extends OMGraphicHandlerLayer implements MapMouseL
 
 					updateDelay--;
 				}
-				System.out.println("UPDATING Base Stations");
+//				System.out.println("UPDATING Base Stations");
 				updateDelay = defaultUpdatedelay; //default update delay
 				doUpdate();
 			} catch (InterruptedException e) {

@@ -3,28 +3,24 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
 
 import javax.swing.JFileChooser;
-//<<<<<<< HEAD
 import javax.swing.JOptionPane;
-//=======
 import javax.swing.JPanel;
-//>>>>>>> acf3d52844b593fb2667a0ca28eb8be8299590fb
 import javax.swing.filechooser.FileFilter;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-import dk.dma.aiscoverage.data.BaseStation;
-import dk.dma.aiscoverage.data.BaseStationHandler;
 import dk.dma.aiscoverage.export.ImageGenerator;
 import dk.dma.aiscoverage.export.KMLGenerator;
 import dk.dma.aiscoverage.project.ProjectHandler;
 
-
 public class GUIHelper {
-	
-	
 	JFileChooser fileChooser = new JFileChooser(){
+		/**
+		 * 
+		 */
+		private static final long serialVersionUID = 1L;
+
 		@Override
 		public void approveSelection(){
 		    File f = getSelectedFile();

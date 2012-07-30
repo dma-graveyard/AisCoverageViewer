@@ -1,19 +1,16 @@
 package dk.dma.aiscoverage.gui;
 
 
-import java.awt.BorderLayout;
 import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.Frame;
-import java.awt.Point;
-import java.awt.PopupMenu;
 
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
-import javax.swing.JWindow;
 
 public abstract class OverlayBox extends JPanel{
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private JPopupMenu popup = new JPopupMenu();
 
 

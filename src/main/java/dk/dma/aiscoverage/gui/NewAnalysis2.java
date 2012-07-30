@@ -1,15 +1,7 @@
 package dk.dma.aiscoverage.gui;
 
-import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.EventQueue;
-
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.JTextArea;
-import javax.swing.border.EmptyBorder;
-import javax.swing.border.TitledBorder;
-
+import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -17,16 +9,29 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.util.ArrayList;
 
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
-import javax.swing.JDialog;
-import javax.swing.JTabbedPane;
+import javax.swing.GroupLayout;
+import javax.swing.GroupLayout.Alignment;
 import javax.swing.JButton;
-import javax.swing.JScrollPane;
-import javax.swing.ScrollPaneConstants;
+import javax.swing.JCheckBox;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.JRadioButton;
+import javax.swing.JScrollPane;
+import javax.swing.JTabbedPane;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
+import javax.swing.LayoutStyle.ComponentPlacement;
+import javax.swing.ScrollPaneConstants;
+import javax.swing.SwingConstants;
 import javax.swing.UIManager;
+import javax.swing.border.EmptyBorder;
+import javax.swing.border.TitledBorder;
 
 import dk.dma.aiscoverage.calculator.AbstractCalculator;
 import dk.dma.aiscoverage.calculator.CoverageCalculator;
@@ -36,21 +41,12 @@ import dk.dma.aiscoverage.project.ProjectHandler;
 import dk.frv.ais.message.ShipTypeCargo;
 import dk.frv.ais.message.ShipTypeCargo.ShipType;
 
-import javax.swing.JLabel;
-import javax.swing.JTextField;
-import javax.swing.JCheckBox;
-import java.awt.FlowLayout;
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.ArrayList;
-import javax.swing.SwingConstants;
-import javax.swing.GroupLayout;
-import javax.swing.GroupLayout.Alignment;
-import javax.swing.LayoutStyle.ComponentPlacement;
-
 public class NewAnalysis2 extends JDialog implements KeyListener, MouseListener {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private String filePath;
 	private long id;
 
@@ -130,6 +126,7 @@ public class NewAnalysis2 extends JDialog implements KeyListener, MouseListener 
 	/**
 	 * Create the frame.
 	 */
+	@SuppressWarnings("static-access")
 	public NewAnalysis2(final AnalysisPanel ap, final ChartPanel cp) {
 		lowThreshold.setHorizontalAlignment(SwingConstants.RIGHT);
 		lowThreshold.setText("30");

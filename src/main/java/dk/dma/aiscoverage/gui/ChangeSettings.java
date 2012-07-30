@@ -1,25 +1,25 @@
 package dk.dma.aiscoverage.gui;
-import java.awt.BorderLayout;
-import java.awt.EventQueue;
-
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.border.EmptyBorder;
-import javax.swing.JLabel;
-import javax.swing.JTextField;
-import javax.swing.JButton;
-import javax.swing.JTabbedPane;
-import javax.swing.JRadioButton;
-import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
-import java.awt.Color;
-import javax.swing.UIManager;
+import java.awt.event.ActionListener;
+
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JRadioButton;
+import javax.swing.JTabbedPane;
+import javax.swing.JTextField;
+import javax.swing.border.EmptyBorder;
 
 import dk.dma.aiscoverage.project.ProjectHandler;
 
 
 public class ChangeSettings extends JFrame {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private GUIHelper guiHelper = new GUIHelper();
 	private JPanel contentPane;
 	private JTextField txtBlablablashape;

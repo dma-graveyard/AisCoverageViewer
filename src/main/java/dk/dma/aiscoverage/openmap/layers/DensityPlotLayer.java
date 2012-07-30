@@ -8,7 +8,6 @@ import java.awt.image.BufferedImage;
 import java.util.Collection;
 import java.util.HashMap;
 
-
 import com.bbn.openmap.event.ProjectionEvent;
 import com.bbn.openmap.layer.OMGraphicHandlerLayer;
 import com.bbn.openmap.omGraphics.OMGraphic;
@@ -20,8 +19,8 @@ import dk.dma.aiscoverage.calculator.DensityPlotCalculator;
 import dk.dma.aiscoverage.data.Cell;
 import dk.dma.aiscoverage.data.ColorGenerator;
 import dk.dma.aiscoverage.event.AisEvent;
-import dk.dma.aiscoverage.event.IProjectHandlerListener;
 import dk.dma.aiscoverage.event.AisEvent.Event;
+import dk.dma.aiscoverage.event.IProjectHandlerListener;
 import dk.dma.aiscoverage.project.AisCoverageProject;
 import dk.dma.aiscoverage.project.ProjectHandler;
 
@@ -121,60 +120,14 @@ public class DensityPlotLayer extends OMGraphicHandlerLayer implements Runnable,
 				color = colors[9];
 			return color;
 		}catch(Exception e){
-			System.out.println("exception");
+//			System.out.println("exception");
 			return Color.WHITE;
 		}
 		
 	}
 
 
-	public void doUpdate() {
-		if(calc == null)
-			return;
-		
-		BufferedImage bi = new BufferedImage(getProjection().getWidth(), getProjection().getHeight(), BufferedImage.TYPE_INT_ARGB); 
-		Graphics2D g = bi.createGraphics();
-		int width = getProjection().getWidth();
-		int height = getProjection().getHeight();
-		System.out.println("start get map");
-		Collection<Cell> cs = calc.getDensityPlotCoverage();
-		System.out.println("end get map");
-		for (Cell cell : cs) {
-			
-			//Convert lat lon coords to x-y pixel coords
-			Point2D point1 = getProjection().forward(cell.getLatitude(), cell.getLongitude());
-			Point2D point2 = getProjection().forward(cell.getLatitude(), cell.getLongitude()+calc.getLongSize());
-			Point2D point3 = getProjection().forward(cell.getLatitude()+calc.getLatSize(), cell.getLongitude()+calc.getLongSize());
-			Point2D point4 = getProjection().forward(cell.getLatitude()+calc.getLatSize(), cell.getLongitude());
 
-			//create arrays for polygon
-			int[] xPoints = {(int)point1.getX(),(int) point2.getX(),(int) point3.getX(),(int)point4.getX()};
-			int[] yPoints = {(int)point1.getY(),(int)point2.getY(),(int)point3.getY(),(int)point4.getY()};
-			int nPoints = 4;
-			
-			//If cell is visible in current projection, draw polygon
-			if(point1.getX() > 0 && point1.getX() < width){
-				if(point1.getY() > 0 && point1.getY() < height){
-					Color color = getColor(cell);
-					g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.5f));
-					g.setColor(color);
-					g.setBackground(color);
-					g.fillPolygon(xPoints, yPoints, nPoints);
-					if(drawBorder){
-						g.drawPolygon(xPoints, yPoints, nPoints);
-					}
-				}
-			}
-		}
-
-		System.out.println("end update");
-		raster = new OMRaster(0, 0, bi);		
-		graphics.clear();
-		graphics.add(raster);
-		System.out.println("UPDATING density layer");
-
-		doPrepare();
-	}
 	public void projectionChanged(ProjectionEvent pe){
 		super.projectionChanged(pe);
 		reset();
@@ -212,7 +165,7 @@ public class DensityPlotLayer extends OMGraphicHandlerLayer implements Runnable,
 					this.calc = project.getDensityPlotCalculator();
 					if(calc != null){
 						if((updateOnce && isVisible()) || (ProjectHandler.getInstance().getProject().isRunning() && isVisible()) ){
-							doUpdate();
+//							doUpdate();
 							updateOnce = false;
 						}
 					}

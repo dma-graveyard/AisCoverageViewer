@@ -34,8 +34,6 @@ import java.awt.Color;
 import java.awt.Point;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Properties;
 
@@ -57,7 +55,6 @@ import com.bbn.openmap.proj.Projection;
 import com.bbn.openmap.proj.coords.LatLonPoint;
 
 import dk.dma.aiscoverage.acv.ACV;
-import dk.dma.aiscoverage.data.BaseStation;
 import dk.dma.aiscoverage.event.NavigationMouseMode;
 import dk.dma.aiscoverage.openmap.layers.BaseStationLayer;
 import dk.dma.aiscoverage.openmap.layers.CoverageLayer;
@@ -84,6 +81,7 @@ public class ChartPanel extends OMComponentPanel implements MouseWheelListener {
 	private MouseDelegator mouseDelegator;
 	public int maxScale = 5000;
 	private DensityPlotLayer densityPlotLayer;
+	private Color background = new Color(168, 228, 255);
 
 
 	public DensityPlotLayer getDensityPlotLayer() {
@@ -137,6 +135,8 @@ public class ChartPanel extends OMComponentPanel implements MouseWheelListener {
 		// Get plugin layers
 		createPluginLayers(props);
 
+		map.setBackground(background);
+		
 		// Add layer handler to map handler
 		mapHandler.add(layerHandler);
 
