@@ -65,6 +65,35 @@ public class BaseStationHandler implements Serializable {
 		}
 	}
 	
+	/**
+	 * latitude is rounded down
+	 * longitude is rounded up.
+	 * The id is lat-lon-coords representing top-left point in cell
+	 */
+	public String getCellId(double latitude, double longitude){
+
+		double lat;
+		double lon;
+		if(latitude < 0){
+			latitude +=latSize;
+			lat = (double)((int)(10000*((latitude)- (latitude % latSize))))/10000;
+			
+		}else{
+			lat = (double)((int)(10000*((latitude)- (latitude % latSize))))/10000;
+		}
+		
+		if(longitude < 0){
+			lon = (double)((int)(10000*(longitude - (longitude % lonSize))))/10000;
+			
+		}else{
+			longitude -=lonSize;
+			lon = (double)((int)(10000*(longitude - (longitude % lonSize))))/10000;
+		}
+		
+		String cellId =  lat+"_"+lon;	
+		return cellId;
+	}
+	
 	
 	public BaseStation getGrid(String bsMmsi){
 		return baseStations.get(bsMmsi);

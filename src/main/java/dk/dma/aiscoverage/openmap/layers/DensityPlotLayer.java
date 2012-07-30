@@ -1,6 +1,10 @@
 package dk.dma.aiscoverage.openmap.layers;
 
+import java.awt.AlphaComposite;
 import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.geom.Point2D;
+import java.awt.image.BufferedImage;
 import java.util.Collection;
 import java.util.HashMap;
 
@@ -9,10 +13,12 @@ import com.bbn.openmap.event.ProjectionEvent;
 import com.bbn.openmap.layer.OMGraphicHandlerLayer;
 import com.bbn.openmap.omGraphics.OMGraphic;
 import com.bbn.openmap.omGraphics.OMGraphicList;
+import com.bbn.openmap.omGraphics.OMRaster;
 import com.bbn.openmap.omGraphics.OMRect;
 
 import dk.dma.aiscoverage.calculator.DensityPlotCalculator;
 import dk.dma.aiscoverage.data.Cell;
+import dk.dma.aiscoverage.data.ColorGenerator;
 import dk.dma.aiscoverage.event.AisEvent;
 import dk.dma.aiscoverage.event.IProjectHandlerListener;
 import dk.dma.aiscoverage.event.AisEvent.Event;
@@ -25,9 +31,7 @@ public class DensityPlotLayer extends OMGraphicHandlerLayer implements Runnable,
 	private DensityPlotCalculator calc;
 	private static final long serialVersionUID = 1L;
 	public boolean isRunning = false;
-	HashMap<String, Color> cellColor = new HashMap<String, Color>(); 
-	HashMap<String, OMRect> addedCell = new HashMap<String, OMRect>(); 
-	private OMGraphicList graphicslist = new OMGraphicList();
+	private OMGraphicList graphics = new OMGraphicList();
 	private Color[] colors = new Color[10];
 	private int updateDelay;
 	private final int defaultUpdatedelay = 100;
@@ -35,6 +39,8 @@ public class DensityPlotLayer extends OMGraphicHandlerLayer implements Runnable,
 	private int dhigh;
 	private int dmedium;
 	private int dlow;
+	private OMRaster raster;
+	private boolean drawBorder;
 
 	
 
@@ -121,51 +127,53 @@ public class DensityPlotLayer extends OMGraphicHandlerLayer implements Runnable,
 		
 	}
 
-	private void updateCell(Cell cell){
-		double longSize = calc.getLongSize();
-		double latSize = calc.getLatSize();
-		
-		OMRect rect = new OMRect(cell.getLatitude(), cell.getLongitude(), cell.getLatitude() + latSize, cell.getLongitude() + longSize, OMGraphic.LINETYPE_STRAIGHT);
-		
-		Color color = this.getColor(cell);
-		
-		
-		rect.setFillColor(color);
-		rect.setLineColor(color);
-		graphicslist.add(rect);
-		cellColor.put(cell.getId(), color);
-		this.addedCell.put(cell.getId(), rect);
-		
-		
-	}
 
 	public void doUpdate() {
-		System.out.println("UPDATING Density Plot");
-//		System.out.println("max ships: "+calc.getMaxShips().shipCount);
-//		System.out.println("min ships: "+calc.getMinShips().shipCount);
-
-
-		Collection<Cell> cells = calc.getDensityPlotCoverage();
-		if(cells== null) return;
-		for (Cell cell : cells) {
+		if(calc == null)
+			return;
+		
+		BufferedImage bi = new BufferedImage(getProjection().getWidth(), getProjection().getHeight(), BufferedImage.TYPE_INT_ARGB); 
+		Graphics2D g = bi.createGraphics();
+		int width = getProjection().getWidth();
+		int height = getProjection().getHeight();
+		System.out.println("start get map");
+		Collection<Cell> cs = calc.getDensityPlotCoverage();
+		System.out.println("end get map");
+		for (Cell cell : cs) {
 			
-			if(!addedCell.containsKey(cell.getId())){
-				updateCell(cell);
-			}else{
-				
-				Color existingColor = cellColor.get(cell.getId());
-				Color newColor = this.getColor(cell);
-				if(existingColor != newColor){
-					OMRect rect = this.addedCell.get(cell.getId());
-					cellColor.put(cell.getId(), newColor);
-					rect.setFillColor(newColor);
-					rect.setLineColor(newColor);
+			//Convert lat lon coords to x-y pixel coords
+			Point2D point1 = getProjection().forward(cell.getLatitude(), cell.getLongitude());
+			Point2D point2 = getProjection().forward(cell.getLatitude(), cell.getLongitude()+calc.getLongSize());
+			Point2D point3 = getProjection().forward(cell.getLatitude()+calc.getLatSize(), cell.getLongitude()+calc.getLongSize());
+			Point2D point4 = getProjection().forward(cell.getLatitude()+calc.getLatSize(), cell.getLongitude());
+
+			//create arrays for polygon
+			int[] xPoints = {(int)point1.getX(),(int) point2.getX(),(int) point3.getX(),(int)point4.getX()};
+			int[] yPoints = {(int)point1.getY(),(int)point2.getY(),(int)point3.getY(),(int)point4.getY()};
+			int nPoints = 4;
+			
+			//If cell is visible in current projection, draw polygon
+			if(point1.getX() > 0 && point1.getX() < width){
+				if(point1.getY() > 0 && point1.getY() < height){
+					Color color = getColor(cell);
+					g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.5f));
+					g.setColor(color);
+					g.setBackground(color);
+					g.fillPolygon(xPoints, yPoints, nPoints);
+					if(drawBorder){
+						g.drawPolygon(xPoints, yPoints, nPoints);
+					}
 				}
 			}
 		}
 
-		doPrepare();
+		System.out.println("end update");
+		raster = new OMRaster(0, 0, bi);		
+		graphics.clear();
+		graphics.add(raster);
+		System.out.println("UPDATING density layer");
 
+		doPrepare();
 	}
 	public void projectionChanged(ProjectionEvent pe){
 		super.projectionChanged(pe);
@@ -181,13 +189,11 @@ public class DensityPlotLayer extends OMGraphicHandlerLayer implements Runnable,
 	
 	@Override
 	public synchronized OMGraphicList prepare() {
-		graphicslist.project(getProjection());
-		return graphicslist;
+		graphics.project(getProjection());
+		return graphics;
 	}
 	public void reset() {
-		graphicslist.clear();
-		this.addedCell.clear();
-		this.cellColor.clear();
+		graphics.clear();
 		updateOnce = true;
 		updateDelay = 1;
 	}
@@ -205,7 +211,7 @@ public class DensityPlotLayer extends OMGraphicHandlerLayer implements Runnable,
 				if(project != null){
 					this.calc = project.getDensityPlotCalculator();
 					if(calc != null){
-						if(updateOnce || (ProjectHandler.getInstance().getProject().isRunning() && isVisible()) ){
+						if((updateOnce && isVisible()) || (ProjectHandler.getInstance().getProject().isRunning() && isVisible()) ){
 							doUpdate();
 							updateOnce = false;
 						}
