@@ -346,7 +346,7 @@ public class NewAnalysis2 extends JDialog implements KeyListener, MouseListener 
 
 		coverageCellsizeTxt = new JTextField();
 		coverageCellsizeTxt.setToolTipText("The width and height of each tile. \\nUnless  map centerpoint is selected, the meter representation will be translated into a lat/long degree difference based on the first message read");
-		coverageCellsizeTxt.setText("2500");
+		coverageCellsizeTxt.setText("12500");
 		coverageCellsizeTxt.setBounds(75, 40, 80, 20);
 		coveragePanel.add(coverageCellsizeTxt);
 		coverageCellsizeTxt.setEditable(true);

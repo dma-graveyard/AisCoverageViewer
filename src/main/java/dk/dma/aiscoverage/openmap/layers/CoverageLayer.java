@@ -32,10 +32,12 @@ public class CoverageLayer extends OMGraphicHandlerLayer implements Runnable, IP
 	private final int defaultUpdatedelay = 100;
 	private boolean updateOnce = true;
 	private OMRaster raster;
-	private boolean drawBorder;
+	private boolean drawBorder = true;
 
+	
 	public void updateOnce() {
 		updateOnce = true;
+		updateDelay = 1;
 	}
 	public CoverageLayer(){		
 		new Thread(this).start();
@@ -58,25 +60,29 @@ public class CoverageLayer extends OMGraphicHandlerLayer implements Runnable, IP
 		for (Cell cell : cs) {
 			
 			//Convert lat lon coords to x-y pixel coords
+//		//Convert lat lon coords to x-y pixel coords
 			Point2D point1 = getProjection().forward(cell.getLatitude(), cell.getLongitude());
-			Point2D point2 = getProjection().forward(cell.getLatitude(), cell.getLongitude()+calc.getLongSize());
-			Point2D point3 = getProjection().forward(cell.getLatitude()+calc.getLatSize(), cell.getLongitude()+calc.getLongSize());
-			Point2D point4 = getProjection().forward(cell.getLatitude()+calc.getLatSize(), cell.getLongitude());
-
-			//create arrays for polygon
-			int[] xPoints = {(int)point1.getX(),(int) point2.getX(),(int) point3.getX(),(int)point4.getX()};
-			int[] yPoints = {(int)point1.getY(),(int)point2.getY(),(int)point3.getY(),(int)point4.getY()};
-			int nPoints = 4;
+			
 			
 			//If cell is visible in current projection, draw polygon
 			if(point1.getX() > 0 && point1.getX() < width){
 				if(point1.getY() > 0 && point1.getY() < height){
+					Point2D point2 = getProjection().forward(cell.getLatitude(), cell.getLongitude()+calc.getLongSize());
+					Point2D point3 = getProjection().forward(cell.getLatitude()-calc.getLatSize(), cell.getLongitude()+calc.getLongSize());
+					Point2D point4 = getProjection().forward(cell.getLatitude()-calc.getLatSize(), cell.getLongitude());
+					
+					//create arrays for polygon
+					int[] xPoints = {(int)Math.round(point1.getX()),(int) Math.round(point2.getX()),(int) Math.round(point3.getX()),(int)Math.round(point4.getX())};
+					int[] yPoints = {(int)Math.round(point1.getY()),(int)Math.round(point2.getY()),(int)Math.round(point3.getY()),(int)Math.round(point4.getY())};
+					int nPoints = 4;
+					
 					Color color = ColorGenerator.getCoverageColor(cell, calc.getHighThreshold(), calc.getLowThreshold());
 					g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.5f));
 					g.setColor(color);
 					g.setBackground(color);
 					g.fillPolygon(xPoints, yPoints, nPoints);
 					if(drawBorder){
+						g.setColor(Color.BLACK);
 						g.drawPolygon(xPoints, yPoints, nPoints);
 					}
 				}
@@ -88,7 +94,7 @@ public class CoverageLayer extends OMGraphicHandlerLayer implements Runnable, IP
 		graphics.clear();
 		graphics.add(raster);
 //		System.out.println("UPDATING coverage layer");
-
+this.
 		doPrepare();
 	}
 	
@@ -160,6 +166,10 @@ public class CoverageLayer extends OMGraphicHandlerLayer implements Runnable, IP
 		updateOnce = true;
 		updateDelay = 1;
 		
+	}
+	
+	public void setDrawBorder(boolean drawBorder) {
+		this.drawBorder = drawBorder;
 	}
 
 }
