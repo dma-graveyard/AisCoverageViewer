@@ -33,6 +33,7 @@ import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
 
+import dk.dma.aiscoverage.acv.ACV;
 import dk.dma.aiscoverage.calculator.AbstractCalculator;
 import dk.dma.aiscoverage.calculator.CoverageCalculator;
 import dk.dma.aiscoverage.calculator.DensityPlotCalculator;
@@ -346,7 +347,7 @@ public class NewAnalysis2 extends JDialog implements KeyListener, MouseListener 
 
 		coverageCellsizeTxt = new JTextField();
 		coverageCellsizeTxt.setToolTipText("The width and height of each tile. \\nUnless  map centerpoint is selected, the meter representation will be translated into a lat/long degree difference based on the first message read");
-		coverageCellsizeTxt.setText("2500");
+		coverageCellsizeTxt.setText(Integer.toString(ACV.getSettings().getGuiSettings().getCoverageCellSize()));
 		coverageCellsizeTxt.setBounds(75, 40, 80, 20);
 		coveragePanel.add(coverageCellsizeTxt);
 		coverageCellsizeTxt.setEditable(true);
@@ -380,7 +381,7 @@ public class NewAnalysis2 extends JDialog implements KeyListener, MouseListener 
 		messageBufferTxt.setText("20");
 		messageBufferTxt.setColumns(10);
 
-		JLabel lblSekunder = new JLabel("Sekunder");
+		JLabel lblSekunder = new JLabel("Seconds");
 		lblSekunder.setBounds(235, 23, 46, 14);
 		advancedSettingsPanel.add(lblSekunder);
 		chckbxIncludeTurningShips.setBounds(10, 45, 167, 23);
@@ -517,7 +518,7 @@ public class NewAnalysis2 extends JDialog implements KeyListener, MouseListener 
 		densityCellSizeTxt = new JTextField();
 		densityCellSizeTxt.setToolTipText("The size of cells in the density plot");
 		densityCellSizeTxt.setHorizontalAlignment(SwingConstants.RIGHT);
-		densityCellSizeTxt.setText("200");
+		densityCellSizeTxt.setText(Integer.toString(ACV.getSettings().getGuiSettings().getDensityCellSize()));
 		densityCellSizeTxt.setBounds(80, 40, 80, 20);
 		densityPanel.add(densityCellSizeTxt);
 		densityCellSizeTxt.setEditable(true);
@@ -708,6 +709,7 @@ public class NewAnalysis2 extends JDialog implements KeyListener, MouseListener 
 		project.setTimeout(time);
 		timer = analysisTime.getText();
 	}
+		System.out.println(timer);
 		return timer;
 	}
 	

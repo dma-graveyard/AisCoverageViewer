@@ -52,6 +52,9 @@ import org.apache.log4j.Logger;
 import com.bbn.openmap.MapHandler;
 
 import dk.dma.aiscoverage.acv.ACV;
+import dk.dma.aiscoverage.calculator.CoverageCalculator;
+import dk.dma.aiscoverage.calculator.DensityPlotCalculator;
+import dk.dma.aiscoverage.data.Ship.ShipClass;
 import dk.dma.aiscoverage.project.ProjectHandler;
 import dk.dma.aiscoverage.settings.GuiSettings;
 
@@ -272,5 +275,67 @@ public class MainFrame extends JFrame implements WindowListener {
 	@Override
 	public void windowOpened(WindowEvent we) {
 	}
+	
+	public void startAnalysisFromCmds(){
+		 
+			 ProjectHandler projectHandler = ProjectHandler.getInstance();
+				String densityCellSize = "-";
+//				String coverageCellSize = "-";
+				//the used project
+				dk.dma.aiscoverage.project.AisCoverageProject project = projectHandler.createProject();
+//
+				 //adds selected file, or loop thru selected streams and add them to the project
+				String input = "filepath";
+//				String timer = setAnalysisTimer(project);
+
+
+				/*
+				 * is coverage enabled. if so, add calculator
+				 */
+//				if (chckbxEnableCoverage.isSelected() == true) {
+					// add coverage calculator
+					CoverageCalculator coverageCalc = new CoverageCalculator(project, true);
+					coverageCalc.setCellSize(ACV.getSettings().getGuiSettings().getCoverageCellSize());
+//					coverageCellSize = coverageCellsizeTxt.getText();
+					coverageCalc.setHighThreshold(8.0);
+					coverageCalc.setLowThreshold(3.0);
+//					calc.getAllowedShipClasses().put(ShipClass.CLASS_A, ShipClass.CLASS_A);
+//					calc.getAllowedShipClasses().put(ShipClass.CLASS_B, ShipClass.CLASS_B);
+//					filterShipClass(coverageCalc);
+//					filterCargoType(coverageCalc);
+//					coverageCalc.setBufferInSeconds(Integer.parseInt(messageBufferTxt.getText()));
+//
+//						if (chckbxIncludeTurningShips.isSelected() == true) {
+//							coverageCalc.setIgnoreRotation(false);
+//							coverageCalc.setDegreesPerMinute(Integer.parseInt(rotationTxt.getText()));
+//						}
+//					
+//					project.addCalculator(coverageCalc);
+//				}
+//
+//				/*
+//				 * is density enabled, if so, if so add calculator
+//				 */
+//				if (chckbxEnableDensity.isSelected() == true) {
+//					DensityPlotCalculator densityCalc = new DensityPlotCalculator(project);
+//					densityCalc.setCellSize(Integer.parseInt(densityCellSizeTxt.getText()));
+//					densityCellSize = densityCellSizeTxt.getText();
+//					filterShipClass(densityCalc);
+//					filterCargoType(densityCalc);
+//					
+//					cp.getDensityPlotLayer().setHighMedLow(Integer.parseInt(highTxt.getText()), Integer.parseInt(mediumTxt.getText()), Integer.parseInt(lowTxt.getText()));
+//					
+//					project.addCalculator(densityCalc);
+//					
+//					
+//					
+//				}
+//
+//				//sets the recorded data in the analysisPanel
+//				ap.setAnalysisData(input, coverageCellSize, densityCellSize, timer);
+//				//Close the window
+//				dispose();
+			}
+//	
 	
 }

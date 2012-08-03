@@ -48,7 +48,8 @@ public class GuiSettings implements Serializable {
 	private Point appLocation = new Point(10, 10);
 	private Dimension appDimensions = new Dimension(1280, 800);
 	private boolean multipleInstancesAllowed = false;
-
+	private int coverageCellSize = 2500;
+	private int densityCellSize = 200;
 
 	public GuiSettings() {
 
@@ -63,6 +64,8 @@ public class GuiSettings implements Serializable {
 		double h = PropUtils.doubleFromProperties(props, PREFIX + "appDimensions_h", appDimensions.getHeight());
 		appDimensions.setSize(w, h);
 		multipleInstancesAllowed = PropUtils.booleanFromProperties(props, PREFIX + "multipleInstancesAllowed", multipleInstancesAllowed);
+		coverageCellSize = PropUtils.intFromProperties(props, PREFIX + "coverageCellSize", coverageCellSize);
+		densityCellSize = PropUtils.intFromProperties(props, PREFIX + "densityCellSize", densityCellSize);
 
 	}
 
@@ -73,6 +76,26 @@ public class GuiSettings implements Serializable {
 		props.put(PREFIX + "appDimensions_w", Double.toString(appDimensions.getWidth()));
 		props.put(PREFIX + "appDimensions_h", Double.toString(appDimensions.getHeight()));
 		props.put(PREFIX + "multipleInstancesAllowed", Boolean.toString(multipleInstancesAllowed));
+		props.put(PREFIX + "coverageCellSize", Integer.toString(coverageCellSize));
+		props.put(PREFIX + "densityCellSize", Integer.toString(densityCellSize));
+	}
+	
+	
+
+	public int getDensityCellSize() {
+		return densityCellSize;
+	}
+
+	public void setDensityCellSize(int densityCellSize) {
+		this.densityCellSize = densityCellSize;
+	}
+
+	public int getCoverageCellSize() {
+		return coverageCellSize;
+	}
+
+	public void setCoverageCellSize(int coverageCellSize) {
+		this.coverageCellSize = coverageCellSize;
 	}
 
 	public Point getAppLocation() {
