@@ -50,7 +50,7 @@ public class GridPolygon extends OMGraphicList {
 		polyPoints[j + 1] = polyPoints[1];
 		OMPoly poly = new OMPoly(polyPoints, OMGraphic.DECIMAL_DEGREES,
 				OMGraphic.LINETYPE_RHUMB, 1);
-		poly.setLinePaint(clear);
+		//poly.setLinePaint(clear);
 		poly.setFillPaint(new Color(0, 0, 0, 1));
 		poly.setTextureMask(new TexturePaint(hatchFill, hatchFillRectangle));
 
