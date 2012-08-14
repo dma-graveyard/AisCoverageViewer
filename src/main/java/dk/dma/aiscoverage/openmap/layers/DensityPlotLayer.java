@@ -213,11 +213,10 @@ public class DensityPlotLayer extends OMGraphicHandlerLayer implements Runnable,
 	}
 
 
-
 	public void projectionChanged(ProjectionEvent pe){
 		super.projectionChanged(pe);
 		updateOnce = true;
-		updateDelay = 2;
+		updateDelay = 1;
 	}
 	
 	@Override
