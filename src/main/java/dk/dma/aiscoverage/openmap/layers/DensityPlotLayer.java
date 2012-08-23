@@ -40,8 +40,7 @@ public class DensityPlotLayer extends OMGraphicHandlerLayer implements Runnable,
 	private int dmedium;
 	private int dlow;
 	private OMRaster raster;
-	private boolean drawBorder;
-	private int antialisingValue = 1;
+	private int antialisingValue = 4;
 
 	
 
@@ -129,9 +128,8 @@ public class DensityPlotLayer extends OMGraphicHandlerLayer implements Runnable,
 	}
 	
 	public static BufferedImage scaleImage(BufferedImage img, int finalWidth, int finalHeight) {
-		System.out.println("weeh");
-	    int imgWidth = img.getWidth();
-	    int imgHeight = img.getHeight();
+//	    int imgWidth = img.getWidth();
+//	    int imgHeight = img.getHeight();
 	    int shrinkWidth = (int) (img.getWidth()*0.5);
 	    int shrinkHeight = (int) (img.getHeight()*0.5);
 	    if(finalWidth > shrinkWidth){
@@ -173,7 +171,7 @@ public class DensityPlotLayer extends OMGraphicHandlerLayer implements Runnable,
 		int width = getProjection().getWidth();
 		int height = getProjection().getHeight();
 		Collection<Cell> cs = calc.getDensityPlotCoverage();
-		System.out.println("start generating density plot");
+//		System.out.println("start generating density plot");
 		for (Cell cell : cs) {
 			
 			//Convert lat lon coords to x-y pixel coords
@@ -199,13 +197,13 @@ public class DensityPlotLayer extends OMGraphicHandlerLayer implements Runnable,
 			}
 		}
 
-		System.out.println("density plot ended");
-		System.out.println("start post processing");
+//		System.out.println("density plot ended");
+//		System.out.println("start post processing");
 		if(antialisingValue == 1)
 			raster = new OMRaster(0, 0, bi);	
 		else
 			raster = new OMRaster(0, 0, DensityPlotLayer.scaleImage(bi, width, height));
-		System.out.println("Postprocessing ended");
+//		System.out.println("Postprocessing ended");
 		graphics.clear();
 		graphics.add(raster);
 //		System.out.println("UPDATING coverage layer");
@@ -294,17 +292,17 @@ public class DensityPlotLayer extends OMGraphicHandlerLayer implements Runnable,
 
 	@Override
 	public boolean mouseClicked(MouseEvent arg0) {
-		if(antialisingValue == 1){
-			antialisingValue = 4;
-			System.out.println("antialiasing on X4");
-		}else if(antialisingValue == 4){
-			antialisingValue = 2;
-			System.out.println("antialiasing on X2");
-		}else{
-			antialisingValue = 1;
-			System.out.println("antialiasing off");
-		}
-		updateOnce();
+//		if(antialisingValue == 1){
+//			antialisingValue = 4;
+//			System.out.println("antialiasing on X4");
+//		}else if(antialisingValue == 4){
+//			antialisingValue = 2;
+//			System.out.println("antialiasing on X2");
+//		}else{
+//			antialisingValue = 1;
+//			System.out.println("antialiasing off");
+//		}
+//		updateOnce();
 		return false;
 	}
 

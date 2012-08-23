@@ -94,7 +94,7 @@ public class CoverageLayer extends OMGraphicHandlerLayer implements Runnable, IP
 		graphics.clear();
 		graphics.add(raster);
 //		System.out.println("UPDATING coverage layer");
-this.
+
 		doPrepare();
 	}
 	
