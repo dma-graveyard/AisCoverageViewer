@@ -116,6 +116,7 @@ public abstract class AbstractCalculator implements Serializable {
 		CustomMessage firstMessage = customMessage.getShip().getFirstMessageInBuffer();
 		CustomMessage lastMessage = customMessage.getShip().getLastMessageInBuffer();
 		if(lastMessage != null){
+			projection.setCentralPoint(firstMessage.getLongitude(), firstMessage.getLatitude());
 			double distance = projection.distBetweenPoints(firstMessage.getLongitude(), firstMessage.getLatitude(), lastMessage.getLongitude(), lastMessage.getLatitude());
 			if(distance > 2000){
 //				System.out.println(distance);

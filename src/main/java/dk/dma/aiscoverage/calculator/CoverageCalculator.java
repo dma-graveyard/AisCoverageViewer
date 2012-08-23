@@ -101,6 +101,7 @@ public class CoverageCalculator extends AbstractCalculator {
 		double p1Lon = m1.getLongitude();
 		double p2Lat = m2.getLatitude();
 		double p2Lon = m2.getLongitude();
+		projection.setCentralPoint(p1Lon,p1Lat);
 		double p1X = projection.lon2x(p1Lon, p1Lat);
 		double p1Y = projection.lat2y(p1Lon, p1Lat);
 		double p2X = projection.lon2x(p2Lon, p2Lat);
