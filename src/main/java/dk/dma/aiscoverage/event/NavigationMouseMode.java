@@ -86,7 +86,7 @@ public class NavigationMouseMode extends AbstractCoordMouseMode {
     public NavigationMouseMode(boolean shouldConsumeEvents) {
         super(modeID, shouldConsumeEvents);
         // override the default cursor
-        setModeCursor(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
+//        setModeCursor(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
     }
 
     /**
