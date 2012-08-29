@@ -61,7 +61,7 @@ public class NewAnalysis2 extends JDialog implements KeyListener, MouseListener 
 	JScrollPane scrollPane = new JScrollPane();
 
 	// panel filling
-	JTextArea ta = new JTextArea("Click here to select file");
+	JTextArea ta = new JTextArea("");
 
 	// buttons
 	// input panel
@@ -122,6 +122,7 @@ public class NewAnalysis2 extends JDialog implements KeyListener, MouseListener 
 	private final JTextField lowThreshold = new JTextField();
 	private final JLabel label = new JLabel("%");
 	private final JLabel label_1 = new JLabel("%");
+	private final JButton btnAddFile = new JButton("Add Files");
 
 
 	/**
@@ -181,7 +182,8 @@ public class NewAnalysis2 extends JDialog implements KeyListener, MouseListener 
 		ta.setEditable(false);
 		ta.setEnabled(false);
 		ta.addMouseListener(this);
-		
+		ta.setText("");
+		btnAddFile.addMouseListener(this);
 //		addActionListener(new ActionListener() {
 //			public void actionPerformed(ActionEvent e) {
 //				filePath = guiHelper.openAISFileDialog();
@@ -225,6 +227,9 @@ public class NewAnalysis2 extends JDialog implements KeyListener, MouseListener 
 				ta.setEditable(true);
 				ta.setEnabled(true);
 				btnNew.setEnabled(false);
+				btnAddFile.setEnabled(false);
+				
+				
 			}
 		});
 
@@ -236,10 +241,11 @@ public class NewAnalysis2 extends JDialog implements KeyListener, MouseListener 
 		rdbtnInputFromFile.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				btnSelectFile.setEnabled(true);
-				ta.setText("Select File");
+				ta.setText("");
 				ta.setEditable(false);
 				ta.setEnabled(false);
 				btnNew.setEnabled(false);
+				btnAddFile.setEnabled(true);
 			}
 		});
 
@@ -313,6 +319,10 @@ public class NewAnalysis2 extends JDialog implements KeyListener, MouseListener 
 				analysisTime.setEditable(false);
 				analysisTime.setText("00:00:00");
 				analysisTime.setSize(new Dimension(52, 20));
+				
+				btnAddFile.setBounds(10, 10, 89, 23);
+				inputPanel.add(btnAddFile);
+				
 		chckbxSetAnalysisTimer.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if (chckbxSetAnalysisTimer.isSelected() == true) {
@@ -765,8 +775,12 @@ public class NewAnalysis2 extends JDialog implements KeyListener, MouseListener 
 		 * is input is from file or streams
 		 */
 		if (rdbtnInputFromFile.isSelected() == true) {
-				project.setFile(filePath);
-				input = ta.getText();
+			String[] files = ta.getText().split("\n");
+			for (String file : files) {
+				project.setFile(file);
+	}	
+			input = "Multiple files";
+
 		} else if (rdbtnInputFromStream.isSelected() == true) {
 				String[] ips = ta.getText().split("\n");
 				for (String ip : ips) {
@@ -805,23 +819,22 @@ public class NewAnalysis2 extends JDialog implements KeyListener, MouseListener 
 		
 	}
 
-
-
 	@Override
 	public void mouseClicked(MouseEvent e) {
-		if (e.getSource() == ta) {
-			if(rdbtnInputFromFile.isSelected() == true)
-			{
-			filePath = guiHelper.openAISFileDialog();
-			if(filePath != null)
-			{
-			String[] chunks = filePath.split("\\\\");
-			final String filename = chunks[chunks.length - 1];
-			ta.setText(filename);
-			btnNew.setEnabled(true);
-			}
-			}
-		}
+		
+//		if (e.getSource() == ta) {
+//			if(rdbtnInputFromFile.isSelected() == true)
+//			{
+//			filePath = guiHelper.openAISFileDialog();
+//			if(filePath != null)
+//			{
+//			String[] chunks = filePath.split("\\\\");
+//			final String filename = chunks[chunks.length - 1];
+//			ta.setText(filename);
+//			btnNew.setEnabled(true);
+//			}
+//			}
+//		}
 		
 	}
 
@@ -837,7 +850,30 @@ public class NewAnalysis2 extends JDialog implements KeyListener, MouseListener 
 
 	@Override
 	public void mouseReleased(MouseEvent e) {
-		// TODO Auto-generated method stub
+	System.out.println(e.getSource());
+		
+		if (e.getSource() == btnAddFile) {
+		if(rdbtnInputFromFile.isSelected() == true)
+		{
+		filePath = guiHelper.openAISFileDialog();
+		if(filePath != null)
+		{
+		String[] chunks = filePath.split("\\\\");
+		final String filename = chunks[chunks.length - 1];
+		String files = "";
+		if (!ta.getText().equals("")){
+			files = ta.getText() + " \n " + filename;	
+		}else{
+			files = filename;
+		}
+		
+		
+		ta.setText(filePath);
+		btnNew.setEnabled(true);
+		}
+		}
+	}
+		
 		
 	}
 

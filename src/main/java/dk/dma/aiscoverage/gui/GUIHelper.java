@@ -88,18 +88,24 @@ public class GUIHelper {
 	
 	public String openAISFileDialog()
 	{
-		String fileUrl = null;
+		String fileUrl = "";
 		//fileChooser = new JFileChooser();
 		//fileChooser.setBounds(0, 0, 600, 400);
 		fileChooser.setAcceptAllFileFilterUsed(false);
 		fileChooser.removeChoosableFileFilter(internalFilter);
 		fileChooser.removeChoosableFileFilter(shapeFilter);
 		fileChooser.removeChoosableFileFilter(kmlFilter);
+		fileChooser.setMultiSelectionEnabled(true);
 		//fileChooser.setFileFilter(internalFilter);
 
 		if (fileChooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION)
 		{
-			fileUrl = fileChooser.getSelectedFile().getPath();
+			File[] selectedFiles = fileChooser.getSelectedFiles();
+			for (int i = 0; i < selectedFiles.length; i++) {
+				fileUrl = fileUrl + selectedFiles[i].getAbsoluteFile() + "\n";
+			}
+			
+//			fileUrl = fileChooser.getSelectedFile().getPath();
 			System.out.println(fileUrl);
 		}		
 		return fileUrl;
