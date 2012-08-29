@@ -58,7 +58,7 @@ public class DensityPlotCalculator extends AbstractCalculator {
 	public boolean filterMessage(CustomMessage message){
 		boolean filterMessage = false;
 		CustomMessage lastMessage = message.getShip().getLastMessage();
-		projection.setCentralPoint(message.getLongitude(), message.getLatitude());
+
 		double distance = projection.distBetweenPoints(message.getLongitude(), message.getLatitude(), lastMessage.getLongitude(), lastMessage.getLatitude());
 		if(distance > 2000)
 			filterMessage = true;
@@ -126,11 +126,6 @@ public class DensityPlotCalculator extends AbstractCalculator {
 		else
 			ystep = -1*getCellSize();
 		
-		if(steep){
-            projection.setCentralPoint(y0,x0);
-	    }else{
-	            projection.setCentralPoint(x0,y0);
-	    }
 			
 		for (double x = x0; x < x1; x += getCellSize()) {
 			double lon;
