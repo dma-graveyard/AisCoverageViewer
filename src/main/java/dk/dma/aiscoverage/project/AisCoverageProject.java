@@ -1,7 +1,11 @@
 package dk.dma.aiscoverage.project;
 
+import java.io.BufferedInputStream;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -42,6 +46,7 @@ public class AisCoverageProject implements Serializable {
 	private long messageCount = 0;
 	private boolean fromFile = false;
 	private int currentFile = 0;
+	private int totalMessages = 0;
 
 	public boolean isRunning() {
 		return isRunning;
@@ -60,6 +65,18 @@ public class AisCoverageProject implements Serializable {
 	}
 
 	public void setFile(String filepath) {
+		int lines = 0;
+		try {
+
+			lines = countLines(filepath);
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		totalMessages = totalMessages + lines;
+		System.out.println("Lines in file: " + lines);
+
+		
 		AisReader reader = null;
 		try {
 			reader = new AisStreamReader(new FileInputStream(filepath));
@@ -381,5 +398,27 @@ public class AisCoverageProject implements Serializable {
 	public int getTotalFiles() {
 		return readers.size();
 	}
+	
+	
+	public int countLines(String filename) throws IOException {
+	    InputStream is = new BufferedInputStream(new FileInputStream(filename));
+	    try {
+	        byte[] c = new byte[1024];
+	        int count = 0;
+	        int readChars = 0;
+	        boolean empty = true;
+	        while ((readChars = is.read(c)) != -1) {
+	            empty = false;
+	            for (int i = 0; i < readChars; ++i) {
+	                if (c[i] == '\n')
+	                    ++count;
+	            }
+	        }
+	        return (count == 0 && !empty) ? 1 : count;
+	    } finally {
+	        is.close();
+	    }
+	}
+
 
 }
