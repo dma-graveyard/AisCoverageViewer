@@ -52,7 +52,7 @@ public abstract class AbstractCalculator implements Serializable {
 	/**
 	 * This is called by message handlers whenever a new message is received.
 	 */
-	public void processMessage(AisMessage aisMessage, String defaultID) {
+	public synchronized void processMessage(AisMessage aisMessage, String defaultID) {
 		
 		CustomMessage newMessage = aisToCustom(aisMessage, defaultID);
 		if(newMessage != null){

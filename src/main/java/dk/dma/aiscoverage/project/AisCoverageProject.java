@@ -122,8 +122,6 @@ public class AisCoverageProject implements Serializable {
 
 		if (fromFile) {
 
-			// Running files,
-
 			// single file
 			if (readers.size() == 1) {
 				readers.get(0).start();
@@ -254,7 +252,7 @@ public class AisCoverageProject implements Serializable {
 						started();
 						for (int i = 0; i < readers.size(); i++) {
 							readers.get(i).join();
-							System.out.println("Finished with reader " + i);
+
 						}
 
 						stopped();
