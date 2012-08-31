@@ -142,77 +142,103 @@ public class AisCoverageProject implements Serializable {
 				});
 				t.start();
 			} else {
-
+				currentFile = 0;
 				final AisCoverageProject project = this;
-				
+
 				// Listen for reader to stop
 				Thread t = new Thread(new Runnable() {
 					public void run() {
-						int remaining = readers.size() -1;
-						int current = -1;
-						
 						AisCoverageProject homeProject = project;
-					
-						
-						System.out.println("Starting threads - a total of "
-								+ (remaining+1));
 						
 						started();
-						while (remaining >= 5) {
-							for (int i = 0; i < 5; i++) {
-								current++;
-								System.out.println("Started thread " + current);
-								readers.get(current).start();
-								System.out.println("Started!");
+						for (AisReader reader : readers) {
+							// start reader
+							reader.start();
 
-							}
-							//Started the first 5 threads
-							remaining = remaining - 5;
-							homeProject.setCurrentFile(current);
-							
 							try {
-								for (int j = 0; j < 5; j++) {
-									System.out.println("Killing thread "
-											+ (current - j));
-									readers.get(current - j).join();
-								}
-
+								reader.join();
+								homeProject.increaseFileProcessed();
 
 							} catch (InterruptedException e) {
 								e.printStackTrace();
 							}
 						}
-						
-						
-						//Have run all the threads possible dividable by 5
-						System.out.println("Remaining threads: " + remaining);
-						System.out.println("Last run thread: " + current);
-						//Run the remainder
-						homeProject.setCurrentFile(current);
-						
-						for (int i = 0; i <= remaining; i++) {
-							current++;
-							System.out.println("Started thread " + current);
-							readers.get(current).start();
-							System.out.println("Started!");
-						}
-						homeProject.setCurrentFile(current);
-						try {			
-						for (int i = 0; i < remaining; i++) {
-							System.out.println("Killing thread " + (current - i));
-								readers.get(current-i).join();
-						}
-						
-						} catch (InterruptedException e) {
-							e.printStackTrace();
-						}
-						
 						stopped();
 					}
+
 				});
 				t.start();
 
-				
+				// final AisCoverageProject project = this;
+				//
+				// // Listen for reader to stop
+				// Thread t = new Thread(new Runnable() {
+				// public void run() {
+				// int remaining = readers.size() -1;
+				// int current = -1;
+				//
+				// AisCoverageProject homeProject = project;
+				//
+				//
+				// System.out.println("Starting threads - a total of "
+				// + (remaining+1));
+				//
+				// started();
+				// while (remaining >= 5) {
+				// for (int i = 0; i < 5; i++) {
+				// current++;
+				// System.out.println("Started thread " + current);
+				// readers.get(current).start();
+				// System.out.println("Started!");
+				//
+				// }
+				// //Started the first 5 threads
+				// remaining = remaining - 5;
+				// homeProject.setCurrentFile(current);
+				//
+				// try {
+				// for (int j = 0; j < 5; j++) {
+				// System.out.println("Killing thread "
+				// + (current - j));
+				// readers.get(current - j).join();
+				// }
+				//
+				//
+				// } catch (InterruptedException e) {
+				// e.printStackTrace();
+				// }
+				// }
+				//
+				//
+				// //Have run all the threads possible dividable by 5
+				// System.out.println("Remaining threads: " + remaining);
+				// System.out.println("Last run thread: " + current);
+				// //Run the remainder
+				// homeProject.setCurrentFile(current);
+				//
+				// for (int i = 0; i <= remaining; i++) {
+				// current++;
+				// System.out.println("Started thread " + current);
+				// readers.get(current).start();
+				// System.out.println("Started!");
+				// }
+				// homeProject.setCurrentFile(current);
+				// try {
+				// for (int i = 0; i < remaining; i++) {
+				// System.out.println("Killing thread " + (current - i));
+				// readers.get(current-i).join();
+				// }
+				//
+				// } catch (InterruptedException e) {
+				// e.printStackTrace();
+				// }
+				//
+				// stopped();
+				// }
+				// });
+				// t.start();
+				//
+				//
 			}
 
 		} else {
@@ -344,18 +370,18 @@ public class AisCoverageProject implements Serializable {
 		return result;
 	}
 
-	public synchronized void setCurrentFile(int currentFile) {
+	public synchronized void increaseFileProcessed() {
 		System.out.println("Currently at: " + currentFile);
-		this.currentFile = currentFile;
+		currentFile++;
+//		this.currentFile = currentFile;
 	}
 
 	public int getCurrentFile() {
 		return currentFile;
 	}
 
-	public int getTotalFiles(){
+	public int getTotalFiles() {
 		return readers.size();
 	}
-	
-	
+
 }

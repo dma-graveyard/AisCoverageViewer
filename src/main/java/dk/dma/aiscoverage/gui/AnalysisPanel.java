@@ -502,7 +502,7 @@ public class AnalysisPanel extends OMComponentPanel implements ActionListener, I
 			updateBaseStationList(ProjectHandler.getInstance().getProject().getCoverageCalculator().getBaseStationNames());
 			runningTime.setText(runningTimeToString(secondsElapsed));
 			
-			fileStatusLbl.setText(""+(ProjectHandler.getInstance().getProject().getCurrentFile()+1) + "/" + ProjectHandler.getInstance().getProject().getTotalFiles());
+			fileStatusLbl.setText(""+(ProjectHandler.getInstance().getProject().getCurrentFile()) + "/" + ProjectHandler.getInstance().getProject().getTotalFiles());
 //			progressBar
 			
 		}
@@ -514,6 +514,9 @@ public class AnalysisPanel extends OMComponentPanel implements ActionListener, I
 			fileStatusLbl.setText("-");
 		}
 	}
+	
+	
+	
 	public void startAnalysis(){
 		//ProjectHandler.getInstance().getProject().setFile("C:\\Users\\Kasper\\Desktop\\aisdump.txt");
 		try {
@@ -615,6 +618,7 @@ public class AnalysisPanel extends OMComponentPanel implements ActionListener, I
 		else if(event.getEvent() == AisEvent.Event.ANALYSIS_STOPPED){
 			System.out.println("analysis stopped");
 			updateButtons();
+			messagesPerSec.setText("-");
 
 		} 
 		else if(event.getEvent() == AisEvent.Event.BS_ADDED){
