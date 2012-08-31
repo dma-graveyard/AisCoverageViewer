@@ -109,10 +109,9 @@ public class AisCoverageProject implements Serializable {
 		}
 		
 		
-
+		System.out.println("We have " + readers.size() + " readers");
 		
 		for (AisReader reader : readers) {
-			
 			// start reader
 			reader.start();
 		}
@@ -122,7 +121,11 @@ public class AisCoverageProject implements Serializable {
             public void run(){
         		try {
         			started();
-        			readers.get(0).join();
+        			for (int i = 0; i < readers.size(); i++) {
+            			readers.get(i).join();	
+            			System.out.println("Finished with reader "  + i);
+					}
+        			
 					stopped();
 				} catch (InterruptedException e) {
 					e.printStackTrace();
