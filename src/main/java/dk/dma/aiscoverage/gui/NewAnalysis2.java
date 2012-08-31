@@ -780,8 +780,15 @@ public class NewAnalysis2 extends JDialog implements KeyListener, MouseListener 
 			String[] files = ta.getText().split("\n");
 			for (String file : files) {
 				project.setFile(file);
-	}	
-			input = "Multiple files";
+			}
+			if (files.length > 1){
+				input = "Multiple files";
+			}else{
+
+				String[] chunks = files[0].split("\\\\");
+				final String filename = chunks[chunks.length - 1];
+				input = filename;
+			}
 
 		} else if (rdbtnInputFromStream.isSelected() == true) {
 				String[] ips = ta.getText().split("\n");

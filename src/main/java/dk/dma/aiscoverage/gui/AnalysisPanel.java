@@ -47,6 +47,7 @@ import javax.swing.border.MatteBorder;
 import java.awt.Color;
 import javax.swing.UIManager;
 import javax.swing.JRadioButton;
+import javax.swing.JProgressBar;
 
 
 public class AnalysisPanel extends OMComponentPanel implements ActionListener, IProjectHandlerListener {
@@ -81,6 +82,9 @@ public class AnalysisPanel extends OMComponentPanel implements ActionListener, I
     private JRadioButton coverageRadio;
     private JRadioButton densityPlotRadio;
     private DensityPlotLayer densityPlotLayer;
+    private JLabel lblOverallStatus;
+    private JProgressBar progressBar;
+    private JLabel fileStatusLbl;
 
 	
 	/**
@@ -230,12 +234,22 @@ public class AnalysisPanel extends OMComponentPanel implements ActionListener, I
 		JLabel lblNewLabel_1 = new JLabel("Messages/Sec");
 		
 		totalMessages = new JLabel();
+		totalMessages.setText("-");
 		
 		messagesPerSec = new JLabel();
+		messagesPerSec.setText("-");
 		
 		lblRunningTime = new JLabel("Running time");
 		
-		runningTime = new JLabel("");
+		runningTime = new JLabel("-");
+		
+		JLabel lblFileStatus = new JLabel("File Status:");
+		
+		fileStatusLbl = new JLabel("-");
+		
+		lblOverallStatus = new JLabel("Overall Progress:");
+		
+		progressBar = new JProgressBar();
 		
 		GroupLayout gl_progressPanel = new GroupLayout(progressPanel);
 		gl_progressPanel.setHorizontalGroup(
@@ -243,21 +257,28 @@ public class AnalysisPanel extends OMComponentPanel implements ActionListener, I
 				.addGroup(gl_progressPanel.createSequentialGroup()
 					.addContainerGap()
 					.addGroup(gl_progressPanel.createParallelGroup(Alignment.LEADING)
-						.addGroup(gl_progressPanel.createSequentialGroup()
-							.addComponent(btnStartAnalysis)
-							.addPreferredGap(ComponentPlacement.RELATED)
-							.addComponent(btnStopAnalysis))
+						.addGroup(gl_progressPanel.createParallelGroup(Alignment.LEADING, false)
+							.addGroup(gl_progressPanel.createSequentialGroup()
+								.addComponent(btnStartAnalysis)
+								.addPreferredGap(ComponentPlacement.RELATED)
+								.addComponent(btnStopAnalysis))
+							.addGroup(gl_progressPanel.createSequentialGroup()
+								.addComponent(lblOverallStatus)
+								.addGap(18)
+								.addComponent(progressBar, 0, 0, Short.MAX_VALUE)))
 						.addGroup(gl_progressPanel.createSequentialGroup()
 							.addGroup(gl_progressPanel.createParallelGroup(Alignment.LEADING)
 								.addComponent(lblNewLabel)
 								.addComponent(lblNewLabel_1)
-								.addComponent(lblRunningTime))
+								.addComponent(lblRunningTime)
+								.addComponent(lblFileStatus))
 							.addGap(18)
 							.addGroup(gl_progressPanel.createParallelGroup(Alignment.LEADING)
+								.addComponent(fileStatusLbl)
 								.addComponent(runningTime)
 								.addComponent(totalMessages)
 								.addComponent(messagesPerSec))))
-					.addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+					.addContainerGap(224, Short.MAX_VALUE))
 		);
 		gl_progressPanel.setVerticalGroup(
 			gl_progressPanel.createParallelGroup(Alignment.LEADING)
@@ -271,18 +292,21 @@ public class AnalysisPanel extends OMComponentPanel implements ActionListener, I
 						.addComponent(lblNewLabel)
 						.addComponent(totalMessages))
 					.addPreferredGap(ComponentPlacement.RELATED)
+					.addGroup(gl_progressPanel.createParallelGroup(Alignment.BASELINE)
+						.addComponent(lblNewLabel_1)
+						.addComponent(messagesPerSec))
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addGroup(gl_progressPanel.createParallelGroup(Alignment.BASELINE)
+						.addComponent(lblFileStatus)
+						.addComponent(fileStatusLbl))
+					.addPreferredGap(ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
 					.addGroup(gl_progressPanel.createParallelGroup(Alignment.LEADING)
-						.addGroup(gl_progressPanel.createSequentialGroup()
-							.addGroup(gl_progressPanel.createParallelGroup(Alignment.BASELINE)
-								.addComponent(lblNewLabel_1)
-								.addComponent(messagesPerSec))
-							.addGap(29))
-						.addGroup(gl_progressPanel.createSequentialGroup()
-							.addPreferredGap(ComponentPlacement.RELATED, 45, Short.MAX_VALUE)
-							.addGroup(gl_progressPanel.createParallelGroup(Alignment.BASELINE)
-								.addComponent(btnStopAnalysis)
-								.addComponent(btnStartAnalysis))
-							.addContainerGap())))
+						.addComponent(lblOverallStatus)
+						.addComponent(progressBar, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
+					.addPreferredGap(ComponentPlacement.RELATED)
+					.addGroup(gl_progressPanel.createParallelGroup(Alignment.BASELINE)
+						.addComponent(btnStartAnalysis)
+						.addComponent(btnStopAnalysis)))
 		);
 		progressPanel.setLayout(gl_progressPanel);
 		bottomPanel.add(progressPanel, BorderLayout.SOUTH);
@@ -477,12 +501,17 @@ public class AnalysisPanel extends OMComponentPanel implements ActionListener, I
 			messagesPerSec.setText(""+ProjectHandler.getInstance().getProject().getMessageCount()/secondsElapsed);
 			updateBaseStationList(ProjectHandler.getInstance().getProject().getCoverageCalculator().getBaseStationNames());
 			runningTime.setText(runningTimeToString(secondsElapsed));
+			
+			fileStatusLbl.setText(""+(ProjectHandler.getInstance().getProject().getCurrentFile()+1) + "/" + ProjectHandler.getInstance().getProject().getTotalFiles());
+//			progressBar
+			
 		}
 		else{
 			totalMessages.setText("-");
 			messagesPerSec.setText("-");
 			updateBaseStationList(ProjectHandler.getInstance().getProject().getCoverageCalculator().getBaseStationNames());
 			runningTime.setText("-");
+			fileStatusLbl.setText("-");
 		}
 	}
 	public void startAnalysis(){
