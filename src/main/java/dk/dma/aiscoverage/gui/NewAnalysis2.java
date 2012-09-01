@@ -901,4 +901,6 @@ public class NewAnalysis2 extends JDialog implements KeyListener, MouseListener 
 		// TODO Auto-generated method stub
 		
 	}
+	
+	
 }

@@ -247,7 +247,7 @@ public class AnalysisPanel extends OMComponentPanel implements ActionListener, I
 		
 		fileStatusLbl = new JLabel("-");
 		
-		lblOverallStatus = new JLabel("Overall Progress:");
+		lblOverallStatus = new JLabel("Total Progress:");
 		
 		progressBar = new JProgressBar();
 		
@@ -466,6 +466,7 @@ public class AnalysisPanel extends OMComponentPanel implements ActionListener, I
 				}else if(ProjectHandler.getInstance().getProject().isDone()){
 					btnStartAnalysis.setEnabled(false);
 					btnStopAnalysis.setEnabled(false);
+					progressBar.setIndeterminate(false);
 				}else{
 					btnStartAnalysis.setEnabled(true);
 					btnStopAnalysis.setEnabled(false);
@@ -502,8 +503,27 @@ public class AnalysisPanel extends OMComponentPanel implements ActionListener, I
 			updateBaseStationList(ProjectHandler.getInstance().getProject().getCoverageCalculator().getBaseStationNames());
 			runningTime.setText(runningTimeToString(secondsElapsed));
 			
-			fileStatusLbl.setText(""+(ProjectHandler.getInstance().getProject().getCurrentFile()) + "/" + ProjectHandler.getInstance().getProject().getTotalFiles());
-//			progressBar
+			if (ProjectHandler.getInstance().getProject().isFromFile()){
+				fileStatusLbl.setText(""+(ProjectHandler.getInstance().getProject().getCurrentFile()) + "/" + ProjectHandler.getInstance().getProject().getTotalFiles());	
+			
+				if(ProjectHandler.getInstance().getProject().isDone()){
+					progressBar.setIndeterminate(false);
+					progressBar.setValue(100);
+				}else{
+					
+					int progress = (int) (ProjectHandler.getInstance().getProject().getMessageCount() * 100)/ProjectHandler.getInstance().getProject().getTotalMessages();
+					progressBar.setValue(progress);
+					System.out.println(progress);
+				}
+				
+				
+//				getTotalMessages
+				
+			}else{
+				fileStatusLbl.setText("-");
+				progressBar.setIndeterminate(true);
+			}
+
 			
 		}
 		else{
@@ -512,6 +532,8 @@ public class AnalysisPanel extends OMComponentPanel implements ActionListener, I
 			updateBaseStationList(ProjectHandler.getInstance().getProject().getCoverageCalculator().getBaseStationNames());
 			runningTime.setText("-");
 			fileStatusLbl.setText("-");
+			progressBar.setIndeterminate(false);
+			progressBar.setValue(0);
 		}
 	}
 	

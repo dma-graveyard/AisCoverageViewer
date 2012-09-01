@@ -420,5 +420,13 @@ public class AisCoverageProject implements Serializable {
 	    }
 	}
 
+	public boolean isFromFile() {
+		return fromFile;
+	}
+
+	public int getTotalMessages() {
+		return totalMessages;
+	}
+
 
 }
