@@ -513,15 +513,17 @@ public class AnalysisPanel extends OMComponentPanel implements ActionListener, I
 					
 					int progress = (int) (ProjectHandler.getInstance().getProject().getMessageCount() * 100)/ProjectHandler.getInstance().getProject().getTotalMessages();
 					progressBar.setValue(progress);
-					System.out.println(progress);
+//					System.out.println(progress);
 				}
-				
-				
-//				getTotalMessages
 				
 			}else{
 				fileStatusLbl.setText("-");
-				progressBar.setIndeterminate(true);
+				if(ProjectHandler.getInstance().getProject().isDone()){
+					progressBar.setIndeterminate(false);
+				}else{
+					progressBar.setIndeterminate(true);	
+				}
+				
 			}
 
 			
