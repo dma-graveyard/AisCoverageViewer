@@ -33,6 +33,7 @@ import javax.swing.UIManager;
 import javax.swing.border.EmptyBorder;
 import javax.swing.border.TitledBorder;
 
+import dk.dma.aiscoverage.acv.ACV;
 import dk.dma.aiscoverage.calculator.AbstractCalculator;
 import dk.dma.aiscoverage.calculator.CoverageCalculator;
 import dk.dma.aiscoverage.calculator.DensityPlotCalculator;
@@ -60,7 +61,7 @@ public class NewAnalysis2 extends JDialog implements KeyListener, MouseListener 
 	JScrollPane scrollPane = new JScrollPane();
 
 	// panel filling
-	JTextArea ta = new JTextArea("Click here to select file");
+	JTextArea ta = new JTextArea("");
 
 	// buttons
 	// input panel
@@ -121,6 +122,7 @@ public class NewAnalysis2 extends JDialog implements KeyListener, MouseListener 
 	private final JTextField lowThreshold = new JTextField();
 	private final JLabel label = new JLabel("%");
 	private final JLabel label_1 = new JLabel("%");
+	private final JButton btnAddFile = new JButton("Add Files");
 
 
 	/**
@@ -180,7 +182,8 @@ public class NewAnalysis2 extends JDialog implements KeyListener, MouseListener 
 		ta.setEditable(false);
 		ta.setEnabled(false);
 		ta.addMouseListener(this);
-		
+		ta.setText("");
+		btnAddFile.addMouseListener(this);
 //		addActionListener(new ActionListener() {
 //			public void actionPerformed(ActionEvent e) {
 //				filePath = guiHelper.openAISFileDialog();
@@ -224,6 +227,9 @@ public class NewAnalysis2 extends JDialog implements KeyListener, MouseListener 
 				ta.setEditable(true);
 				ta.setEnabled(true);
 				btnNew.setEnabled(false);
+				btnAddFile.setEnabled(false);
+				
+				
 			}
 		});
 
@@ -235,10 +241,11 @@ public class NewAnalysis2 extends JDialog implements KeyListener, MouseListener 
 		rdbtnInputFromFile.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				btnSelectFile.setEnabled(true);
-				ta.setText("Select File");
+				ta.setText("");
 				ta.setEditable(false);
 				ta.setEnabled(false);
 				btnNew.setEnabled(false);
+				btnAddFile.setEnabled(true);
 			}
 		});
 
@@ -312,6 +319,10 @@ public class NewAnalysis2 extends JDialog implements KeyListener, MouseListener 
 				analysisTime.setEditable(false);
 				analysisTime.setText("00:00:00");
 				analysisTime.setSize(new Dimension(52, 20));
+				
+				btnAddFile.setBounds(10, 10, 89, 23);
+				inputPanel.add(btnAddFile);
+				
 		chckbxSetAnalysisTimer.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				if (chckbxSetAnalysisTimer.isSelected() == true) {
@@ -346,7 +357,9 @@ public class NewAnalysis2 extends JDialog implements KeyListener, MouseListener 
 
 		coverageCellsizeTxt = new JTextField();
 		coverageCellsizeTxt.setToolTipText("The width and height of each tile. \\nUnless  map centerpoint is selected, the meter representation will be translated into a lat/long degree difference based on the first message read");
-		coverageCellsizeTxt.setText("2500");
+
+		coverageCellsizeTxt.setText(Integer.toString(ACV.getSettings().getGuiSettings().getCoverageCellSize()));
+
 		coverageCellsizeTxt.setBounds(75, 40, 80, 20);
 		coveragePanel.add(coverageCellsizeTxt);
 		coverageCellsizeTxt.setEditable(true);
@@ -380,7 +393,7 @@ public class NewAnalysis2 extends JDialog implements KeyListener, MouseListener 
 		messageBufferTxt.setText("20");
 		messageBufferTxt.setColumns(10);
 
-		JLabel lblSekunder = new JLabel("Sekunder");
+		JLabel lblSekunder = new JLabel("Seconds");
 		lblSekunder.setBounds(235, 23, 46, 14);
 		advancedSettingsPanel.add(lblSekunder);
 		chckbxIncludeTurningShips.setBounds(10, 45, 167, 23);
@@ -517,7 +530,7 @@ public class NewAnalysis2 extends JDialog implements KeyListener, MouseListener 
 		densityCellSizeTxt = new JTextField();
 		densityCellSizeTxt.setToolTipText("The size of cells in the density plot");
 		densityCellSizeTxt.setHorizontalAlignment(SwingConstants.RIGHT);
-		densityCellSizeTxt.setText("200");
+		densityCellSizeTxt.setText(Integer.toString(ACV.getSettings().getGuiSettings().getDensityCellSize()));
 		densityCellSizeTxt.setBounds(80, 40, 80, 20);
 		densityPanel.add(densityCellSizeTxt);
 		densityCellSizeTxt.setEditable(true);
@@ -708,6 +721,7 @@ public class NewAnalysis2 extends JDialog implements KeyListener, MouseListener 
 		project.setTimeout(time);
 		timer = analysisTime.getText();
 	}
+		System.out.println(timer);
 		return timer;
 	}
 	
@@ -763,8 +777,19 @@ public class NewAnalysis2 extends JDialog implements KeyListener, MouseListener 
 		 * is input is from file or streams
 		 */
 		if (rdbtnInputFromFile.isSelected() == true) {
-				project.setFile(filePath);
-				input = ta.getText();
+			String[] files = ta.getText().split("\n");
+			for (String file : files) {
+				project.setFile(file);
+			}
+			if (files.length > 1){
+				input = "Multiple files";
+			}else{
+
+				String[] chunks = files[0].split("\\\\");
+				final String filename = chunks[chunks.length - 1];
+				input = filename;
+			}
+
 		} else if (rdbtnInputFromStream.isSelected() == true) {
 				String[] ips = ta.getText().split("\n");
 				for (String ip : ips) {
@@ -803,23 +828,22 @@ public class NewAnalysis2 extends JDialog implements KeyListener, MouseListener 
 		
 	}
 
-
-
 	@Override
 	public void mouseClicked(MouseEvent e) {
-		if (e.getSource() == ta) {
-			if(rdbtnInputFromFile.isSelected() == true)
-			{
-			filePath = guiHelper.openAISFileDialog();
-			if(filePath != null)
-			{
-			String[] chunks = filePath.split("\\\\");
-			final String filename = chunks[chunks.length - 1];
-			ta.setText(filename);
-			btnNew.setEnabled(true);
-			}
-			}
-		}
+		
+//		if (e.getSource() == ta) {
+//			if(rdbtnInputFromFile.isSelected() == true)
+//			{
+//			filePath = guiHelper.openAISFileDialog();
+//			if(filePath != null)
+//			{
+//			String[] chunks = filePath.split("\\\\");
+//			final String filename = chunks[chunks.length - 1];
+//			ta.setText(filename);
+//			btnNew.setEnabled(true);
+//			}
+//			}
+//		}
 		
 	}
 
@@ -835,7 +859,30 @@ public class NewAnalysis2 extends JDialog implements KeyListener, MouseListener 
 
 	@Override
 	public void mouseReleased(MouseEvent e) {
-		// TODO Auto-generated method stub
+	System.out.println(e.getSource());
+		
+		if (e.getSource() == btnAddFile) {
+		if(rdbtnInputFromFile.isSelected() == true)
+		{
+		filePath = guiHelper.openAISFileDialog();
+		if(filePath != null)
+		{
+		String[] chunks = filePath.split("\\\\");
+		final String filename = chunks[chunks.length - 1];
+		String files = "";
+		if (!ta.getText().equals("")){
+			files = ta.getText() + " \n " + filename;	
+		}else{
+			files = filename;
+		}
+		
+		
+		ta.setText(filePath);
+		btnNew.setEnabled(true);
+		}
+		}
+	}
+		
 		
 	}
 
@@ -854,4 +901,6 @@ public class NewAnalysis2 extends JDialog implements KeyListener, MouseListener 
 		// TODO Auto-generated method stub
 		
 	}
+	
+	
 }

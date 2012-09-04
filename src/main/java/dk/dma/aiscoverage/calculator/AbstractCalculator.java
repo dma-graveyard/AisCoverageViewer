@@ -52,7 +52,7 @@ public abstract class AbstractCalculator implements Serializable {
 	/**
 	 * This is called by message handlers whenever a new message is received.
 	 */
-	public void processMessage(AisMessage aisMessage, String defaultID) {
+	public synchronized void processMessage(AisMessage aisMessage, String defaultID) {
 		
 		CustomMessage newMessage = aisToCustom(aisMessage, defaultID);
 		if(newMessage != null){
@@ -116,6 +116,7 @@ public abstract class AbstractCalculator implements Serializable {
 		CustomMessage firstMessage = customMessage.getShip().getFirstMessageInBuffer();
 		CustomMessage lastMessage = customMessage.getShip().getLastMessageInBuffer();
 		if(lastMessage != null){
+			projection.setCentralPoint(firstMessage.getLongitude(), firstMessage.getLatitude());
 			double distance = projection.distBetweenPoints(firstMessage.getLongitude(), firstMessage.getLatitude(), lastMessage.getLongitude(), lastMessage.getLatitude());
 			if(distance > 2000){
 //				System.out.println(distance);

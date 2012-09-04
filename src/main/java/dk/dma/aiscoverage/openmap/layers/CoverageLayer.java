@@ -1,14 +1,16 @@
 package dk.dma.aiscoverage.openmap.layers;
 
+import java.awt.AlphaComposite;
 import java.awt.Color;
-import java.util.ArrayList;
+import java.awt.Graphics2D;
+import java.awt.geom.Point2D;
+import java.awt.image.BufferedImage;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
 
+import com.bbn.openmap.event.ProjectionEvent;
 import com.bbn.openmap.layer.OMGraphicHandlerLayer;
 import com.bbn.openmap.omGraphics.OMGraphicList;
-import com.bbn.openmap.proj.coords.LatLonPoint;
+import com.bbn.openmap.omGraphics.OMRaster;
 
 import dk.dma.aiscoverage.calculator.CoverageCalculator;
 import dk.dma.aiscoverage.data.Cell;
@@ -26,39 +28,21 @@ public class CoverageLayer extends OMGraphicHandlerLayer implements Runnable, IP
 	private static final long serialVersionUID = 1L;
 	private OMGraphicList graphics = new OMGraphicList();
 	public boolean isRunning = false;
-	HashMap<String, GridPolygon> cellMap = new HashMap<String, GridPolygon>();
 	private int updateDelay;
 	private final int defaultUpdatedelay = 100;
 	private boolean updateOnce = true;
+	private OMRaster raster;
+	private boolean drawBorder = true;
 
+	
 	public void updateOnce() {
 		updateOnce = true;
+		updateDelay = 1;
 	}
-	public CoverageLayer(){
-		setRenderPolicy(new com.bbn.openmap.layer.policy.BufferedImageRenderPolicy());
-		
+	public CoverageLayer(){		
 		new Thread(this).start();
 		ProjectHandler.getInstance().addProjectHandlerListener(this);
-		
-	}
-	
-
-	
-	
-	private void updateCell(Cell cell){
-		double longSize = calc.getLongSize();
-		double latSize = calc.getLatSize();
-		List<LatLonPoint> polygon = new ArrayList<LatLonPoint>();
-
-		polygon.add(new LatLonPoint.Double(cell.getLatitude(), cell.getLongitude()));
-		polygon.add(new LatLonPoint.Double(cell.getLatitude(), cell.getLongitude() + longSize));
-		polygon.add(new LatLonPoint.Double(cell.getLatitude() + latSize, cell.getLongitude() + longSize));
-		polygon.add(new LatLonPoint.Double(cell.getLatitude() + latSize, cell.getLongitude()));
-
-		Color color = ColorGenerator.getCoverageColor(cell, calc.getHighThreshold(), calc.getLowThreshold());
-
-		GridPolygon g = new GridPolygon(polygon, color);
-		graphics.add(g);
+		doUpdate();
 	}
 
 	public void doUpdate() {
@@ -66,16 +50,51 @@ public class CoverageLayer extends OMGraphicHandlerLayer implements Runnable, IP
 		if(calc == null)
 			return;
 		
-		Collection<Cell> cells = calc.getCoverage();
-		if(cells == null) return;
-		
-		System.out.println("UPDATING coverage layer");
-
-		graphics.clear();
-		
-		for (Cell cell : cells) {
-			updateCell(cell);
+		BufferedImage bi = new BufferedImage(getProjection().getWidth(), getProjection().getHeight(), BufferedImage.TYPE_INT_ARGB); 
+		Graphics2D g = bi.createGraphics();
+		int width = getProjection().getWidth();
+		int height = getProjection().getHeight();
+//		System.out.println("start get map");
+		Collection<Cell> cs = calc.getCoverage();
+//		System.out.println("end get map");
+		for (Cell cell : cs) {
+			
+			//Convert lat lon coords to x-y pixel coords
+//		//Convert lat lon coords to x-y pixel coords
+			Point2D point1 = getProjection().forward(cell.getLatitude(), cell.getLongitude());
+			
+			
+			//If cell is visible in current projection, draw polygon
+			if(point1.getX() > 0 && point1.getX() < width){
+				if(point1.getY() > 0 && point1.getY() < height){
+					Point2D point2 = getProjection().forward(cell.getLatitude(), cell.getLongitude()+calc.getLongSize());
+					Point2D point3 = getProjection().forward(cell.getLatitude()-calc.getLatSize(), cell.getLongitude()+calc.getLongSize());
+					Point2D point4 = getProjection().forward(cell.getLatitude()-calc.getLatSize(), cell.getLongitude());
+					
+					//create arrays for polygon
+					int[] xPoints = {(int)Math.round(point1.getX()),(int) Math.round(point2.getX()),(int) Math.round(point3.getX()),(int)Math.round(point4.getX())};
+					int[] yPoints = {(int)Math.round(point1.getY()),(int)Math.round(point2.getY()),(int)Math.round(point3.getY()),(int)Math.round(point4.getY())};
+					int nPoints = 4;
+					
+					Color color = ColorGenerator.getCoverageColor(cell, calc.getHighThreshold(), calc.getLowThreshold());
+					g.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.5f));
+					g.setColor(color);
+					g.setBackground(color);
+					g.fillPolygon(xPoints, yPoints, nPoints);
+					if(drawBorder){
+						g.setColor(Color.BLACK);
+						g.drawPolygon(xPoints, yPoints, nPoints);
+					}
+				}
+			}
 		}
+
+//		System.out.println("end update");
+		raster = new OMRaster(0, 0, bi);		
+		graphics.clear();
+		graphics.add(raster);
+//		System.out.println("UPDATING coverage layer");
+this.
 		doPrepare();
 	}
 	
@@ -106,7 +125,7 @@ public class CoverageLayer extends OMGraphicHandlerLayer implements Runnable, IP
 				if(project != null){
 					this.calc = project.getCoverageCalculator();
 					if(calc != null){
-						if(updateOnce || (ProjectHandler.getInstance().getProject().isRunning() && isVisible()) ){
+						if((updateOnce && isVisible()) || (ProjectHandler.getInstance().getProject().isRunning() && isVisible()) ){
 							doUpdate();
 							updateOnce = false;
 						}
@@ -133,14 +152,24 @@ public class CoverageLayer extends OMGraphicHandlerLayer implements Runnable, IP
 		}else if(event.getEvent() == Event.PROJECT_LOADED){
 			updateOnce();
 		}
-	
 	}
+	
+	@Override
+	public void projectionChanged(ProjectionEvent e){
+		super.projectionChanged(e);
+		updateOnce = true;
+		updateDelay = 2;
+	}
+	
 	private void reset() {
-		cellMap.clear();
 		graphics.clear();
 		updateOnce = true;
 		updateDelay = 1;
 		
+	}
+	
+	public void setDrawBorder(boolean drawBorder) {
+		this.drawBorder = drawBorder;
 	}
 
 }

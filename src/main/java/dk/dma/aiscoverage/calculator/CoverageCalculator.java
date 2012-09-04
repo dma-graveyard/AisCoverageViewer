@@ -3,6 +3,7 @@ package dk.dma.aiscoverage.calculator;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import dk.dma.aiscoverage.data.BaseStation;
 import dk.dma.aiscoverage.data.Cell;
@@ -101,6 +102,7 @@ public class CoverageCalculator extends AbstractCalculator {
 		double p1Lon = m1.getLongitude();
 		double p2Lat = m2.getLatitude();
 		double p2Lon = m2.getLongitude();
+		projection.setCentralPoint(p1Lon,p1Lat);
 		double p1X = projection.lon2x(p1Lon, p1Lat);
 		double p1Y = projection.lat2y(p1Lon, p1Lat);
 		double p2X = projection.lon2x(p2Lon, p2Lat);
@@ -188,6 +190,36 @@ public class CoverageCalculator extends AbstractCalculator {
 			
 		}
 		return cells.values();
+	}
+	
+	/**
+	 * @return 
+	 * A combined coverage of cells from selected base stations.
+	 * If two base stations cover same area, the best coverage is chosen.
+	 * 
+	 * Consider optimizing?
+	 */
+	public Map<String, Cell> getCoverageMap() {
+		HashMap<String, Cell> cells = new HashMap<String, Cell>();
+		//For each base station
+		Collection<BaseStation> basestations = gridHandler.getBaseStations().values();
+		for (BaseStation basestation : basestations) {
+
+			if(basestation.isVisible()){
+				//For each cell
+				Collection<Cell> bscells = basestation.getGrid().values();
+				for (Cell cell : bscells) {
+					Cell existing = cells.get(cell.getId());
+					if(existing == null)
+						cells.put(cell.getId(), cell);
+					else
+						if(cell.getCoverage() > existing.getCoverage())
+							cells.put(cell.getId(), cell);
+				}
+			}
+			
+		}
+		return cells;
 	}
 	
 	
