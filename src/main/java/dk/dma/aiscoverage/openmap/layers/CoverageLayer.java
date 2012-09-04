@@ -39,7 +39,7 @@ public class CoverageLayer extends OMGraphicHandlerLayer implements Runnable, IP
 		updateOnce = true;
 		updateDelay = 1;
 	}
-	public CoverageLayer(){		
+	public CoverageLayer(){	
 		new Thread(this).start();
 		ProjectHandler.getInstance().addProjectHandlerListener(this);
 		doUpdate();
@@ -94,7 +94,7 @@ public class CoverageLayer extends OMGraphicHandlerLayer implements Runnable, IP
 		graphics.clear();
 		graphics.add(raster);
 //		System.out.println("UPDATING coverage layer");
-this.
+
 		doPrepare();
 	}
 	
@@ -158,7 +158,7 @@ this.
 	public void projectionChanged(ProjectionEvent e){
 		super.projectionChanged(e);
 		updateOnce = true;
-		updateDelay = 2;
+		updateDelay = 1;
 	}
 	
 	private void reset() {
