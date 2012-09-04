@@ -58,7 +58,7 @@ public class CoverageCalculator extends AbstractCalculator {
 			
 			if(timeDifference < 1800){
 				List<CustomMessage> buffer = message.getShip().getMessages();
-				double rotation = Math.abs( angleDiff((double)firstMessage.getCog(), (double)lastMessage.getCog()) );
+				double rotation = Math.abs( angleDiff(firstMessage.getCog(), lastMessage.getCog()) );
 				
 				//Ship is rotating
 				if(rotation > ((double)degreesPerMinute/60)*timeDifference){
@@ -117,7 +117,7 @@ public class CoverageCalculator extends AbstractCalculator {
 		if(timeSinceLastMessage > expectedTransmittingFrequency) {
 
 			// Number of missing points between the two points
-			missingMessages = (int) (Math.round((double)timeSinceLastMessage/(double)expectedTransmittingFrequency)-1);
+			missingMessages = (int) (Math.round(timeSinceLastMessage/expectedTransmittingFrequency)-1);
 
 			// Finds lat/lon of each missing point and adds "missing signal" to corresponding cell
 			for (int i = 1; i <= missingMessages; i++) {

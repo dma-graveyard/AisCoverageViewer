@@ -128,7 +128,7 @@ public class AnalysisPanel extends OMComponentPanel implements ActionListener, I
 		baseStationWrapperPanel.setLayout(new BorderLayout(0, 0));
 		
 		selectAllPanel = new JPanel();
-		selectAllPanel.setBorder(new MatteBorder(0, 0, 1, 0, (Color) UIManager.getColor("Button.shadow")));
+		selectAllPanel.setBorder(new MatteBorder(0, 0, 1, 0, UIManager.getColor("Button.shadow")));
 		FlowLayout flowLayout = (FlowLayout) selectAllPanel.getLayout();
 		flowLayout.setAlignment(FlowLayout.LEFT);
 		baseStationWrapperPanel.add(selectAllPanel, BorderLayout.NORTH);

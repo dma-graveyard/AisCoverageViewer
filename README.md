@@ -2,7 +2,7 @@
 
 ## Introduction ##
    
-The AIS Coverage Viewer is a stand-alone application used for analyizing
+The AIS Coverage Viewer is a stand-alone application used for analyzing
 AIS data and determining the strength of the signal in a given area   
    
 The application is in Java and uses OpenMap(tm) for presenting geospatial
@@ -93,7 +93,7 @@ following way.
 To use Eclipse as IDE just import project. Eclipse `.project` and settings files
 are included.
 
-Launch configuration `EeINS.launch` is included, so it is possible to run as Java 
+Launch configuration `AIS-Coverage-Viewer.launch` is included, so it is possible to run as Java 
 application from Eclipse. You will need to do a manual build before running.
 
 ## Contribution ##

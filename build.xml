@@ -21,7 +21,6 @@
 
 	<path id="compile.class.path">
 		<fileset dir="${extlib}" >
-			<exclude name="**/svnAnt/*"/>
 			<include name="**/*.jar"/>
 		</fileset>
 	</path>
@@ -53,15 +52,15 @@
 			<manifest>
 				<attribute name="Built-By" value="${user.name}" />
 
-				<attribute name="Main-Class" value="dk.frv.enav.acv.ACV" />
+				<attribute name="Main-Class" value="dk.dma.aiscoverage.acv.ACV" />
 				<attribute name="Class-Path" value=". lib/*"/>
-				<section name="dk/frv/enav/acv/">
+				<section name="dk/dma/aiscoverage/acv/">
 					<attribute name="Specification-Title" value="AIS Coverage Viewer (ACV)" />
 					<attribute name="Specification-Version" value="${version}" />
 					<attribute name="Specification-Vendor" value="Danish Maratime Authority" />
-					<attribute name="Package-Title" value="dk.frv.enav.acv" />
+					<attribute name="Package-Title" value="dk.dma.aiscoverage.acv" />
 					<attribute name="Package-Version" value="${version}" />
-					<attribute name="Package-Vendor" value="dk.frv.enav.acv" />
+					<attribute name="Package-Vendor" value="dk.dma.aiscoverage.acv" />
 					<attribute name="Package-Vendor-Id" value="DMA" />
 					<attribute name="Implementation-Version" value="${version}"/>
 				</section>
@@ -85,8 +84,7 @@
 	</target>
 
 	<target name="run" depends="dist">
-		<java classname="dk.frv.enav.acv.ACV" fork="true" dir="${distdir}" maxmemory="1024m">
-			<sysproperty key="java.library.path" value="navicon/native/" />
+		<java classname="dk.dma.aiscoverage.acv.ACV" fork="true" dir="${distdir}" maxmemory="1024m">
 			<jvmarg value="-Xmx1024M"/>
 			<jvmarg value="-Xms1024M"/>
 			<jvmarg value="-Xmn256M"/>
@@ -97,9 +95,7 @@
 				</fileset>
 			</classpath>
 		</java>
-	</target>
-
-	
+	</target>	
 
 	<target name="javadoc">
 		<mkdir dir="${javadoc.dir}" />
